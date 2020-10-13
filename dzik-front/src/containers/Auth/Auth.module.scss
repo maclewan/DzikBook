@@ -1,0 +1,28 @@
+.authContainer {
+    position: relative;
+    background: linear-gradient(120.64deg, rgba(#7ED56F,1) 0%, rgba(#219653,1) 58.13%);
+    height: 100vh;
+    width: 100vw;
+    img {
+        position: absolute;
+        z-index: 2;
+        padding: 1rem;
+        width: 20rem;
+    }
+}
+.authVideo { 
+    position: absolute;
+    top: 0;
+    left: 0; 
+    height: 100%;
+    width: 100%;
+    z-index: 1;
+    opacity: .15;
+    overflow: hidden;
+
+    .authVideoContent { 
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+    }
+}
