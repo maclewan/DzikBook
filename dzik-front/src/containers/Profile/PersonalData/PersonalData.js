@@ -74,17 +74,18 @@ const PersonalData = (props) => {
 
   const infoTypes = infoTypesList.map((type, id) => {
     return (
-      <li key={id} className={classes.infoType}>
+      <p key={id} className={classes.dataRow__type}>
         {type}
-      </li>
+      </p>
     );
   });
 
   const data = dataList.map((data, id) => {
     return (
-      <div key={id} className={classes.DataRow}>
+      <li key={id} className={classes.dataRow}>
+        {infoTypes[id]}
         <input
-          className={classes.DataRow__input}
+          className={classes.dataRow__input}
           readOnly={!variables[id][0]["editable"]}
           value={variables[id][0]["value"]}
           onChange={(event) => {
@@ -99,7 +100,7 @@ const PersonalData = (props) => {
         />
 
         <button
-          className={[classes.Button, classes.DataRow__button].join(" ")}
+          className={classes.dataRow__button}
           onClick={() => {
             const type = variables[id][0];
             const setType = variables[id][1];
@@ -121,7 +122,7 @@ const PersonalData = (props) => {
             variables[id][0]["buttonText"] // buttonText
           }
         </button>
-      </div>
+      </li>
     );
   });
 
@@ -133,13 +134,13 @@ const PersonalData = (props) => {
     <button className={classes.Button} onClick={updateData}>Submit changes</button>
   ) : null;
   return (
-    <React.Fragment>
-      <div className={classes.PersonalData}>
-        <ul className={classes.PersonalData__typesList}>{infoTypes}</ul>
-        <ul className={classes.PersonalData__dataList}>{data}</ul>
+    <div className={classes.background}>
+      <div className={classes.personalData}>
+        {/* <ul className={classes.personalData__typesList}>{infoTypes}</ul> */}
+        <ul className={classes.personalData__dataList}>{data}</ul>
       </div>
       {submitButton}
-    </React.Fragment>
+    </div>
   );
 };
 

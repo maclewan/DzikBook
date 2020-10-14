@@ -1,0 +1,65 @@
+.background {
+    background-color: pink;
+    width: 100vw;
+    height: 100vh;
+}
+
+.personalData {
+    padding: 1.5rem;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 35vw;
+    height: auto;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border: none;
+    border-radius: 10px;
+    // display: grid;
+    // grid-template-columns: 2fr 3fr;
+    // // grid-column-gap: 20px;
+    // grid-template-rows: 1fr;
+    align-items: start;
+    box-sizing: border-box;
+
+
+    &__typesList {
+        padding: 0;
+        list-style-type: none;
+        border-right: 1px solid #ccc;
+        display: grid;
+        grid-template-rows: repeat(6, 1fr);
+    }
+
+    &__dataList {
+        padding: 0;
+        padding-left: 1rem;
+        list-style-type: none;
+        width: 100%;
+        height: auto;
+        
+        .dataRow {
+            display: grid;
+            grid-template-columns: 2fr 2fr 1fr;
+
+            &:not(:last-child) {
+                margin-bottom: 2rem;
+            }
+
+            &__type {
+                font-weight: 500;
+            }
+
+            &__input {
+                padding: 0;
+                border: none;
+                border-bottom: 1px solid #ccc;
+            }
+
+            &__button {
+                width: 70%;
+                height: 50%;
+            }
+        }
+    }
+}
