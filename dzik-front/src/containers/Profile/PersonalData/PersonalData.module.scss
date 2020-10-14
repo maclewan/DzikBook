@@ -59,6 +59,7 @@
             &__button {
                 width: 70%;
                 height: 50%;
+                transition: transformY(30%);
             }
         }
     }
