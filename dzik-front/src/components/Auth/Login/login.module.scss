@@ -1,67 +1,21 @@
-.loginContainer { 
-    background-color: white;
-    position: absolute;
-    top: 50%; 
-    transform: translateY(-50%);
-    right: 10%;
-    width: 30vw;
-    height: 75vh;
-    border-radius: 10px;
-    overflow: hidden;
-    z-index: 2;
-    opacity: .85;
-    box-shadow: 0px 20px 40px rgba(0, 0, 0, 0.25);
-    p { 
-        text-align: center;
+.notRegistered {
+    font-size: 1rem;
+    font-family: 'PT Sans', sans-serif;
+    text-align: center;
+    width: 100%;
+    margin-top: 1rem;
+
+
+    p {
+        margin: 0 auto;
+        width: 100%;
+        padding: 0;
     }
 }
 
-.loginForm { 
-    input { 
-        outline: none;
-        border: none; 
-        
-        font-family: 'PT Sans', sans-serif;
-        // font-family: 'PT Sans Narrow', sans-serif;
-
-        font-weight: 500;
-        background-color: white;
-        font-size: 1.5rem;
-        display: block;
-        margin: 2rem auto;
-        padding: .4rem;
-        width: 75%;
-        border: .1rem solid rgba(92, 91, 91, 0.548);
-        border-radius: 4px;
-        &:first-of-type { 
-            margin-top: 3.5rem;
-        }
-        // transition: all .2s ease-in-out;
-        &:invalid { 
-            // border-bottom: 2px solid red;
-        }
-        &:valid { 
-            // border-bottom: 2px solid #55C57A;
-        }
-        &:focus, &:active { 
-            // border-bottom: 2px solid #55C57A;
-        }
-        
-    }
-
-}
-
-.loginButton {
-    outline: none;
-    cursor: pointer;
-    border: none; 
-    color: white;
-    background-color: #55C57A;
-    font-size: 2rem;
-    display: block;
-    margin: 2rem auto;
-    padding: .5rem;
-    width: 65%;
-    border-radius: 10px;
-    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.15);
+.buttonRegister {
+    font-size: 1.1rem;
+    text-decoration: none;
+    color: #55C57A;
+    font-weight: 700;
 }

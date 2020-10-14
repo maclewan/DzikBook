@@ -9,6 +9,11 @@ const Auth = () => {
   return (
     <div className={classes.authContainer}>
         <img src={logo} alt="dziklogo" />
+        <div className={classes.textContainer}>
+          <p>Ćwicz.</p>
+          <p>Rośnij.</p>
+          <p>Dzikuj.</p>
+        </div>
         <div class={classes.authVideo}>
           <video class={classes.authVideoContent} autoPlay  muted loop>
             <source src={video} type="video/mp4" />
