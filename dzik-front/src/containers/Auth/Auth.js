@@ -17,8 +17,8 @@ const Auth = () => {
           <p>Rośnij.</p>
           <p>Dzikuj.</p>
         </div>
-        <div class={classes.authVideo}>
-          <video class={classes.authVideoContent} autoPlay  muted loop>
+        <div className={classes.authVideo}>
+          <video className={classes.authVideoContent} autoPlay  muted loop>
             <source src={video1} type="video/mp4" />
             <source src={video2} type="video/webm" />
             Your browser is not supported!

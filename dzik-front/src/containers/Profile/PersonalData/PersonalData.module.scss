@@ -40,10 +40,10 @@
         
         .dataRow {
             display: grid;
-            grid-template-columns: 2fr 2fr 1fr;
+            grid-template-columns: 3fr 4fr 2fr;
 
             &:not(:last-child) {
-                margin-bottom: 2rem;
+                margin-bottom: .5rem;
             }
 
             &__type {
@@ -51,15 +51,29 @@
             }
 
             &__input {
-                padding: 0;
+                height: 1.5rem;
+                width: 90%;
                 border: none;
                 border-bottom: 1px solid #ccc;
+                border-radius: 3px;
+                font-size: 1rem;
+                position: relative;
+                top: 50%;
+                transform: translateY(-50%);
+                
             }
 
             &__button {
-                width: 70%;
+                border: none;
+                width: 60%;
                 height: 50%;
-                transition: transformY(30%);
+                position: relative;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: white;
+                background-color: #55C57A;
+                border-radius: 5px;
             }
         }
     }

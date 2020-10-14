@@ -36,31 +36,37 @@ const PersonalData = (props) => {
     editable: false,
     value: dataList[0],
     buttonText: "Edytuj",
+    type: 'text',
   });
   const [username, setUsername] = useState({
     editable: false,
     value: dataList[1],
     buttonText: "Edytuj",
+    type: 'text',
   });
   const [email, setEmail] = useState({
-    editable: editEmail,
+    editable: editEmail(),
     value: dataList[2],
     buttonText: "Edytuj",
+    type: 'email',
   });
   const [homeAddress, setHomeAddress] = useState({
     editable: false,
     value: dataList[3],
     buttonText: "Edytuj",
+    type: 'text',
   });
   const [gymAddress, setGymAddress] = useState({
     editable: false,
     value: dataList[4],
     buttonText: "Edytuj",
+    type: 'text',
   });
   const [password, setPassword] = useState({
-    editable: editPassword,
+    editable: editPassword(),
     value: dataList[5],
     buttonText: "Edytuj",
+    type: 'password',
   });
 
   const variables = [
@@ -88,6 +94,7 @@ const PersonalData = (props) => {
           className={classes.dataRow__input}
           readOnly={!variables[id][0]["editable"]}
           value={variables[id][0]["value"]}
+          type={variables[id][0]['type']}
           onChange={(event) => {
             const type = variables[id][0];
             const value = event.target.value;
@@ -110,6 +117,9 @@ const PersonalData = (props) => {
             if (editable === true || editable === false) {
               buttonText = editable ? "Edytuj" : "Zapisz";
               editable = !type["editable"];
+            }
+            else {
+              editable()
             }
             setType({
               ...type,
