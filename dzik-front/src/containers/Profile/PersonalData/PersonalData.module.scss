@@ -1,5 +1,5 @@
 .background {
-    background-color: pink;
+    background-color: lightblue;
     width: 100vw;
     height: 100vh;
 }
@@ -51,20 +51,21 @@
             }
 
             &__input {
+                // box-shadow: 2px 3px 5px rgba($color: #000000, $alpha: .2);
                 height: 1.5rem;
                 width: 90%;
                 border: none;
                 border-bottom: 1px solid #ccc;
-                border-radius: 3px;
+                border-radius: 5px;
                 font-size: 1rem;
                 position: relative;
                 top: 50%;
                 transform: translateY(-50%);
-                
             }
 
             &__button {
                 border: none;
+                box-shadow: 2px 3px 5px rgba($color: #000000, $alpha: .2);
                 width: 60%;
                 height: 50%;
                 position: relative;
@@ -77,4 +78,36 @@
             }
         }
     }
+}
+
+.readOnly {
+    cursor: default;
+
+    &:active,
+    &:focus {
+        outline: none;
+    }
+    // background-color: #f0f0f0;
+}
+
+.readWrite {
+    cursor: text;
+    // outline: none;
+    &:active, &:focus {
+        outline: none;
+        border-bottom: 2px solid #55C57A;
+        box-shadow: 1px 2px 5px rgba($color: #000000, $alpha: .2);
+        // caret-color: #55C57A;
+    }
+}
+
+.submitButton {
+    display: block;
+    margin: 1.5rem auto;
+    border: none;
+    box-shadow: 2px 3px 5px rgba($color: #000000, $alpha: .2);
+    height: 2.5rem;
+    color: white;
+    background-color: #55C57A;
+    border-radius: 5px;
 }

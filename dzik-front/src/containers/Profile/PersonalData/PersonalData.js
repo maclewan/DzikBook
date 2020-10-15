@@ -20,53 +20,51 @@ const PersonalData = (props) => {
     "Hasło",
   ];
 
-  const editEmail = () => {
-    // send email with link enabling email change
-    return false;
-  };
-
-  const editPassword = () => {
-    // send email with link enabling password change
-    return false;
+  const changeSensData = (link) => {
+    // exec link to change password/email
+    console.log(link)
+    return 0;
   };
 
   const [dataEdited, setDataEdited] = useState(false);
-
+  
   const [name, setName] = useState({
     editable: false,
     value: dataList[0],
     buttonText: "Edytuj",
-    type: 'text',
+    type: "text",
   });
   const [username, setUsername] = useState({
     editable: false,
     value: dataList[1],
     buttonText: "Edytuj",
-    type: 'text',
+    type: "text",
   });
   const [email, setEmail] = useState({
-    editable: editEmail(),
+    editable: false,
     value: dataList[2],
     buttonText: "Edytuj",
-    type: 'email',
+    type: "email",
+    link: 'link to change email'
   });
   const [homeAddress, setHomeAddress] = useState({
     editable: false,
     value: dataList[3],
     buttonText: "Edytuj",
-    type: 'text',
+    type: "text",
   });
   const [gymAddress, setGymAddress] = useState({
     editable: false,
     value: dataList[4],
     buttonText: "Edytuj",
-    type: 'text',
+    type: "text",
   });
   const [password, setPassword] = useState({
-    editable: editPassword(),
+    editable: false,
     value: dataList[5],
     buttonText: "Edytuj",
-    type: 'password',
+    type: "password",
+    link: 'link to change password'
   });
 
   const variables = [
@@ -87,14 +85,18 @@ const PersonalData = (props) => {
   });
 
   const data = dataList.map((data, id) => {
+    const inputClasses = variables[id][0]["editable"]
+      ? [classes.dataRow__input, classes.readWrite]
+      : [classes.dataRow__input, classes.readOnly];
+
     return (
       <li key={id} className={classes.dataRow}>
         {infoTypes[id]}
         <input
-          className={classes.dataRow__input}
+          className={inputClasses.join(" ")}
           readOnly={!variables[id][0]["editable"]}
           value={variables[id][0]["value"]}
-          type={variables[id][0]['type']}
+          type={variables[id][0]["type"]}
           onChange={(event) => {
             const type = variables[id][0];
             const value = event.target.value;
@@ -105,22 +107,34 @@ const PersonalData = (props) => {
             setDataEdited(true);
           }}
         />
-
         <button
           className={classes.dataRow__button}
-          onClick={() => {
+          onClick={(event) => {
             const type = variables[id][0];
             const setType = variables[id][1];
             let editable = type["editable"];
             let buttonText = type["buttonText"];
 
-            if (editable === true || editable === false) {
-              buttonText = editable ? "Edytuj" : "Zapisz";
-              editable = !type["editable"];
+            const input = event.target.closest('li').querySelector('input')
+            input.focus()
+
+            if(type.hasOwnProperty('link')) {
+              changeSensData(type['link'])
+              editable = false;
+              input.blur();
             }
             else {
-              editable()
+              if (editable) {
+                buttonText = 'Edytuj'
+                input.blur();
+              }
+              else {
+                buttonText = 'Zapisz'
+                input.focus();
+              }
+              editable = !type["editable"];
             }
+
             setType({
               ...type,
               editable: editable,
@@ -138,18 +152,21 @@ const PersonalData = (props) => {
 
   const updateData = () => {
     // post updated data to database
-  }
+    console.log('send post to backend with updated data')
+  };
 
   const submitButton = dataEdited ? (
-    <button className={classes.Button} onClick={updateData}>Submit changes</button>
+    <button className={classes.submitButton} onClick={updateData}>
+      Submit changes
+    </button>
   ) : null;
   return (
     <div className={classes.background}>
       <div className={classes.personalData}>
         {/* <ul className={classes.personalData__typesList}>{infoTypes}</ul> */}
         <ul className={classes.personalData__dataList}>{data}</ul>
-      </div>
-      {submitButton}
+        {submitButton}
+      </div>    
     </div>
   );
 };
