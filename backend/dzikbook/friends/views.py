@@ -15,7 +15,6 @@ class SigInUserFriendsInvitationsView(APIView):
         context = {'message':'Invitation successfully send.'}
         return Response(context)
 
-    # TODO: może request_id?
     def delete(self, request, user_id):
         context = {'message':'Invitation successfully canceled.'}
         return Response(context)
@@ -24,7 +23,7 @@ class SigInUserInvitationsSendView(APIView):
 
     def get(self, request):
         invitations_list = []
-        context = {'invitations list':invitations_list}
+        context = {'invitations_list':invitations_list}
         return Response(context)
 
 class InvitationsManagementView(APIView):
@@ -38,20 +37,22 @@ class InvitationsManagementView(APIView):
         context = {'message':'Invitation successfully rejected.'}
         return Response(context)
 
-# TODO: zmień nazwę, koniecznie
-class SigInUserAreYouFriendsView(APIView):
+class SigInUserFriendInfo(APIView):
     def get(self, request, user_id):
-        context = {'message':'Yes.'}
+        context = {
+            'relation':'Friends',
+            'request_id': '5',
+            }
         return Response(context)
 
 class SigInUserFriendsView(APIView):
     def get(self, request):
         friends_list = []
-        context = {'friends list':friends_list}
+        context = {'friends_list':friends_list}
         return Response(context)
 
 class FriendsView(APIView):
     def get(self, request, user_id):
         friends_list = []
-        context = {'friends list':friends_list}
+        context = {'friends_list':friends_list}
         return Response(context)

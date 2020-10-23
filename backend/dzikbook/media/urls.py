@@ -5,8 +5,7 @@ from .views import (
     ProfilePhotoView,
     SigInUserProfilePhotoView
 )
-# TODO: zmieniłem media_id na photo_id
-# TODO: zamiast set profile photo mamy typ metody post
+
 urlpatterns = [
     path('photo/', PhotoManagementView.as_view(), name='upload_photo'),
     path('photo/<int:photo_id>/', PhotoManagementView.as_view(), name='photo_management'),

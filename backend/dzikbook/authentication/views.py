@@ -3,7 +3,6 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 # Create your views here.
-# TODO: View vs ApiView
 
 class RegisterView(APIView):
 
@@ -12,7 +11,7 @@ class RegisterView(APIView):
         context = {'message': 'Successfully registered'}
         return Response(context)
 
-# TODO: 
+# TODO: do usunięcia
 class LoginView(APIView):
 
     pass

@@ -8,17 +8,8 @@ class PhotoManagementView(APIView):
 
     def post(self, request):
         context = {
-            'photo id':'5',
+            'photo_id':'5',
             'message':'Photo uploaded successfully.'
-        }
-        return Response(context)
-    
-    # TODO: czy to jest nam potrzebne?
-    def put(self, request, photo_id):
-        photo = None
-        context = {
-            'photo id':'5',
-            'message':'Photo updated successfully.'
         }
         return Response(context)
     
@@ -31,17 +22,8 @@ class VideoManagementView(APIView):
     
     def post(self, request):
         context = {
-            'video id':'5',
+            'video_id':'5',
             'message':'Video uploaded successfully.'
-        }
-        return Response(context)
-    
-    # TODO: czy to jest nam potrzebne?
-    def put(self, request, video_id):
-        video = None
-        context = {
-            'video id':'5',
-            'message':'Video updated successfully.'
         }
         return Response(context)
     
@@ -54,7 +36,7 @@ class SigInUserProfilePhotoView(APIView):
     
     def post(self, request):
         context = {
-            'photo id':'5',
+            'photo_id':'5',
             'message':'Profile photo uploaded successfully.'
         }
         return Response(context)
