@@ -12,10 +12,10 @@ class SignedInUserDataView(APIView):
         return Response(context)
     
     def post(self, request):
-        
         user_data = None
         context = {'message':'Data successfully updated'}
         return Response(context)
+
 
 class UserDataView(APIView):
 
@@ -23,6 +23,7 @@ class UserDataView(APIView):
         user_data = None
         context = {'user_data':user_data}
         return Response(context)
+
 
 class SearchView(APIView):
     

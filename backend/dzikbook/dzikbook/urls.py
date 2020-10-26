@@ -22,10 +22,8 @@ urlpatterns = [
     path('auth/', include('authentication.urls')),
     path('users/', include('users.urls')),
     path('friends/', include('friends.urls')),
-    path('media/', include('media.urls'))
-]
-"""
+    path('media/', include('media.urls')),
     path('wall/', include('wall.urls')),
     path('socials/', include('socials.urls')),
-    path('notifications', include('notifications.urls'))
-    """
+    path('notifications/', include('notifications.urls'))
+]
