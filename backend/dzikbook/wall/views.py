@@ -14,7 +14,7 @@ class SigInUserPostsView(APIView):
 	        'media': media_object
             }
         return Response(context)
-    # TODO: ten post jest na innym url
+    
     def post(self, request):
         context = {
             'post_id': '5',

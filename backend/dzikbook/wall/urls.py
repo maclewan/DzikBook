@@ -6,7 +6,6 @@ from .views import (
 )
 
 urlpatterns = [
-
     path('post/<int:post_id>/', SigInUserPostsView.as_view(), name='sig_in_user_posts'),
     path('post/', SigInUserPostsView.as_view(), name='sig_in_user_add_post'),
     path('', SigInUserPostsListView.as_view(), name='sig_in_user_posts_list'),
