@@ -11,5 +11,6 @@ class Comment(models.Model):
 
 
 class Reaction(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    # post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    post = models.IntegerField()
     giver = models.ForeignKey(User, on_delete=models.CASCADE)

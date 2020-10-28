@@ -7,10 +7,47 @@ from django.http import QueryDict
 from .models import Comment, Reaction
 from django.db import models
 from rest_framework.permissions import IsAuthenticated
-from .serializers import CommentSerializer
+from .serializers import CommentSerializer, ReactionSerializer
 
 
 # create your views here
+
+class ReactionsView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, post_id):
+        try:
+            reactions_list = Reaction.objects.filter(post=post_id)
+            context = ReactionSerializer(reactions_list, many=True).data
+        except:
+            return Response("Error during reading reactions!", status=status.HTTP_404_NOT_FOUND)
+        return Response(context)
+
+    def post(self, request, post_id):
+        print('POST REACTION')
+        try:
+            if Reaction.objects.filter(post=post_id, giver=request.user).exists():
+                return Response("Reaction already exists!", status=status.HTTP_404_NOT_FOUND)
+            data = {
+                "giver": request.user,
+                "post": post_id,
+            }
+            reaction_serializer = ReactionSerializer()
+            reaction = reaction_serializer.create(validated_data=data)
+            reaction.save()
+            return Response(ReactionSerializer(reaction).data)
+        except Exception as e:
+            print(e)
+            return Response("Error!", status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request, post_id):
+        try:
+            reaction = Reaction.objects.filter(post=post_id, giver=request.user)
+            reaction.delete()
+            return Response({"message": "Reaction deleted"})
+        except models.ObjectDoesNotExist:
+            return Response("Reaction doesn't exist!", status=status.HTTP_404_NOT_FOUND)
+
 
 class CommentsView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -20,7 +57,7 @@ class CommentsView(APIView):
             comments_list = Comment.objects.filter(post=post_id)
             context = CommentSerializer(comments_list, many=True).data
         except:
-            return Response("Error during posting a comment!", status=status.HTTP_404_NOT_FOUND)
+            return Response("Error during loading a comment!", status=status.HTTP_404_NOT_FOUND)
         return Response(context)
 
     def post(self, request, post_id):
@@ -35,7 +72,7 @@ class CommentsView(APIView):
             comment.save()
             return Response(CommentSerializer(comment).data)
         except:
-            return Response("Error!", status=status.HTTP_404_NOT_FOUND)
+            return Response("Error during posting a comment!", status=status.HTTP_404_NOT_FOUND)
 
     def delete(self, request, comment_id):
         try:
@@ -45,7 +82,6 @@ class CommentsView(APIView):
         except models.ObjectDoesNotExist:
             return Response("Comment doesn't exist!", status=status.HTTP_404_NOT_FOUND)
 
-    # TODO: Put zmieniona ścieżka
     def put(self, request, comment_id):
         try:
             comment = Comment.objects.get(pk=comment_id, author=request.user)
@@ -57,19 +93,3 @@ class CommentsView(APIView):
             return Response(CommentSerializer(comment).data)
         except models.ObjectDoesNotExist:
             return Response("Comment doesn't exist!", status=status.HTTP_404_NOT_FOUND)
-
-
-class ReactionsView(APIView):
-
-    def get(self, request, post_id):
-        reactions_list = []
-        context = {'reactions_list': reactions_list}
-        return Response(context)
-
-    def post(self, request, post_id):
-        context = {'message': 'Reaction successdully added.'}
-        return Response(context)
-
-    def delete(self, request, post_id):
-        context = {'message': 'Reaction successfully deleted.'}
-        return Response(context)
