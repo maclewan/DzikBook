@@ -16,7 +16,6 @@ urlpatterns = [
     path('<int:user_id>/', SigInUserFriendInfo.as_view(), name='are_you_friends'),
     path('list/', SigInUserFriendsView.as_view(), name='sig_in_user_friends'),
     path('list/<int:user_id>/', FriendsView.as_view(), name='friends')
-
 ]
 
 
