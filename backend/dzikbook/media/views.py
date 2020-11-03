@@ -7,6 +7,7 @@ from .decorators import authenticate
 
 
 class PhotoManagementView(APIView):
+    authentication_classes = []
 
     @authenticate
     def post(self, request):
@@ -24,6 +25,7 @@ class PhotoManagementView(APIView):
 
 
 class VideoManagementView(APIView):
+    authentication_classes = []
 
     @authenticate
     def post(self, request):
@@ -41,6 +43,7 @@ class VideoManagementView(APIView):
 
 
 class SigInUserProfilePhotoView(APIView):
+    authentication_classes = []
 
     @authenticate
     def post(self, request):
@@ -61,6 +64,7 @@ class SigInUserProfilePhotoView(APIView):
 
 
 class ProfilePhotoView(APIView):
+    authentication_classes = []
 
     @authenticate
     def get(self, request, user_id):

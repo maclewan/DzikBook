@@ -34,7 +34,7 @@ class SignedInUserDataView(APIView):
 
 
 class UserDataView(APIView):
-
+    authentication_classes = []
     @authenticate
     def get(self, request, id):
         user_data = None
@@ -43,6 +43,7 @@ class UserDataView(APIView):
 
 
 class SearchView(APIView):
+    authentication_classes = []
 
     @authenticate
     def get(self, request):

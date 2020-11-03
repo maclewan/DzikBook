@@ -8,6 +8,7 @@ from .decorators import authenticate
 
 
 class SigInUserFriendsInvitationsView(APIView):
+    authentication_classes = []
 
     @authenticate
     def get(self, request):
@@ -27,6 +28,7 @@ class SigInUserFriendsInvitationsView(APIView):
 
 
 class SigInUserInvitationsSendView(APIView):
+    authentication_classes = []
 
     @authenticate
     def get(self, request):
@@ -36,6 +38,7 @@ class SigInUserInvitationsSendView(APIView):
 
 
 class InvitationsManagementView(APIView):
+    authentication_classes = []
 
     @authenticate
     def post(self, request, invitation_id):
@@ -49,6 +52,8 @@ class InvitationsManagementView(APIView):
 
 
 class SigInUserFriendInfo(APIView):
+    authentication_classes = []
+
     @authenticate
     def get(self, request, user_id):
         context = {
@@ -59,6 +64,8 @@ class SigInUserFriendInfo(APIView):
 
 
 class SigInUserFriendsView(APIView):
+    authentication_classes = []
+
     @authenticate
     def get(self, request):
         friends_list = []
@@ -67,6 +74,8 @@ class SigInUserFriendsView(APIView):
 
 
 class FriendsView(APIView):
+    authentication_classes = []
+
     @authenticate
     def get(self, request, user_id):
         friends_list = []

@@ -7,6 +7,7 @@ from .decorators import authenticate
 
 
 class SigInUserPostsView(APIView):
+    authentication_classes = []
 
     @authenticate
     def get(self, request, post_id):
@@ -41,6 +42,7 @@ class SigInUserPostsView(APIView):
 
 
 class SigInUserPostsListView(APIView):
+    authentication_classes = []
 
     @authenticate
     def get(self, request):
@@ -51,6 +53,7 @@ class SigInUserPostsListView(APIView):
 
 
 class PostsListView(APIView):
+    authentication_classes = []
 
     @authenticate
     def get(self, request, user_id):

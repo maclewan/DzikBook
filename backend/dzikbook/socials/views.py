@@ -8,6 +8,7 @@ from .decorators import authenticate
 
 
 class CommentsView(APIView):
+    authentication_classes = []
 
     @authenticate
     def get(self, request, post_id):
@@ -36,6 +37,8 @@ class CommentsView(APIView):
 
 
 class ReactionsView(APIView):
+    authentication_classes = []
+
     @authenticate
     def get(self, request, post_id):
         reactions_list = []
