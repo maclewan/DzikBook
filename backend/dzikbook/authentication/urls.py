@@ -8,15 +8,15 @@ from rest_framework_simplejwt.views import (
 from django.urls import path
 from .views import (
     RegisterView,
-    ResetPasswordView,
-    DeleteAccountView
+    ValidateUserView,
+    DeleteAccountView, LogoutPossibleTokenObtainPairView
 )
 
 # TODO: /account zamiast /delete
 urlpatterns = [
 
     #done
-    path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('login/', LogoutPossibleTokenObtainPairView.as_view(), name='token_obtain_pair'),
     #done
     path('login/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     #done
@@ -28,7 +28,11 @@ urlpatterns = [
     path('reset/done/', PasswordChangeDoneView.as_view(), name='password_reset_done'),
     path('reset/complete/$', PasswordResetCompleteView.as_view(), name='password_reset_complete'),
 
-    path('delete/', DeleteAccountView.as_view(), name='delete_account')
+    #todo
+    path('delete/', DeleteAccountView.as_view(), name='delete_account'),
+
+    #todo
+    path('validate/', ValidateUserView.as_view(), name='validate_user')
 
 
 ]

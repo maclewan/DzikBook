@@ -1,8 +1,10 @@
-
 from django.contrib.auth.models import User
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import RegisterSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+from .serializers import RegisterSerializer, LogoutPossibleTokenObtainPairSerializer
 
 
 # Create your views here.
@@ -33,12 +35,6 @@ class RegisterView(APIView):
             return Response({str(e)})
 
 
-
-# TODO: do usunięcia
-class LoginView(APIView):
-    pass
-
-
 class ResetPasswordView(APIView):
 
     def post(self, request):
@@ -51,3 +47,16 @@ class DeleteAccountView(APIView):
     def delete(self, request):
         context = {'message': 'Account successfully deleted.'}
         return Response(context)
+
+
+class LogoutPossibleTokenObtainPairView(TokenObtainPairView):
+    serializer_class = LogoutPossibleTokenObtainPairSerializer
+
+
+class ValidateUserView(APIView):
+    permission_classes = [IsAuthenticated, ]
+
+    def get(self, request):
+        return Response({
+            'detail': "true"
+        })

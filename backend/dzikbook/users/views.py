@@ -1,33 +1,28 @@
+import requests
 from django.shortcuts import render
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
+from .decorators import authenticate
 from .models import UserData
 
 
 # create your views here
 
 class SignedInUserDataView(APIView):
-    #permission_classes = (IsAuthenticated,)
     """
     Get this user data
     """
-    def get(self, request):
-        # user_data = UserData.objects.filter(user = )
-        jwt_object = JWTAuthentication()
-        token = request.headers.get('Token')
-        validated_token = jwt_object.get_validated_token(token)
-        user = jwt_object.get_user(validated_token)
-        print(user)
 
-        if not request.user.is_authenticated:
-            print("HAHAHAHAHAHAHAH nie.")
+    @authenticate
+    def get(self, request):
 
         context = {
             'username': request.user.id,
-            'name': str(request)
+
+
         }
         return Response(context)
 
