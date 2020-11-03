@@ -10,11 +10,15 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import CommentSerializer, ReactionSerializer
 
 
+
 # create your views here
+from .decorators import authenticate
+
 
 class ReactionsView(APIView):
     authentication_classes = []
 
+    @authenticate
     def get(self, request, post_id):
         try:
             reactions_list = Reaction.objects.filter(post=post_id)
@@ -23,6 +27,7 @@ class ReactionsView(APIView):
             return Response("Error during reading reactions!", status=status.HTTP_404_NOT_FOUND)
         return Response(context)
 
+    @authenticate
     def post(self, request, post_id):
         try:
             if Reaction.objects.filter(post=post_id, giver=request.user).exists():
@@ -59,6 +64,7 @@ class CommentsView(APIView):
             return Response("Error during loading a comment!", status=status.HTTP_404_NOT_FOUND)
         return Response(context)
 
+    @authenticate
     def post(self, request, post_id):
         try:
             data = {
