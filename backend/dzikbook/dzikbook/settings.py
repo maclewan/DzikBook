@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 import datetime
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -146,5 +147,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+MEDIA_ROOT =  os.path.join(BASE_DIR, 'storage') 
+MEDIA_URL = '/storage/'
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 1025
