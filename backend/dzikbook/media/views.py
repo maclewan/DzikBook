@@ -3,58 +3,70 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 # create your views here
+from .decorators import authenticate
+
 
 class PhotoManagementView(APIView):
 
+    @authenticate
     def post(self, request):
         context = {
-            'photo_id':'5',
-            'message':'Photo uploaded successfully.'
+            'photo_id': '5',
+            'message': 'Photo uploaded successfully.'
         }
         return Response(context)
-    
+
+    @authenticate
     def delete(self, request, photo_id):
         photo = None
-        context = {'message':'Photo deleted successfully.'}
+        context = {'message': 'Photo deleted successfully.'}
         return Response(context)
+
 
 class VideoManagementView(APIView):
-    
+
+    @authenticate
     def post(self, request):
         context = {
-            'video_id':'5',
-            'message':'Video uploaded successfully.'
+            'video_id': '5',
+            'message': 'Video uploaded successfully.'
         }
-        return Response(context)
-    
-    def delete(self, request, video_id):
-        video = None
-        context = {'message':'Video deleted successfully.'}
         return Response(context)
 
+    @authenticate
+    def delete(self, request, video_id):
+        video = None
+        context = {'message': 'Video deleted successfully.'}
+        return Response(context)
+
+
 class SigInUserProfilePhotoView(APIView):
-    
+
+    @authenticate
     def post(self, request):
         context = {
-            'photo_id':'5',
-            'message':'Profile photo uploaded successfully.'
+            'photo_id': '5',
+            'message': 'Profile photo uploaded successfully.'
         }
         return Response(context)
-    
+
+    @authenticate
     def get(self, request):
         photo = None
         context = {
-            'photo':photo,
-            'description':'Looking great!'
+            'photo': photo,
+            'description': 'Looking great!'
         }
         return Response(context)
 
+
 class ProfilePhotoView(APIView):
 
+    @authenticate
     def get(self, request, user_id):
         photo = None
         context = {
-            'photo':photo,
-            'description':''
+            'photo': photo,
+            'description': ''
         }
         return Response(context)

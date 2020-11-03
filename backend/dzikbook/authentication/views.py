@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .serializers import RegisterSerializer, LogoutPossibleTokenObtainPairSerializer
@@ -57,6 +58,12 @@ class ValidateUserView(APIView):
     permission_classes = [IsAuthenticated, ]
 
     def get(self, request):
+        try:
+            valid_token = AccessToken(request.headers['Authorization'].split(" ")[-1])
+            user_id = valid_token.payload['user_id']
+        except:
+            user_id = -1
+
         return Response({
-            'detail': "true"
+            'user_id': user_id
         })

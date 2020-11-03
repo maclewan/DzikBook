@@ -11,10 +11,12 @@ from .models import UserData
 
 # create your views here
 
+
 class SignedInUserDataView(APIView):
     """
     Get this user data
     """
+    authentication_classes = []
 
     @authenticate
     def get(self, request):
@@ -24,6 +26,7 @@ class SignedInUserDataView(APIView):
         }
         return Response(context)
 
+    @authenticate
     def post(self, request):
         user_data = None
         context = {'message': 'Data successfully updated'}
@@ -32,6 +35,7 @@ class SignedInUserDataView(APIView):
 
 class UserDataView(APIView):
 
+    @authenticate
     def get(self, request, id):
         user_data = None
         context = {'user_data': user_data}
@@ -40,6 +44,7 @@ class UserDataView(APIView):
 
 class SearchView(APIView):
 
+    @authenticate
     def get(self, request):
         print(request.GET)
         users_list = []

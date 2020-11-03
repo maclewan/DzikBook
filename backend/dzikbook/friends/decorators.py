@@ -1,7 +1,6 @@
 import requests
 from rest_framework.response import Response
 from django.contrib.auth.models import User
-from rest_framework_simplejwt.tokens import AccessToken
 
 
 def authenticate(f):
