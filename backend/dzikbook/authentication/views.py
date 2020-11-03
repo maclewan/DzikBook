@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -58,12 +59,10 @@ class ValidateUserView(APIView):
     permission_classes = [IsAuthenticated, ]
 
     def get(self, request):
-        try:
-            valid_token = AccessToken(request.headers['Authorization'].split(" ")[-1])
-            user_id = valid_token.payload['user_id']
-        except:
-            user_id = -1
+        if hasattr(request.user, 'pk'):
+            return Response({
+                'user_id': request.user.pk
+            })
+        else:
+            Response("User doesnt exist!", status=status.HTTP_404_NOT_FOUND) #this should never happen
 
-        return Response({
-            'user_id': user_id
-        })
