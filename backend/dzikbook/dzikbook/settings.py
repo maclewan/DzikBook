@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-
+import datetime
 from pathlib import Path
 import os
 
@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'authentication',
     'friends',
     'media',
@@ -50,9 +51,19 @@ INSTALLED_APPS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'authentication.authentication.MyJWTAuthentication',
     )
 }
+
+# JWT lib
+JWT_AUTH = {
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=25),
+    'JWT_ALLOW_REFRESH': True,
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=30),
+    'ROTATE_REFRESH_TOKENS': True,
+
+}
+
 
 
 MIDDLEWARE = [
@@ -97,6 +108,7 @@ DATABASES = {
 }
 
 
+
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 
@@ -137,3 +149,5 @@ STATIC_URL = '/static/'
 
 MEDIA_ROOT =  os.path.join(BASE_DIR, 'storage') 
 MEDIA_URL = '/storage/'
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 1025

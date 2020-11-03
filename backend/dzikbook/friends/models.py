@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 class Invitation(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sender", default=-1)
     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name="receiver", default=-1)
-    time_stamp = models.TimeField(auto_now=True)
+    time_stamp = models.DateTimeField(auto_now=True)
 
 
 class Relation(models.Model):

@@ -8,10 +8,13 @@ from rest_framework import status
 from django.db import models
 
 # create your views here
+from .decorators import authenticate
+
 
 class SigInUserNotificationsView(APIView):
     # permission_classes = (IsAuthenticated,)
 
+    @authenticate
     def get(self, request):
         try:
             current_user = request.user
