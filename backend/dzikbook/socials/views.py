@@ -24,7 +24,6 @@ class ReactionsView(APIView):
         return Response(context)
 
     def post(self, request, post_id):
-        print('POST REACTION')
         try:
             if Reaction.objects.filter(post=post_id, giver=request.user).exists():
                 return Response("Reaction already exists!", status=status.HTTP_404_NOT_FOUND)
