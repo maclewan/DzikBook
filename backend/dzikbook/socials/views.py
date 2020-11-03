@@ -13,7 +13,7 @@ from .serializers import CommentSerializer, ReactionSerializer
 # create your views here
 
 class ReactionsView(APIView):
-    permission_classes = (IsAuthenticated,)
+    authentication_classes = []
 
     def get(self, request, post_id):
         try:
@@ -50,7 +50,7 @@ class ReactionsView(APIView):
 
 
 class CommentsView(APIView):
-    permission_classes = (IsAuthenticated,)
+    authentication_classes = []
 
     def get(self, request, post_id):
         try:
