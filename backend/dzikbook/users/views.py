@@ -20,9 +20,7 @@ class SignedInUserDataView(APIView):
     def get(self, request):
 
         context = {
-            'username': request.user.id,
-
-
+            'user_id': request.user.id,
         }
         return Response(context)
 

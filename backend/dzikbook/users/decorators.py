@@ -14,11 +14,11 @@ def authenticate(f):
             "Authorization": auth}
         r = requests.get(url, headers=headers)
         det = r.json()['detail']
+
         if not det == 'true':
             return Response(r.json())
 
-        user = get_user(auth.split(" ")[-1])
-        request.user = user
+        request.user = get_user(auth.split(" ")[-1])
 
         return f(args[0], request)
 
@@ -28,10 +28,10 @@ def authenticate(f):
 def get_user(token):
     try:
         valid_token = AccessToken(token)
+        user_id = valid_token.payload['user_id']
     except:
-        return None
+        user_id = -1
 
-    user_id = valid_token.payload['user_id']
     new_user = User()
     new_user.id = user_id
     return new_user
