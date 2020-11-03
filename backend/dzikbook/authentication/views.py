@@ -11,7 +11,6 @@ from .serializers import RegisterSerializer, LogoutPossibleTokenObtainPairSerial
 # Create your views here.
 
 class RegisterView(APIView):
-
     def post(self, request):
         try:
             data = {
