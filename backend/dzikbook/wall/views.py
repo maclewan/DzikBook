@@ -69,8 +69,6 @@ class SigInUserPostsView(APIView):
                 image_path = 'edited path from image microservice'
                 data['image'] = image_path
 
-            print(post)
-            print(data)
             post_serializer = PostSerializer()
             post = post_serializer.update(instance=post, validated_data=data)
             return Response(PostSerializer(post).data)
