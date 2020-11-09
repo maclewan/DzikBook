@@ -3,14 +3,14 @@ from .models import UserData
 
 
 class UserDataSerializer(serializers.Serializer):
-    user = serializers.PrimaryKeyRelatedField(read_only=True)
+    user = serializers.IntegerField(required=True, allow_null=False)
     gym = serializers.CharField(required=True, allow_blank=True)
     # TODO: ewentualnie zmieniamy na konkretne
-    additional_data = serializers.JSONField(required=True, allow_blank=False)
+    additional_data = serializers.CharField(required=True, allow_blank=False)
 
     class Meta:
         model = UserData
-        fields = ('user', 'gym', 'additional_data')
+        fields = ('user', 'gym', 'additional_data',)
 
     def create(self, validated_data):
         """
