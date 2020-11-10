@@ -1,14 +1,9 @@
 import json
 
-import requests
-from django.core import serializers
-from django.http.response import JsonResponse
+from django.db import models
 from rest_framework import status
-from rest_framework.parsers import JSONParser
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from .decorators import authenticate
 from .models import UserData
@@ -26,17 +21,20 @@ class SignedInUserDataView(APIView):
 
     @authenticate
     def get(self, request):
-        user_id = request.user.id
-        user_data = list(UserData.objects.filter(user=user_id).values())
+        try:
+            user_id = request.user.id
+            user_data = UserData.objects.get(user=user_id)
+            context = UserDataSerializer(user_data, many=False).data
 
-        return JsonResponse(user_data, safe=False)
+            return Response(context)
+        except models.ObjectDoesNotExist:
+            return Response("User data doesnt exist!", status=status.HTTP_404_NOT_FOUND)
+
 
     @authenticate
     def post(self, request):
         try:
             user_id = request.user.id
-            if UserData.objects.filter(user=user_id).exists():\
-                return Response("UserData already exists!", status=status.HTTP_409_CONFLICT)
 
             data = json.loads(json.dumps(request.POST))
             data['user'] = user_id
@@ -47,16 +45,44 @@ class SignedInUserDataView(APIView):
                 return Response("Invalid data provided!", status=status.HTTP_400_BAD_REQUEST)
 
             data_serializer.create(validated_data=data)
-
             return Response(data_serializer.data)
 
         except Exception as e:
-            return Response("Error during posting a comment!", status=status.HTTP_409_CONFLICT)
+            print(e)
+            return Response("Error during posting a comment, record already exists!", status=status.HTTP_409_CONFLICT)
 
     @authenticate
     def put(self, request):
-        user_data = None
-        context = {'message': 'Data successfully updated'}
+        try:
+            user_id = request.user.id
+            user_data = UserData.objects.get(user=user_id)
+
+            data = json.loads(json.dumps(request.POST))
+            data['user'] = user_id
+
+            data_serializer = UserDataSerializer(data=data)
+
+            if not data_serializer.is_valid():
+                return Response("Invalid data provided!", status=status.HTTP_400_BAD_REQUEST)
+
+            user_data = data_serializer.update(instance=user_data, validated_data=data)
+
+        except models.ObjectDoesNotExist:
+            return Response("User data doesnt exist!", status=status.HTTP_404_NOT_FOUND)
+
+        context = {'message': 'Data successfully updated', 'user_data': UserDataSerializer(user_data).data}
+        return Response(context)
+
+    @authenticate
+    def delete(self, request):
+        try:
+            user_id = request.user.id
+            UserData.objects.get(user=user_id).delete()
+
+        except models.ObjectDoesNotExist:
+            return Response("User data doesnt exist!", status=status.HTTP_404_NOT_FOUND)
+
+        context = {'message': 'Data successfully deleted'}
         return Response(context)
 
 
@@ -65,8 +91,9 @@ class UserDataView(APIView):
 
     @authenticate
     def get(self, request, id):
-        user_data = None
-        context = {'user_data': user_data}
+        #if in friends, get data, if not, get only
+
+        context = {'user_data': 'xd'}
         return Response(context)
 
 

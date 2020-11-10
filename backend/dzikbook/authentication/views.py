@@ -28,7 +28,6 @@ class RegisterView(APIView):
             serializer = RegisterSerializer(data=data)
             if serializer.is_valid():
                 user = serializer.save()
-                print(user)
             else:
                 raise Exception('Problem with data validation')
 

@@ -1,11 +1,10 @@
 import requests
 from rest_framework.response import Response
 from django.contrib.auth.models import User
-from rest_framework_simplejwt.tokens import AccessToken
 
 
 def authenticate(f):
-    def validate(*args):
+    def validate(*args, **kwargs):
         request = args[1]
         auth = request.headers["Authorization"] if 'Authorization' in request.headers else ''
         url = 'http://localhost:8000/auth/validate/'
@@ -18,7 +17,8 @@ def authenticate(f):
             return Response(r.json())
 
         request.user = get_user(id)
-        return f(args[0], request)
+
+        return f(*args, **kwargs)
 
     return validate
 

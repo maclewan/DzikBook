@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 
 def authenticate(f):
-    def validate(*args):
+    def validate(*args, **kwargs):
         request = args[1]
         auth = request.headers["Authorization"] if 'Authorization' in request.headers else ''
         url = 'http://localhost:8000/auth/validate/'
@@ -15,9 +15,8 @@ def authenticate(f):
             id = r.json()['user_id']
         except:
             return Response(r.json())
-
         request.user = get_user(id)
-        return f(args[0], request)
+        return f(*args, **kwargs)
 
     return validate
 
