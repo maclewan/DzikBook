@@ -12,7 +12,7 @@ from .decorators import authenticate
 
 
 class SigInUserNotificationsView(APIView):
-    # permission_classes = (IsAuthenticated,)
+    authentication_classes = []
 
     @authenticate
     def get(self, request):
@@ -25,6 +25,7 @@ class SigInUserNotificationsView(APIView):
         return Response(context)
     
     # TODO: zamienić na aktualizowanie czasu
+    @authenticate
     def put(self, request, notification_id):
         try:
             notification = Notification.objects.get(pk = notification_id)
