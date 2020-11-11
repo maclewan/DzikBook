@@ -123,8 +123,8 @@ class SearchView(APIView):
 
         key = request.GET.get('key', '')
         value = request.GET.get('value', '')
-        amount = request.GET.get('amount', '')
-        offset = request.GET.get('offset', '')
+        amount = int(request.GET.get('amount', ''))
+        offset = int(request.GET.get('offset', ''))
 
         if '' in (key, amount, offset, value):
             return Response("Wrong argument set (key, amount, offset).",
@@ -132,7 +132,7 @@ class SearchView(APIView):
         if key not in ('gym', 'name'):
             return Response("Wrong search key (gym, name).",
                             status=status.HTTP_422_UNPROCESSABLE_ENTITY)
-        if (not int(amount) > 0) or (not int(offset) >= 0):
+        if (not amount > 0) or (not offset >= 0):
             return Response("Wrong numeric argument, provide numbers > 0.",
                             status=status.HTTP_406_NOT_ACCEPTABLE)
 
@@ -144,10 +144,11 @@ class SearchView(APIView):
 
         elif key == 'name':
             names_list = value.split(' ')
-            last_name = names_list[len(names_list)-1]
+            last_name = names_list[len(names_list) - 1]
             first_name = names_list[0]
 
-            user_data_list.extend(list(UserData.objects.filter(first_name__iexact=first_name, last_name__iexact=last_name)))
+            user_data_list.extend(
+                list(UserData.objects.filter(first_name__iexact=first_name, last_name__iexact=last_name)))
             user_data_list.extend(list(UserData.objects.filter(last_name__iexact=last_name)))
             user_data_list.extend(list(UserData.objects.filter(last_name__icontains=last_name)))
 
@@ -158,6 +159,14 @@ class SearchView(APIView):
             'last_name': u.last_name,
             'gym': u.gym
         }, user_data_list))
+
+        # Apply offset and amount filters
+        count = len(context)
+        context = \
+            [] if count <= offset else \
+            context[offset:count] if count <= offset + amount \
+            else context[offset:offset+amount]
+
 
         context = {'users_list': context}
         return Response(context)
