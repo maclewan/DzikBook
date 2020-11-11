@@ -3,8 +3,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .decorators import authenticate
 
-# create your views here
 
+# create your views here
 
 
 class SigInUserFriendsInvitationsView(APIView):
@@ -58,7 +58,7 @@ class SigInUserFriendInfo(APIView):
     def get(self, request, user_id):
         context = {
             'relation': 'Friends',
-            'request_id': '5',
+            'request_id': None,
         }
         return Response(context)
 

@@ -1,13 +1,13 @@
 import json
 
+import requests
 from django.db import models
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .decorators import authenticate
+from .decorators import authenticate, hash_user
 from .models import UserData
-
 
 # create your views here
 from .serializers import UserDataSerializer
@@ -30,7 +30,6 @@ class SignedInUserDataView(APIView):
         except models.ObjectDoesNotExist:
             return Response("User data doesnt exist!", status=status.HTTP_404_NOT_FOUND)
 
-
     @authenticate
     def post(self, request):
         try:
@@ -48,7 +47,6 @@ class SignedInUserDataView(APIView):
             return Response(data_serializer.data)
 
         except Exception as e:
-            print(e)
             return Response("Error during posting a comment, record already exists!", status=status.HTTP_409_CONFLICT)
 
     @authenticate
@@ -91,10 +89,30 @@ class UserDataView(APIView):
 
     @authenticate
     def get(self, request, id):
-        #if in friends, get data, if not, get only
+        url = 'http://localhost:8000/friends/' + str(id) + '/'
+        headers = {"Uid": str(request.user.id), "Flag": hash_user(request.user.id)}
+        r = requests.get(url, headers=headers)
+        r = r.json()
 
-        context = {'user_data': 'xd'}
-        return Response(context)
+        try:
+            if r['relation'] == 'Friends':
+                # If user are friends
+                user_data = UserData.objects.get(user=id)
+                context = UserDataSerializer(user_data, many=False).data
+
+                return Response(context)
+            else:
+                # If not
+                user_data = UserData.objects.get(user=id)
+                context = {
+                    'first_name': user_data.first_name,
+                    'last_name': user_data.last_name
+                }
+
+                return Response(context)
+
+        except models.ObjectDoesNotExist:
+            return Response("User data doesnt exist!", status=status.HTTP_404_NOT_FOUND)
 
 
 class SearchView(APIView):
@@ -102,7 +120,44 @@ class SearchView(APIView):
 
     @authenticate
     def get(self, request):
-        print(request.GET)
-        users_list = []
-        context = {'users_list': users_list}
+
+        key = request.GET.get('key', '')
+        value = request.GET.get('value', '')
+        amount = request.GET.get('amount', '')
+        offset = request.GET.get('offset', '')
+
+        if '' in (key, amount, offset, value):
+            return Response("Wrong argument set (key, amount, offset).",
+                            status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        if key not in ('gym', 'name'):
+            return Response("Wrong search key (gym, name).",
+                            status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        if (not int(amount) > 0) or (not int(offset) >= 0):
+            return Response("Wrong numeric argument, provide numbers > 0.",
+                            status=status.HTTP_406_NOT_ACCEPTABLE)
+
+        user_data_list = []
+        if key == 'gym':
+
+            user_data_list.extend(list(UserData.objects.filter(gym__iexact=value)))
+            user_data_list.extend(list(UserData.objects.filter(gym__icontains=value)))
+
+        elif key == 'name':
+            names_list = value.split(' ')
+            last_name = names_list[len(names_list)-1]
+            first_name = names_list[0]
+
+            user_data_list.extend(list(UserData.objects.filter(first_name__iexact=first_name, last_name__iexact=last_name)))
+            user_data_list.extend(list(UserData.objects.filter(last_name__iexact=last_name)))
+            user_data_list.extend(list(UserData.objects.filter(last_name__icontains=last_name)))
+
+        user_data_list = list(set(user_data_list))
+        context = list(map(lambda u: {
+            'user_id': u.user,
+            'first_name': u.first_name,
+            'last_name': u.last_name,
+            'gym': u.gym
+        }, user_data_list))
+
+        context = {'users_list': context}
         return Response(context)
