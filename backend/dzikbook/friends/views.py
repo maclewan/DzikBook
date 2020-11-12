@@ -9,7 +9,7 @@ from .decorators import authenticate, hash_user
 
 # create your views here
 from .models import Invitation, Relation
-from .serializers import InvitationSerializer
+from .serializers import InvitationSerializer, RelationSerializer
 
 
 class SigInUserFriendsInvitationsView(APIView):
@@ -37,9 +37,7 @@ class SigInUserFriendsInvitationsView(APIView):
         if check_invitations(id, user_id):
             return Response("There is already one invitation!", status=status.HTTP_208_ALREADY_REPORTED)
 
-        # Check if user exists
-        url = 'http://localhost:8000/auth/user/' + str(user_id) + '/'
-        if requests.get(url).text == 'false':
+        if check_if_user_exist(user_id):
             return Response("No such user in db!", status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
         data = {
@@ -92,11 +90,29 @@ class InvitationsManagementView(APIView):
 
     @authenticate
     def post(self, request, invitation_id):
-        context = {'message': 'Invitation successfully accepted.'}
-        return Response(context)
+        id = request.user.id
+
+        if not Invitation.objects.filter(id=invitation_id).exists():
+            return Response("No such invitation", status=status.HTTP_404_NOT_FOUND)
+        invitation = Invitation.objects.get(id=invitation_id)
+
+        if str(id) not in (str(invitation.sender), str(invitation.receiver)):
+            return Response("Wrong invitation id", status=status.HTTP_403_FORBIDDEN)
+
+        return create_relation(invitation)
 
     @authenticate
     def delete(self, request, invitation_id):
+        id = request.user.id
+
+        if not Invitation.objects.filter(id=invitation_id).exists():
+            return Response("No such invitation", status=status.HTTP_404_NOT_FOUND)
+        invitation = Invitation.objects.get(id=invitation_id)
+
+        if str(id) != str(invitation.receiver):
+            return Response("Wrong invitation id", status=status.HTTP_403_FORBIDDEN)
+
+        invitation.delete()
         context = {'message': 'Invitation successfully rejected.'}
         return Response(context)
 
@@ -109,7 +125,7 @@ class SigInUserFriendInfo(APIView):
         id = request.user.id
 
         (request_id, relation) = \
-            (None, 'Just you') if str(id) == str(user_id) \
+                (None, 'Just you') if str(id) == str(user_id) \
                 else (None, 'Friends') if check_friendship(id, user_id) \
                 else (get_invitation_id(id, user_id), 'Request sent') if check_if_sent(id, user_id) \
                 else (get_invitation_id(id, user_id), 'Request received') if check_if_sent(user_id, id) \
@@ -121,6 +137,19 @@ class SigInUserFriendInfo(APIView):
         }
         return Response(context)
 
+    @authenticate
+    def delete(self, request, user_id):
+        id = request.user.id
+        if not check_friendship(user_id, id):
+            Response("You are not friends!",status=status.HTTP_403_FORBIDDEN)
+
+        relation = Relation.objects.filter(user1=id, user2=user_id) \
+            if Relation.objects.filter(user1=id, user2=user_id).exists() \
+            else Relation.objects.filter(user1=user_id, user2=id)
+
+        relation.delete()
+        return Response({"message": "Successfully removed user with id: " + str(user_id) + " from friends."})
+
 
 class SigInUserFriendsView(APIView):
     authentication_classes = []
@@ -128,11 +157,7 @@ class SigInUserFriendsView(APIView):
     @authenticate
     def get(self, request):
         id = request.user.id
-        friends_list = []
-        friends_list.extend(Relation.objects.filter(user1=id))
-        friends_list.extend(Relation.objects.filter(user2=id))
-
-        friends_list = list(map(lambda a: a.user2 if str(a.user1) == str(id) else a.user1, friends_list))
+        friends_list = get_friends_id(id)
 
         resp = get_user_list(friends_list, request.user.id)
 
@@ -144,11 +169,7 @@ class FriendsView(APIView):
 
     @authenticate
     def get(self, request, user_id):
-        friends_list = []
-        friends_list.extend(Relation.objects.filter(user1=user_id))
-        friends_list.extend(Relation.objects.filter(user2=user_id))
-
-        friends_list = list(map(lambda a: a.user2 if str(a.user1) == str(user_id) else a.user1, friends_list))
+        friends_list = get_friends_id(user_id)
 
         resp = get_user_list(friends_list, request.user.id)
 
@@ -186,5 +207,36 @@ def get_user_list(friends_list, id):
     return r.json()
 
 
-def check_if_user_exist():
-    pass
+def get_friends_id(user_id):
+    friends_list = []
+    friends_list.extend(Relation.objects.filter(user1=user_id))
+    friends_list.extend(Relation.objects.filter(user2=user_id))
+
+    return list(map(lambda a: a.user2 if str(a.user1) == str(user_id) else a.user1, friends_list))
+
+
+def check_if_user_exist(user_id):
+    url = 'http://localhost:8000/auth/user/' + str(user_id) + '/'
+    if requests.get(url).text == 'true':
+        return True
+    else:
+        return False
+
+
+def create_relation(invitation):
+    data = {
+        'user1': invitation.receiver,
+        'user2': invitation.sender
+    }
+
+    serializer = RelationSerializer(data=data)
+
+    if not serializer.is_valid():
+        return Response("Invalid data provided!", status=status.HTTP_400_BAD_REQUEST)
+
+    relation = serializer.create(validated_data=data)
+    relation.save()
+    invitation.delete()
+
+    # TODO: Notify notification service
+    return Response({"message": "Relation created", "relation": serializer.data})

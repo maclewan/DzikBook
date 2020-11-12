@@ -24,12 +24,13 @@ class InvitationSerializer(serializers.Serializer):
 
 
 class RelationSerializer(serializers.Serializer):
+    id = serializers.IntegerField(required=False)
     user1 = serializers.IntegerField(required=True)
     user2 = serializers.IntegerField(required=True)
 
     class Meta:
         model = Relation
-        fields = ('user1', 'user2')
+        fields = ('id', 'user1', 'user2')
 
     def create(self, validated_data):
         """
@@ -37,5 +38,3 @@ class RelationSerializer(serializers.Serializer):
         """
         return Relation.objects.create(**validated_data)
 
-    def update(self, instance, validated_data):
-        pass
