@@ -36,13 +36,6 @@ class RegisterView(APIView):
             return Response({str(e)})
 
 
-class ResetPasswordView(APIView):
-
-    def post(self, request):
-        context = {'message': 'Passord successfully changed. Check mail.'}
-        return Response(context)
-
-
 class DeleteAccountView(APIView):
 
     def delete(self, request):
@@ -67,3 +60,14 @@ class ValidateUserView(APIView):
         return Response({
             'user_id': user_id
         })
+
+
+class ExistsUserView(APIView):
+    permission_classes = []
+
+    def get(self, request, id):
+        if User.objects.filter(id=id).exists():
+            return Response(True)
+        else:
+            return Response(False)
+

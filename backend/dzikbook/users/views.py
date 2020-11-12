@@ -3,10 +3,11 @@ import json
 import requests
 from django.db import models
 from rest_framework import status
+from rest_framework.exceptions import ParseError
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .decorators import authenticate, hash_user
+from .decorators import authenticate, internal, hash_user
 from .models import UserData
 
 # create your views here
@@ -43,7 +44,8 @@ class SignedInUserDataView(APIView):
             if not data_serializer.is_valid():
                 return Response("Invalid data provided!", status=status.HTTP_400_BAD_REQUEST)
 
-            data_serializer.create(validated_data=data)
+            user_data = data_serializer.create(validated_data=data)
+            user_data.save()
             return Response(data_serializer.data)
 
         except Exception as e:
@@ -167,6 +169,28 @@ class SearchView(APIView):
             context[offset:count] if count <= offset + amount \
             else context[offset:offset+amount]
 
-
         context = {'users_list': context}
         return Response(context)
+
+
+class MultipleUsersDataView(APIView):
+    authentication_classes = []
+
+    @internal
+    def post(self, request):
+
+        json_data = json.loads(request.body)
+        user_id_list = []
+        try:
+            user_id_list = json_data['id_list']
+        except:
+            return Response("Wrong data set.", status=status.HTTP_406_NOT_ACCEPTABLE)
+
+        data_list = [UserData.objects.get(user=u) for u in user_id_list if UserData.objects.filter(user=u).exists() ]
+        return_list = [{
+                'user_id': a.user,
+                'first_name': a.first_name,
+                'last_name': a.last_name
+            } for a in data_list]
+
+        return Response({"user_data_list": return_list})
