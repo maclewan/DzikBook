@@ -117,3 +117,9 @@ ENV/
 
 # photos
 storage
+
+# migrations
+migrations
+
+# base
+db.sqlite3
