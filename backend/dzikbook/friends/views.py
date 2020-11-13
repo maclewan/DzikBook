@@ -37,7 +37,7 @@ class SigInUserFriendsInvitationsView(APIView):
         if check_invitations(id, user_id):
             return Response("There is already one invitation!", status=status.HTTP_208_ALREADY_REPORTED)
 
-        if check_if_user_exist(user_id):
+        if not check_if_user_exist(user_id):
             return Response("No such user in db!", status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
         data = {

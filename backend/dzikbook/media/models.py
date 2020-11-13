@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 # TODO: to string
 class Photo(models.Model):
     photo = models.ImageField(upload_to='photos')
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.IntegerField(null=False, blank=False)
 
 
 class ProfilePhoto(models.Model):
