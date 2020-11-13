@@ -41,6 +41,31 @@ def authenticate(f):
     return validate
 
 
+def internal(f):
+    def validate(*args, **kwargs):
+        request = args[1]
+
+        if 'Flag' in request.headers:
+            # If service will communicate just with another service
+
+            try:
+                id = request.headers["Uid"]
+                flag = request.headers["Flag"]
+
+                if not valid_hash(flag, id):
+                    raise Exception
+
+            except Exception:
+                pass
+
+        else:
+            return Response("Not authorised!", status=status.HTTP_401_UNAUTHORIZED)
+
+        return f(*args, **kwargs)
+
+    return validate
+
+
 def get_user(id):
     new_user = User()
     new_user.id = id
@@ -50,7 +75,6 @@ def get_user(id):
 def valid_hash(flag, uid):
     text = 'stonoga' + str(uid)
     h = hashlib.sha256(str(text).encode('utf-8'))
-    print(h.hexdigest())
     return flag == h.hexdigest()
 
 

@@ -28,20 +28,12 @@ class RegisterView(APIView):
             serializer = RegisterSerializer(data=data)
             if serializer.is_valid():
                 user = serializer.save()
-                print(user)
             else:
                 raise Exception('Problem with data validation')
 
             return Response("User Created Successfully. Now login to get your token")
         except Exception as e:
             return Response({str(e)})
-
-
-class ResetPasswordView(APIView):
-
-    def post(self, request):
-        context = {'message': 'Passord successfully changed. Check mail.'}
-        return Response(context)
 
 
 class DeleteAccountView(APIView):
@@ -59,10 +51,23 @@ class ValidateUserView(APIView):
     permission_classes = [IsAuthenticated, ]
 
     def get(self, request):
-        if hasattr(request.user, 'pk'):
-            return Response({
-                'user_id': request.user.pk
-            })
+        try:
+            valid_token = AccessToken(request.headers['Authorization'].split(" ")[-1])
+            user_id = valid_token.payload['user_id']
+        except:
+            user_id = -1
+
+        return Response({
+            'user_id': user_id
+        })
+
+
+class ExistsUserView(APIView):
+    permission_classes = []
+
+    def get(self, request, id):
+        if User.objects.filter(id=id).exists():
+            return Response(True)
         else:
-            Response("User doesnt exist!", status=status.HTTP_404_NOT_FOUND) #this should never happen
+            return Response(False)
 

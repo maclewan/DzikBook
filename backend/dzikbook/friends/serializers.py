@@ -4,13 +4,14 @@ import datetime
 
 
 class InvitationSerializer(serializers.Serializer):
-    sender = serializers.PrimaryKeyRelatedField(read_only=True, required=True)
-    receiver = serializers.PrimaryKeyRelatedField(read_only=True, required=True)
+    id = serializers.IntegerField(required=False)
+    sender = serializers.IntegerField(required=True)
+    receiver = serializers.IntegerField(required=True)
     time_stamp = serializers.DateTimeField(default=datetime.datetime.now)
 
     class Meta:
         model = Invitation
-        fields = ('sender', 'receiver')
+        fields = ('id', 'sender', 'receiver')
 
     def create(self, validated_data):
         """
@@ -23,12 +24,13 @@ class InvitationSerializer(serializers.Serializer):
 
 
 class RelationSerializer(serializers.Serializer):
-    user1 = serializers.PrimaryKeyRelatedField(read_only=True, required=True)
-    user2 = serializers.PrimaryKeyRelatedField(read_only=True, required=True)
+    id = serializers.IntegerField(required=False)
+    user1 = serializers.IntegerField(required=True)
+    user2 = serializers.IntegerField(required=True)
 
     class Meta:
         model = Relation
-        fields = ('user1', 'user2')
+        fields = ('id', 'user1', 'user2')
 
     def create(self, validated_data):
         """
@@ -36,5 +38,3 @@ class RelationSerializer(serializers.Serializer):
         """
         return Relation.objects.create(**validated_data)
 
-    def update(self, instance, validated_data):
-        pass

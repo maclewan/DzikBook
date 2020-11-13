@@ -9,7 +9,7 @@ from django.urls import path
 from .views import (
     RegisterView,
     ValidateUserView,
-    DeleteAccountView, LogoutPossibleTokenObtainPairView
+    DeleteAccountView, LogoutPossibleTokenObtainPairView, ExistsUserView
 )
 
 # TODO: /account zamiast /delete
@@ -27,12 +27,14 @@ urlpatterns = [
     path('reset/confirm/<uidb64>/<token>/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('reset/done/', PasswordChangeDoneView.as_view(), name='password_reset_done'),
     path('reset/complete/$', PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+    #done
+    path('validate/', ValidateUserView.as_view(), name='validate_user'),
+    #done
+    path('user/<int:id>/', ExistsUserView.as_view(), name='check_if_user_exists'),
 
     #todo
     path('delete/', DeleteAccountView.as_view(), name='delete_account'),
 
-    #todo
-    path('validate/', ValidateUserView.as_view(), name='validate_user')
 
 
 ]

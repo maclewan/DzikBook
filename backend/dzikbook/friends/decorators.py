@@ -50,7 +50,6 @@ def get_user(id):
 def valid_hash(flag, uid):
     text = 'stonoga' + str(uid)
     h = hashlib.sha256(str(text).encode('utf-8'))
-    print(h.hexdigest())
     return flag == h.hexdigest()
 
 

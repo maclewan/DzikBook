@@ -57,9 +57,9 @@ REST_FRAMEWORK = {
 
 # JWT lib
 JWT_AUTH = {
-    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=25),
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=55),
     'JWT_ALLOW_REFRESH': True,
-    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=30),
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(minutes=60),
     'ROTATE_REFRESH_TOKENS': True,
 
 }
