@@ -44,6 +44,7 @@ class ReactionsView(APIView):
             print(e)
             return Response("Error!", status=status.HTTP_404_NOT_FOUND)
 
+    @authenticate
     def delete(self, request, post_id):
         try:
             reaction = Reaction.objects.filter(post=post_id, giver=request.user)
@@ -56,6 +57,7 @@ class ReactionsView(APIView):
 class CommentsView(APIView):
     authentication_classes = []
 
+    @authenticate
     def get(self, request, post_id):
         try:
             comments_list = Comment.objects.filter(post=post_id)
@@ -79,6 +81,7 @@ class CommentsView(APIView):
         except:
             return Response("Error during posting a comment!", status=status.HTTP_404_NOT_FOUND)
 
+    @authenticate
     def delete(self, request, comment_id):
         try:
             comment = Comment.objects.get(pk=comment_id, author=request.user)
@@ -87,6 +90,7 @@ class CommentsView(APIView):
         except models.ObjectDoesNotExist:
             return Response("Comment doesn't exist!", status=status.HTTP_404_NOT_FOUND)
 
+    @authenticate
     def put(self, request, comment_id):
         try:
             comment = Comment.objects.get(pk=comment_id, author=request.user)
