@@ -12,3 +12,4 @@ class Photo(models.Model):
 class ProfilePhoto(models.Model):
     original_photo = models.OneToOneField(Photo, on_delete=models.CASCADE)
     profile_photo = models.ImageField(upload_to='profile_photos')
+    user = models.IntegerField(null=False, blank=False)
