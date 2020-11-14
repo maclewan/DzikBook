@@ -20,18 +20,17 @@ class PhotoManagementView(APIView):
     @authenticate
     def post(self, request):
         form = PhotoForm(request.POST, request.FILES)
-        if form.is_valid():
-            user_id = form.cleaned_data['user']
-            if not check_if_user_exist(user_id):
-                return Response("User with id: " + str(user_id) + " doesn't exist!", status=status.HTTP_404_NOT_FOUND)
-            photo = form.save() 
-            context = {
-                'photo': PhotoSerializer(photo).data,
-                'message': 'Photo uploaded successfully.'
-            }
-            return Response(context)
-        else:
-            return Response("Could not create photo.", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        if not form.is_valid():
+            return Response("Invalid form, could not create photo.", status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        user_id = form.cleaned_data['user']
+        if not check_if_user_exist(user_id):
+            return Response("User with id: " + str(user_id) + " doesn't exist!", status=status.HTTP_404_NOT_FOUND)
+        photo = form.save() 
+        context = {
+            'photo': PhotoSerializer(photo).data,
+            'message': 'Photo uploaded successfully.'
+        }
+        return Response(context)
 
     @authenticate
     def delete(self, request, photo_id):
@@ -79,18 +78,19 @@ class SigInUserProfilePhotoView(APIView):
     @authenticate
     def post(self, request):
         form = ProfilePhotoForm(request.POST, request.FILES)
-        if form.is_valid():
-            user_id = form.cleaned_data['user']
-            if not check_if_user_exist(user_id):
-                return Response("User with id: " + str(user_id) + " doesn't exist!", status=status.HTTP_404_NOT_FOUND)
-            profile_photo = form.save() 
-            context = {
-                'profile_photo': ProfilePhotoSerializer(profile_photo).data,
-                'message': 'Profile photo uploaded successfully.'
-            }
-            return Response(context)
-        else:
-            return Response("Could not create profile photo.", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        if not form.is_valid():
+            return Response("Invalid form, could not create profile photo.", status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        user_id = form.cleaned_data['user']
+        if not check_if_user_exist(user_id):
+            return Response("User with id: " + str(user_id) + " doesn't exist!", status=status.HTTP_404_NOT_FOUND)
+        profile_photo = form.save() 
+        context = {
+            'profile_photo': ProfilePhotoSerializer(profile_photo).data,
+            'message': 'Profile photo uploaded successfully.'
+        }
+        return Response(context)
+        
+
     # TODO: Na razie można mieć kilka zdjęć profilowych.
     @authenticate
     def get(self, request):
@@ -104,7 +104,7 @@ class SigInUserProfilePhotoView(APIView):
         except:
             return Response("Error, could not retrive logged in user profile photos!", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response(context)
-
+    
     """
     @authenticate
     def get(self, request):
@@ -112,6 +112,7 @@ class SigInUserProfilePhotoView(APIView):
         context = {"form": form}
         return render(request, "profile_photo_form.html", context)
     """
+
 
 class ProfilePhotoView(APIView):
     authentication_classes = []
