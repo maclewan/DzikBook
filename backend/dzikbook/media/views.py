@@ -31,7 +31,7 @@ class PhotoManagementView(APIView):
             }
             return Response(context)
         else:
-            return Response("Could not create photo.", status=status.HTTP_404_NOT_FOUND)
+            return Response("Could not create photo.", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @authenticate
     def delete(self, request, photo_id):
@@ -50,7 +50,7 @@ class PhotoManagementView(APIView):
         context = {"form": form}
         return render(request, "photo_form.html", context)
 
-# Na razie nie używane
+# Currently unused
 class VideoManagementView(APIView):
     authentication_classes = []
 
@@ -90,8 +90,8 @@ class SigInUserProfilePhotoView(APIView):
             }
             return Response(context)
         else:
-            return Response("Could not create profile photo.", status=status.HTTP_404_NOT_FOUND)
-
+            return Response("Could not create profile photo.", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    # TODO: Na razie można mieć kilka zdjęć profilowych.
     @authenticate
     def get(self, request):
         try:
@@ -102,7 +102,7 @@ class SigInUserProfilePhotoView(APIView):
                 'description': 'Looking great!'
             }
         except:
-            return Response("Error, could not retrive logged in user profile photo!", status=status.HTTP_404_NOT_FOUND)
+            return Response("Error, could not retrive logged in user profile photos!", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response(context)
 
     """
