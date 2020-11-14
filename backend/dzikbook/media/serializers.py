@@ -3,7 +3,6 @@ from .models import Photo, ProfilePhoto
 
 
 class PhotoSerializer(serializers.ModelSerializer):
-    owner = serializers.PrimaryKeyRelatedField(read_only=True)
 
     def get_photo_id(self, obj):
         return obj.pk
@@ -11,7 +10,7 @@ class PhotoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Photo
-        fields = ['id', 'photo', 'owner']
+        fields = ['id', 'photo', 'user']
     
     def create(self, validated_data):
         """
@@ -28,7 +27,7 @@ class ProfilePhotoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProfilePhoto
-        fields = ['id', 'profile_photo', 'original_photo']
+        fields = ['id', 'profile_photo', 'original_photo', 'user']
     
     def create(self, validated_data):
         """

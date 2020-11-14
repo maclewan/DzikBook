@@ -6,6 +6,9 @@ from .serializers import PhotoSerializer, ProfilePhotoSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from django.db import models
+from .forms import PhotoForm, ProfilePhotoForm
+from django.shortcuts import render
+import requests
 
 # create your views here
 from .decorators import authenticate
@@ -14,11 +17,17 @@ from .decorators import authenticate
 class PhotoManagementView(APIView):
     authentication_classes = []
 
-    # TODO: dopytać jak wygląda zdjęcie które dostajemy
     @authenticate
     def post(self, request):
+        form = PhotoForm(request.POST, request.FILES)
+        if not form.is_valid():
+            return Response("Invalid form, could not create photo.", status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        user_id = form.cleaned_data['user']
+        if not check_if_user_exist(user_id):
+            return Response("User with id: " + str(user_id) + " doesn't exist!", status=status.HTTP_404_NOT_FOUND)
+        photo = form.save() 
         context = {
-            'photo_id': '5',
+            'photo': PhotoSerializer(photo).data,
             'message': 'Photo uploaded successfully.'
         }
         return Response(context)
@@ -34,6 +43,13 @@ class PhotoManagementView(APIView):
         return Response(context)
 
 
+    @authenticate
+    def get(self, request):
+        form = PhotoForm()
+        context = {"form": form}
+        return render(request, "photo_form.html", context)
+
+# Currently unused
 class VideoManagementView(APIView):
     authentication_classes = []
 
@@ -59,27 +75,43 @@ class VideoManagementView(APIView):
 class SigInUserProfilePhotoView(APIView):
     authentication_classes = []
 
-    # TODO: dopytać jak wygląda zdjęcie które dostajemy
     @authenticate
     def post(self, request):
+        form = ProfilePhotoForm(request.POST, request.FILES)
+        if not form.is_valid():
+            return Response("Invalid form, could not create profile photo.", status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        user_id = form.cleaned_data['user']
+        if not check_if_user_exist(user_id):
+            return Response("User with id: " + str(user_id) + " doesn't exist!", status=status.HTTP_404_NOT_FOUND)
+        profile_photo = form.save() 
         context = {
-            'photo_id': '5',
+            'profile_photo': ProfilePhotoSerializer(profile_photo).data,
             'message': 'Profile photo uploaded successfully.'
         }
         return Response(context)
+        
 
+    # TODO: Na razie można mieć kilka zdjęć profilowych.
     @authenticate
     def get(self, request):
         try:
             current_user = request.user
-            photo = ProfilePhotoSerializer(ProfilePhoto.objects.get(pk=current_user.pk)).data
+            profile_photos = ProfilePhoto.objects.filter(user=current_user.pk)
             context = {
-                'photo': photo,
+                'photos': ProfilePhotoSerializer(profile_photos, many=True).data,
                 'description': 'Looking great!'
             }
         except:
-            return Response("Error, could not retrive logged in user profile photo!", status=status.HTTP_404_NOT_FOUND)
+            return Response("Error, could not retrive logged in user profile photos!", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response(context)
+    
+    """
+    @authenticate
+    def get(self, request):
+        form = ProfilePhotoForm()
+        context = {"form": form}
+        return render(request, "profile_photo_form.html", context)
+    """
 
 
 class ProfilePhotoView(APIView):
@@ -97,3 +129,11 @@ class ProfilePhotoView(APIView):
             return Response("Error, could not retrive profile photo with id " + str(user_id) + "!",
                             status=status.HTTP_404_NOT_FOUND)
         return Response(context)
+
+
+def check_if_user_exist(user_id):
+    url = 'http://localhost:8000/auth/user/' + str(user_id) + '/'
+    if requests.get(url).text == 'true':
+        return True
+    else:
+        return False
