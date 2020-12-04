@@ -20,15 +20,14 @@ class PhotoSerializer(serializers.ModelSerializer):
 
 
 class ProfilePhotoSerializer(serializers.ModelSerializer):
-    photo = PhotoSerializer()
-    downsized_photo = PhotoSerializer()
+    original_photo = PhotoSerializer()
 
     def get_profile_photo_id(self, obj):
         return obj.id
 
     class Meta:
         model = ProfilePhoto
-        fields = ['id', 'downsized_photo', 'photo', 'user']
+        fields = ['id', 'profile_photo', 'original_photo', 'user']
     
     def create(self, validated_data):
         """
