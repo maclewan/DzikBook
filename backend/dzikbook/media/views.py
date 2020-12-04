@@ -1,5 +1,3 @@
-from django.contrib.auth.models import User
-from django.core.files.base import ContentFile
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -11,11 +9,6 @@ from django.db import models
 from .forms import PhotoForm, ProfilePhotoForm
 from django.shortcuts import render
 import requests
-from PIL import Image
-import uuid
-import os
-from io import BytesIO
-from django.core.files.uploadedfile import InMemoryUploadedFile
 
 # create your views here
 from .decorators import authenticate
@@ -28,10 +21,11 @@ class PhotoManagementView(APIView):
     def post(self, request):
         form = PhotoForm(request.POST, request.FILES)
         if not form.is_valid():
-            return Response("Invalid form, please provide an image!", status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-
-        form.instance.user = request.user.id
-        photo = form.save()
+            return Response("Invalid form, could not create photo.", status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        user_id = form.cleaned_data['user']
+        if not check_if_user_exist(user_id):
+            return Response("User with id: " + str(user_id) + " doesn't exist!", status=status.HTTP_404_NOT_FOUND)
+        photo = form.save() 
         context = {
             'photo': PhotoSerializer(photo).data,
             'message': 'Photo uploaded successfully.'
@@ -41,7 +35,36 @@ class PhotoManagementView(APIView):
     @authenticate
     def delete(self, request, photo_id):
         try:
-            photo = Photo.objects.get(id=photo_id, user=request.user.id)
+            photo = Photo.objects.get(id=photo_id)
+            photo.delete()
+            context = {'message': 'Photo deleted successfully.'}
+        except models.ObjectDoesNotExist:
+            return Response("Photo doesn't exist!", status=status.HTTP_404_NOT_FOUND)
+        return Response(context)
+
+
+    @authenticate
+    def get(self, request):
+        form = PhotoForm()
+        context = {"form": form}
+        return render(request, "photo_form.html", context)
+
+# Currently unused
+class VideoManagementView(APIView):
+    authentication_classes = []
+
+    @authenticate
+    def post(self, request):
+        context = {
+            'video_id': '5',
+            'message': 'Video uploaded successfully.'
+        }
+        return Response(context)
+
+    @authenticate
+    def delete(self, request, video_id):
+        try:
+            photo = Photo.objects.get(id=video_id)
             photo.delete()
             context = {'message': 'Photo deleted successfully.'}
         except models.ObjectDoesNotExist:
@@ -54,45 +77,21 @@ class SigInUserProfilePhotoView(APIView):
 
     @authenticate
     def post(self, request):
-        response = PhotoManagementView().post(request)
-        if 'photo' not in response.data:  # if error occured
-            return response
-
-        original_photo_id = response.data['photo']['id']
-        photo = request.FILES['photo']
-        photo = Image.open(photo.file)
-        downsized_photo = photo.resize((100, 100))
-
-        in_memory_file = image_to_inmemory(downsized_photo)
-
-        request.FILES['photo'] = in_memory_file
-        response_downsized = PhotoManagementView().post(request)
-
-        if 'photo' not in response_downsized.data:  # if error occured
-            return response_downsized
-
-        downsized_photo_id = response_downsized.data['photo']['id']
-
-        original_photo = Photo.objects.get(pk=original_photo_id)
-        downsized_photo = Photo.objects.get(pk=downsized_photo_id)
-
-        profile_photo = ProfilePhoto.objects.create(photo=original_photo,
-                                                    downsized_photo=downsized_photo,
-                                                    user=request.user.pk)
-        try:
-            old_profile_photo = ProfilePhoto.objects.filter(user=request.user.pk)
-            old_profile_photo.delete()
-        except ProfilePhoto.DoesNotExist:
-            pass
-
-        profile_photo.save()
-
+        form = ProfilePhotoForm(request.POST, request.FILES)
+        if not form.is_valid():
+            return Response("Invalid form, could not create profile photo.", status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        user_id = form.cleaned_data['user']
+        if not check_if_user_exist(user_id):
+            return Response("User with id: " + str(user_id) + " doesn't exist!", status=status.HTTP_404_NOT_FOUND)
+        profile_photo = form.save() 
         context = {
-            'photo': ProfilePhotoSerializer(profile_photo).data,
-            'message': 'Photo uploaded successfully.'
+            'profile_photo': ProfilePhotoSerializer(profile_photo).data,
+            'message': 'Profile photo uploaded successfully.'
         }
         return Response(context)
+        
 
+    # TODO: Na razie można mieć kilka zdjęć profilowych.
     @authenticate
     def get(self, request):
         try:
@@ -103,19 +102,16 @@ class SigInUserProfilePhotoView(APIView):
                 'description': 'Looking great!'
             }
         except:
-            return Response("Error, could not retrive logged in user profile photos!",
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response("Error, could not retrive logged in user profile photos!", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response(context)
-
+    
+    """
     @authenticate
-    def delete(self, request, profile_photo_id):
-        try:
-            profile_photo = ProfilePhoto.objects.get(id=profile_photo_id, user=request.user.id)
-            profile_photo.delete()
-            context = {'message': 'Profile photo deleted successfully.'}
-        except models.ObjectDoesNotExist:
-            return Response("Profile photo doesn't exist!", status=status.HTTP_404_NOT_FOUND)
-        return Response(context)
+    def get(self, request):
+        form = ProfilePhotoForm()
+        context = {"form": form}
+        return render(request, "profile_photo_form.html", context)
+    """
 
 
 class ProfilePhotoView(APIView):
@@ -124,7 +120,7 @@ class ProfilePhotoView(APIView):
     @authenticate
     def get(self, request, user_id):
         try:
-            photo = ProfilePhotoSerializer(ProfilePhoto.objects.get(user=user_id)).data
+            photo = ProfilePhotoSerializer(ProfilePhoto.objects.get(pk=user_id)).data
             context = {
                 'photo': photo,
                 'description': ''
@@ -133,25 +129,6 @@ class ProfilePhotoView(APIView):
             return Response("Error, could not retrive profile photo with id " + str(user_id) + "!",
                             status=status.HTTP_404_NOT_FOUND)
         return Response(context)
-
-
-def image_to_inmemory(photo):
-    path = os.path.join(os.path.abspath(""), 'storage', 'thumbnails')
-
-    while True:
-        filename = uuid.uuid4().hex + '.png'
-        full_path = os.path.join(path, filename)
-        if not os.path.isfile(full_path):
-            break
-
-    photo_io = BytesIO()
-    photo.save(fp=photo_io, format='PNG')
-    photo_file = ContentFile(photo_io.getvalue())
-
-    photo_file = InMemoryUploadedFile(photo_file, None, filename, 'image/png',
-                                      photo_file.tell, None)
-
-    return photo_file
 
 
 def check_if_user_exist(user_id):

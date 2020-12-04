@@ -7,5 +7,5 @@ from wall.models import Post
 # TODO: zobaczyć jak z postami
 class Notification(models.Model):
     notification_type = models.TextField()
-    user = models.IntegerField(null=False, blank=False, default=-1)
+    user = models.IntegerField(null=False, blank=False)
     post = models.IntegerField(null=True, blank=False)
