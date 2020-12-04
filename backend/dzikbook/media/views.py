@@ -26,17 +26,8 @@ class PhotoManagementView(APIView):
 
     @authenticate
     def post(self, request):
-        form = PhotoForm(request.POST, request.FILES)
-        if not form.is_valid():
-            return Response("Invalid form, please provide an image!", status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-
-        form.instance.user = request.user.id
-        photo = form.save()
-        context = {
-            'photo': PhotoSerializer(photo).data,
-            'message': 'Photo uploaded successfully.'
-        }
-        return Response(context)
+        response = save_inmemory_image(request)
+        return response
 
     @authenticate
     def delete(self, request, photo_id):
@@ -54,7 +45,7 @@ class SigInUserProfilePhotoView(APIView):
 
     @authenticate
     def post(self, request):
-        response = PhotoManagementView().post(request)
+        response = save_inmemory_image(request)
         if 'photo' not in response.data:  # if error occured
             return response
 
@@ -66,7 +57,7 @@ class SigInUserProfilePhotoView(APIView):
         in_memory_file = image_to_inmemory(downsized_photo)
 
         request.FILES['photo'] = in_memory_file
-        response_downsized = PhotoManagementView().post(request)
+        response_downsized = save_inmemory_image(request)
 
         if 'photo' not in response_downsized.data:  # if error occured
             return response_downsized
@@ -135,6 +126,20 @@ class ProfilePhotoView(APIView):
         return Response(context)
 
 
+def save_inmemory_image(request):
+    form = PhotoForm(request.POST, request.FILES)
+    if not form.is_valid():
+        return Response("Invalid form, please provide an image!", status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+    form.instance.user = request.user.id
+    photo = form.save()
+    context = {
+        'photo': PhotoSerializer(photo).data,
+        'message': 'Photo uploaded successfully.'
+    }
+    return Response(context)
+
+
 def image_to_inmemory(photo):
     path = os.path.join(os.path.abspath(""), 'storage', 'thumbnails')
 
@@ -152,11 +157,3 @@ def image_to_inmemory(photo):
                                       photo_file.tell, None)
 
     return photo_file
-
-
-def check_if_user_exist(user_id):
-    url = 'http://localhost:8000/auth/user/' + str(user_id) + '/'
-    if requests.get(url).text == 'true':
-        return True
-    else:
-        return False
