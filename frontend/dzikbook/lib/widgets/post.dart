@@ -17,7 +17,7 @@ class Post extends StatelessWidget {
         borderRadius: BorderRadius.circular(5),
         border: Border.all(
           color: Colors.green,
-          width: 3,
+          width: 1.5,
         ),
       ),
       child: Column(
@@ -38,7 +38,7 @@ class Post extends StatelessWidget {
                           shape: BoxShape.circle,
                           image: DecorationImage(
                             image: NetworkImage(this.userImg),
-                            fit: BoxFit.fill,
+                            fit: BoxFit.cover,
                           )),
                     ),
                     Text(
@@ -65,12 +65,16 @@ class Post extends StatelessWidget {
           ),
           Container(
             width: double.infinity,
+            padding: EdgeInsets.only(top: 10, left: 15, bottom: 10, right: 15),
             child: Align(
-              alignment: Alignment.center,
-              child: Text(
+              alignment: Alignment.centerLeft,
+              child: SelectableText(
                 description,
                 textAlign: TextAlign.justify,
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w300),
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w300,
+                ),
               ),
             ),
             decoration: BoxDecoration(
