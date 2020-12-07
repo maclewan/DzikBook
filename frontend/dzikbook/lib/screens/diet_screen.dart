@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../widgets/exercise_item.dart';
 
-import '../providers/workouts.dart';
+import '../providers/diets.dart';
+import '../widgets/food_item.dart';
 
-class WorkoutScreen extends StatelessWidget {
-  static final routeName = '/workout';
+class DietScreen extends StatelessWidget {
+  static final routeName = '/diet';
 
   @override
   Widget build(BuildContext context) {
-    final workoutData = ModalRoute.of(context).settings.arguments as Workout;
+    final dietData = ModalRoute.of(context).settings.arguments as Diet;
     final deviceSize = MediaQuery.of(context).size;
     return Scaffold(
       body: Container(
@@ -23,7 +22,7 @@ class WorkoutScreen extends StatelessWidget {
               height: 80,
             ),
             Text(
-              workoutData.name,
+              dietData.name,
               style: TextStyle(
                 fontSize: 36,
                 fontWeight: FontWeight.w500,
@@ -36,9 +35,9 @@ class WorkoutScreen extends StatelessWidget {
             Flexible(
               child: ListView.builder(
                 shrinkWrap: true,
-                itemCount: workoutData.exercises.length,
-                itemBuilder: (context, id) => ExerciseItem(
-                  exerciseData: workoutData.exercises[id],
+                itemCount: dietData.foodList.length,
+                itemBuilder: (context, id) => FoodItem(
+                  foodData: dietData.foodList[id],
                 ),
               ),
             )

@@ -1,3 +1,4 @@
+import 'package:dzikbook/screens/diet_list_screen.dart';
 import 'package:flutter/material.dart';
 
 import './workout_list_screen.dart';
@@ -20,6 +21,19 @@ class ProfileScreen extends StatelessWidget {
             },
             child: Text(
               "Treningi",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+          SizedBox(
+            height: 30,
+          ),
+          FlatButton(
+            color: Theme.of(context).primaryColor,
+            onPressed: () {
+              Navigator.of(context).pushNamed(DietListScreen.routeName);
+            },
+            child: Text(
+              "Diety",
               style: TextStyle(color: Colors.white),
             ),
           )

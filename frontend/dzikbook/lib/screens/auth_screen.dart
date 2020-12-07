@@ -319,7 +319,10 @@ class _AuthCardState extends State<AuthCard> {
                             textColor: Colors.white,
                             color: Theme.of(context).primaryColor,
                             child: _isLoading
-                                ? CircularProgressIndicator()
+                                ? CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white),
+                                  )
                                 : Text(
                                     _btnText,
                                     textAlign: TextAlign.center,
