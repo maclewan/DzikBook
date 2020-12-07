@@ -1,3 +1,4 @@
+import 'package:dzikbook/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -150,6 +151,8 @@ class _AuthCardState extends State<AuthCard> {
           _authData['email'],
           _authData['password'],
         );
+
+        Navigator.of(context).pushReplacementNamed(ProfileScreen.routeName);
       } else {
         // Sign user up
         await Provider.of<Auth>(context, listen: false).signup(
@@ -158,6 +161,7 @@ class _AuthCardState extends State<AuthCard> {
           // _authData['name'],
           // _authData['username],
         );
+        _toggleAuthType();
       }
     } on HttpException catch (error) {
       var errorMessage = 'Authentication failed';
