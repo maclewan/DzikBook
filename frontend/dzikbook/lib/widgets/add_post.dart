@@ -1,8 +1,25 @@
 import 'package:flutter/material.dart';
 
-class AddPost extends StatelessWidget {
-  final String userImage;
-  AddPost(this.userImage);
+class AddPost extends StatefulWidget {
+  String userImage;
+  final void Function(String) addPost;
+
+  AddPost(this.addPost, this.userImage);
+
+  @override
+  _AddPostState createState() => _AddPostState();
+}
+
+class _AddPostState extends State<AddPost> {
+  final myController = TextEditingController();
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    myController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -28,7 +45,7 @@ class AddPost extends StatelessWidget {
                           topLeft: Radius.circular(10),
                         ),
                         child: Image.network(
-                          this.userImage,
+                          this.widget.userImage,
                           height: double.infinity,
                           fit: BoxFit.cover,
                         ),
@@ -53,6 +70,7 @@ class AddPost extends StatelessWidget {
                                 reverse: false,
                                 child: SizedBox(
                                   child: new TextFormField(
+                                    controller: myController,
                                     maxLines: 20,
                                     style: TextStyle(
                                       fontSize: 10,
@@ -84,7 +102,10 @@ class AddPost extends StatelessWidget {
                           borderRadius: BorderRadius.only(
                               bottomLeft: Radius.circular(10)),
                         ),
-                        onPressed: () => {},
+                        onPressed: () => {
+                          this.widget.addPost(myController.text),
+                          myController.clear(),
+                        },
                         child: Text("OPUBLIKUJ",
                             style: TextStyle(
                               color: Colors.white,

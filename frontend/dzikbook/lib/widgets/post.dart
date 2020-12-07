@@ -44,7 +44,7 @@ class Post extends StatelessWidget {
                     Text(
                       this.userName,
                       style:
-                          TextStyle(fontSize: 13, fontWeight: FontWeight.w300),
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
                     ),
                   ],
                 ),
@@ -70,10 +70,11 @@ class Post extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: SelectableText(
                 description,
-                textAlign: TextAlign.justify,
+                textAlign: TextAlign.left,
                 style: TextStyle(
-                  fontSize: 10,
+                  fontSize: 12,
                   fontWeight: FontWeight.w300,
+                  letterSpacing: .2,
                 ),
               ),
             ),
