@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:dzikbook/widgets/add_post.dart';
 import 'package:dzikbook/widgets/post.dart';
+import '../models/dummyData.dart';
 
 class ProfileScreen extends StatefulWidget {
   static final routeName = '/profile';
@@ -82,15 +83,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _addPost(postDescription) {
     setState(() {
       _posts.insert(
-        0,
-        new PostModel(
+          0,
+          new PostModel(
             description: postDescription,
             id: "15",
             timeTaken: "0m",
-            userName: "Aleksandra",
-            userImg:
-                "https://scontent-waw1-1.cdninstagram.com/v/t51.2885-15/sh0.08/e35/s640x640/102961878_261268128624182_7495919051351016811_n.jpg?_nc_ht=scontent-waw1-1.cdninstagram.com&_nc_cat=102&_nc_ohc=guXVxhmpNwAAX99UoVb&tp=1&oh=fa49d2ba06d4607807963b90f693449c&oe=5FF5F2E8"),
-      );
+            userName: mainUserName,
+            userImg: mainUserImage,
+          ));
     });
   }
 
@@ -135,9 +135,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         body: ListView.builder(
           itemCount: _hasMore ? _posts.length + 1 : _posts.length,
           itemBuilder: (BuildContext context, int index) {
-            if (index == 0)
-              return AddPost(_addPost,
-                  "https://scontent-waw1-1.cdninstagram.com/v/t51.2885-15/sh0.08/e35/s640x640/102961878_261268128624182_7495919051351016811_n.jpg?_nc_ht=scontent-waw1-1.cdninstagram.com&_nc_cat=102&_nc_ohc=guXVxhmpNwAAX99UoVb&tp=1&oh=fa49d2ba06d4607807963b90f693449c&oe=5FF5F2E8");
+            if (index == 0) return AddPost(_addPost, mainUserImage);
             if (index >= _posts.length) {
               if (!_isLoading) {
                 _loadMore();

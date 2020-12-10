@@ -1,4 +1,5 @@
 import 'package:dzikbook/models/CommentModel.dart';
+import 'package:dzikbook/models/dummyData.dart';
 import 'package:dzikbook/widgets/add_comment.dart';
 import 'package:flutter/material.dart';
 
@@ -11,6 +12,17 @@ class CommentsSection extends StatefulWidget {
 }
 
 class _CommentsSectionState extends State<CommentsSection> {
+  void _addComment(String desc) {
+    this.setState(() {
+      this.widget.comments.add(
+            CommentModel(
+              description: desc,
+              imgSource: mainUserImage,
+            ),
+          );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -53,6 +65,7 @@ class _CommentsSectionState extends State<CommentsSection> {
           ),
           AddComment(
             key: Key("1asdsccdgfdbgvbfc"),
+            addCommentHandler: _addComment,
           ),
         ],
       ),

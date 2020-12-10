@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class AddComment extends StatefulWidget {
-  AddComment({Key key}) : super(key: key);
+  final void Function(String) addCommentHandler;
+  AddComment({Key key, @required this.addCommentHandler}) : super(key: key);
 
   @override
   _AddCommentState createState() => _AddCommentState();
@@ -72,7 +73,11 @@ class _AddCommentState extends State<AddComment> {
                     size: 30,
                     color: Colors.green,
                   ),
-                  onPressed: () {}))
+                  onPressed: () {
+                    if (myController.text.isNotEmpty)
+                      this.widget.addCommentHandler(myController.text);
+                    myController.clear();
+                  }))
         ],
       ),
     );
