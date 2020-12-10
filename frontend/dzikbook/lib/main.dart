@@ -1,12 +1,20 @@
+import 'package:dzikbook/screens/add_diet_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'dart:async';
 
 import './providers/auth.dart';
+import './providers/workouts.dart';
+import './providers/diets.dart';
+import './providers/static.dart';
 
 import './screens/auth_screen.dart';
 import './screens/profile_screen.dart';
+import './screens/splash_screen.dart';
+import './screens/workout_list_screen.dart';
+import './screens/workout_screen.dart';
+import './screens/diet_screen.dart';
+import './screens/diet_list_screen.dart';
+import 'screens/add_workout_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -21,13 +29,22 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider(
             create: (context) => Auth(),
           ),
+          ChangeNotifierProvider(
+            create: (context) => Workouts(),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => Diets(),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => Static(),
+          )
         ],
         child: Consumer<Auth>(
           builder: (ctx, auth, _) => MaterialApp(
             title: 'Flutter Demo',
             theme: ThemeData(
               primarySwatch: Colors.green,
-              accentColor: Colors.white,
+              accentColor: Colors.green,
               fontFamily: 'Montserrat',
               visualDensity: VisualDensity.adaptivePlatformDensity,
             ),
@@ -35,53 +52,14 @@ class MyApp extends StatelessWidget {
             routes: {
               ProfileScreen.routeName: (ctx) => ProfileScreen(),
               AuthScreen.routeName: (ctx) => AuthScreen(),
+              WorkoutListScreen.routeName: (ctx) => WorkoutListScreen(),
+              WorkoutScreen.routeName: (ctx) => WorkoutScreen(),
+              DietListScreen.routeName: (ctx) => DietListScreen(),
+              DietScreen.routeName: (ctx) => DietScreen(),
+              AddWorkoutScreen.routeName: (ctx) => AddWorkoutScreen(),
+              AddDietScreen.routeName: (ctx) => AddDietScreen(),
             },
           ),
         ));
-  }
-}
-
-class SplashScreen extends StatefulWidget {
-  SplashScreen({Key key}) : super(key: key);
-
-  @override
-  _SplashScreenState createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  @override
-  void initState() {
-    super.initState();
-    final isAuth = Provider.of<Auth>(context, listen: false).isAuth;
-    Timer(Duration(seconds: 3), () {
-      if (isAuth) {
-        Navigator.of(context).pushReplacementNamed(ProfileScreen.routeName);
-      } else {
-        Navigator.of(context).pushReplacementNamed(AuthScreen.routeName);
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        body: Center(
-            child: Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Color.fromRGBO(33, 150, 83, 1),
-            Color.fromRGBO(126, 213, 111, 1),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomCenter,
-        ),
-      ),
-      child: Center(
-          child: SvgPicture.asset(
-        'assets/images/dzikbook.svg',
-        color: Colors.white,
-      )),
-    )));
   }
 }
