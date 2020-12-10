@@ -1,3 +1,5 @@
+import 'package:dzikbook/models/CommentModel.dart';
+import 'package:dzikbook/widgets/comments_section.dart';
 import 'package:flutter/material.dart';
 
 class Post extends StatelessWidget {
@@ -7,13 +9,18 @@ class Post extends StatelessWidget {
   final String description;
   final String timeTaken;
   final String loadedImg;
-  Post(
-      {this.id,
-      this.userName,
-      this.description,
-      this.userImg,
-      this.timeTaken,
-      this.loadedImg = ""});
+  final List<String> comments;
+  final int reactions;
+  Post({
+    @required this.id,
+    @required this.userName,
+    @required this.description,
+    @required this.userImg,
+    @required this.timeTaken,
+    this.loadedImg = "",
+    this.comments,
+    this.reactions = 0,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -43,9 +50,9 @@ class Post extends StatelessWidget {
                       decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           image: DecorationImage(
-                            image: NetworkImage(this.userImg),
-                            fit: BoxFit.cover,
-                          )),
+                              image: NetworkImage(this.userImg),
+                              fit: BoxFit.cover,
+                              alignment: Alignment.topCenter)),
                     ),
                     Text(
                       this.userName,
@@ -96,9 +103,22 @@ class Post extends StatelessWidget {
                   loadingBuilder: (context, child, loadingProgress) {
                     return loadingProgress == null
                         ? child
-                        : LinearProgressIndicator();
+                        : LinearProgressIndicator(
+                            value: loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes,
+                          );
                   },
                 ),
+          CommentsSection([
+            CommentModel(
+                description: "Bardzo fajnie!", imgSource: this.userImg),
+            CommentModel(description: "X" * 100 + "D", imgSource: this.userImg),
+            CommentModel(description: "X" * 100 + "D", imgSource: this.userImg),
+            CommentModel(description: "X" * 100 + "D", imgSource: this.userImg),
+            CommentModel(description: "X" * 100 + "D", imgSource: this.userImg),
+            CommentModel(description: "X" * 100 + "D", imgSource: this.userImg),
+            CommentModel(description: "X" * 500 + "D", imgSource: this.userImg),
+          ])
         ],
       ),
     );

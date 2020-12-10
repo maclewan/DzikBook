@@ -52,6 +52,9 @@ class PostFetcher {
               timeTaken: '${random.nextInt(24) + 1}h${random.nextInt(60) + 1}m',
               userImg: profileUrl,
               userName: name,
+              loadedImg: random.nextInt(4) == 1
+                  ? 'https://picsum.photos/400?random=${random.nextInt(10)}'
+                  : "",
               description: generateWordPairs()
                   .take(random.nextInt(10) + 10)
                   .toList()
