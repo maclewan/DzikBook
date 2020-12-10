@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
               fontFamily: 'Montserrat',
               visualDensity: VisualDensity.adaptivePlatformDensity,
             ),
-            home: SplashScreen(),
+            home: ProfileScreen(),
             routes: {
               ProfileScreen.routeName: (ctx) => ProfileScreen(),
               AuthScreen.routeName: (ctx) => AuthScreen(),
