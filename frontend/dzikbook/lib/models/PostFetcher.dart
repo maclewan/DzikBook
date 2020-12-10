@@ -23,6 +23,9 @@ class PostFetcher {
 
     final posts = <PostModel>[];
     final n = min(_itemsPerPage, _count - _currentPage * _itemsPerPage);
+    if (n <= 0) {
+      return [];
+    }
     print('Now on page $_currentPage');
     try {
       await Future.delayed(Duration(seconds: 1));
