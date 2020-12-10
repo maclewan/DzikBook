@@ -1,4 +1,5 @@
 import 'package:dzikbook/models/CommentModel.dart';
+import 'package:dzikbook/widgets/add_comment.dart';
 import 'package:flutter/material.dart';
 
 class CommentsSection extends StatefulWidget {
@@ -15,15 +16,16 @@ class _CommentsSectionState extends State<CommentsSection> {
     return Container(
       padding: EdgeInsets.only(top: 10),
       decoration: BoxDecoration(
-          border: Border(top: BorderSide(color: Colors.green, width: 1.5))),
+          border: Border(top: BorderSide(color: Colors.grey[300], width: 0.5))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            height: 200,
+            height: 150,
             child: ListView(
               children: [
+                //TODO: lazy loading for these
                 ...this.widget.comments.map(
                       (comment) => Container(
                         decoration: BoxDecoration(
@@ -48,7 +50,10 @@ class _CommentsSectionState extends State<CommentsSection> {
                     ),
               ],
             ),
-          )
+          ),
+          AddComment(
+            key: Key("1asdsccdgfdbgvbfc"),
+          ),
         ],
       ),
     );
