@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 
 class ReactionsSections extends StatefulWidget {
   ReactionsSections({Key key}) : super(key: key);
-  bool hasReacted = false;
-  int reactionCount = 0;
+
   @override
   _ReactionsSectionsState createState() => _ReactionsSectionsState();
 }
 
 class _ReactionsSectionsState extends State<ReactionsSections> {
+  bool hasReacted = false;
+  int reactionCount = 0;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -19,18 +20,16 @@ class _ReactionsSectionsState extends State<ReactionsSections> {
         children: [
           IconButton(
             icon: Icon(
-                this.widget.hasReacted
-                    ? Icons.favorite
-                    : Icons.favorite_outline,
+                this.hasReacted ? Icons.favorite : Icons.favorite_outline,
                 color: Colors.red[700]),
             onPressed: () {
               this.setState(() {
-                if (this.widget.hasReacted) {
-                  this.widget.reactionCount--;
-                  this.widget.hasReacted = false;
+                if (this.hasReacted) {
+                  this.reactionCount--;
+                  this.hasReacted = false;
                 } else {
-                  this.widget.reactionCount++;
-                  this.widget.hasReacted = true;
+                  this.reactionCount++;
+                  this.hasReacted = true;
                 }
               });
             },
@@ -40,7 +39,7 @@ class _ReactionsSectionsState extends State<ReactionsSections> {
             child: RichText(
                 text: TextSpan(children: [
               TextSpan(
-                  text: '${this.widget.reactionCount}',
+                  text: '${this.reactionCount}',
                   style: TextStyle(color: Colors.grey[400])),
               WidgetSpan(
                 child: Padding(

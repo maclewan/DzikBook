@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:dzikbook/models/CommentModel.dart';
 import 'package:dzikbook/models/dummyData.dart';
 import 'package:dzikbook/widgets/add_comment.dart';
@@ -44,7 +46,7 @@ class _CommentsSectionState extends State<CommentsSection> {
         children: [
           ReactionsSections(),
           Container(
-            height: 150,
+            height: min(150, (this.widget.comments.length) * 50.0),
             child: ScrollablePositionedList.builder(
               itemCount: this.widget.comments.length,
               itemScrollController: this.itemScrollController,
