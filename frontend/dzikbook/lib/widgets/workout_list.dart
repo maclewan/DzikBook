@@ -11,9 +11,8 @@ class WorkoutList extends StatelessWidget {
   Widget build(BuildContext context) {
     final workoutsData = Provider.of<Workouts>(context);
     final workouts = workoutsData.workouts;
-    print(workoutsData);
     return ListView.builder(
-      shrinkWrap: true,
+      // shrinkWrap: true,
       // scrollDirection: Axis.horizontal,
       itemCount: workouts.length,
       itemBuilder: (context, i) {

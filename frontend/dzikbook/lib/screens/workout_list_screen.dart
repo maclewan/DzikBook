@@ -1,3 +1,4 @@
+import 'package:dzikbook/screens/add_workout_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -9,9 +10,15 @@ class WorkoutListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final workoutsData = Provider.of<Workouts>(context);
-    final workouts = workoutsData.workouts;
+    // final workoutsData = Provider.of<Workouts>(context);
+    // final workouts = workoutsData.workouts;
     return Scaffold(
+        // floatingActionButton: FloatingActionButton(
+        //   child: Icon(Icons.add),
+        //   onPressed: () {
+        //     Navigator.of(context).pushNamed(AddWorkoutScreen.routeName);
+        //   },
+        // ),
         body: Container(
       // padding: EdgeInsets.only(left: 20),
       child: Column(
@@ -20,9 +27,9 @@ class WorkoutListScreen extends StatelessWidget {
           SizedBox(
             height: 40,
           ),
-          Align(
-            alignment: Alignment(-0.9, 0),
-            child: Text(
+          Flexible(
+              child: ListTile(
+            leading: Text(
               "Treningi",
               style: TextStyle(
                   fontFamily: 'Montserrat',
@@ -30,8 +37,19 @@ class WorkoutListScreen extends StatelessWidget {
                   fontSize: 36),
               textAlign: TextAlign.start,
             ),
-          ),
+            trailing: IconButton(
+              onPressed: () {
+                Navigator.of(context).pushNamed(AddWorkoutScreen.routeName);
+              },
+              icon: Icon(
+                Icons.add,
+                color: Theme.of(context).primaryColor,
+                size: 35,
+              ),
+            ),
+          )),
           Flexible(
+            flex: 10,
             child: WorkoutList(),
           ),
         ],

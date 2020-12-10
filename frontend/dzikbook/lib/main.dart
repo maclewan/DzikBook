@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import './providers/auth.dart';
 import './providers/workouts.dart';
 import './providers/diets.dart';
+import './providers/static.dart';
 
 import './screens/auth_screen.dart';
 import './screens/profile_screen.dart';
@@ -12,6 +13,7 @@ import './screens/workout_list_screen.dart';
 import './screens/workout_screen.dart';
 import './screens/diet_screen.dart';
 import './screens/diet_list_screen.dart';
+import 'screens/add_workout_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -31,6 +33,9 @@ class MyApp extends StatelessWidget {
           ),
           ChangeNotifierProvider(
             create: (context) => Diets(),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => Static(),
           )
         ],
         child: Consumer<Auth>(
@@ -50,6 +55,7 @@ class MyApp extends StatelessWidget {
               WorkoutScreen.routeName: (ctx) => WorkoutScreen(),
               DietListScreen.routeName: (ctx) => DietListScreen(),
               DietScreen.routeName: (ctx) => DietScreen(),
+              AddWorkoutScreen.routeName: (ctx) => AddWorkoutScreen(),
             },
           ),
         ));

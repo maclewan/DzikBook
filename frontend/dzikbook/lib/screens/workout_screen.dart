@@ -48,3 +48,25 @@ class WorkoutScreen extends StatelessWidget {
     );
   }
 }
+// Flexible(
+//                   // width: 100,
+//                   child: ListTile(
+//                 leading: Text(
+//                   "Treningi",
+//                   style: TextStyle(
+//                       fontFamily: 'Montserrat',
+//                       fontWeight: FontWeight.w700,
+//                       fontSize: 36),
+//                   textAlign: TextAlign.start,
+//                 ),
+//                 trailing: IconButton(
+//                   onPressed: () {
+//                     Navigator.of(context).pushNamed(AddWorkoutScreen.routeName);
+//                   },
+//                   icon: Icon(
+//                     Icons.add,
+//                     color: Theme.of(context).primaryColor,
+//                     size: 35,
+//                   ),
+//                 ),
+//               )),

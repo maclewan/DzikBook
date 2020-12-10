@@ -63,4 +63,15 @@ class Workouts with ChangeNotifier {
   List<Workout> get workouts {
     return [..._workouts];
   }
+
+  Future<int> countWorkoutLength(List<Exercise> exercises) async {
+    return exercises
+        .map((e) => e.breakTime * e.series)
+        .reduce((value, element) => value + element);
+  }
+
+  void addWorkout(Workout newWorkout) {
+    _workouts.add(newWorkout);
+    notifyListeners();
+  }
 }
