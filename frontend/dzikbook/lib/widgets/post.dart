@@ -112,12 +112,12 @@ class Post extends StatelessWidget {
           CommentsSection([
             CommentModel(
                 description: "Bardzo fajnie!", imgSource: this.userImg),
-            CommentModel(description: "X" * 100 + "D", imgSource: this.userImg),
-            CommentModel(description: "X" * 100 + "D", imgSource: this.userImg),
-            CommentModel(description: "X" * 100 + "D", imgSource: this.userImg),
-            CommentModel(description: "X" * 100 + "D", imgSource: this.userImg),
-            CommentModel(description: "X" * 100 + "D", imgSource: this.userImg),
-            CommentModel(description: "X" * 500 + "D", imgSource: this.userImg),
+            // CommentModel(description: "X" * 100 + "D", imgSource: this.userImg),
+            // CommentModel(description: "X" * 100 + "D", imgSource: this.userImg),
+            // CommentModel(description: "X" * 100 + "D", imgSource: this.userImg),
+            // CommentModel(description: "X" * 100 + "D", imgSource: this.userImg),
+            // CommentModel(description: "X" * 100 + "D", imgSource: this.userImg),
+            // CommentModel(description: "X" * 300 + "D", imgSource: this.userImg),
           ])
         ],
       ),
