@@ -103,7 +103,8 @@ class _AddPostState extends State<AddPost> {
                               bottomLeft: Radius.circular(10)),
                         ),
                         onPressed: () => {
-                          this.widget.addPost(myController.text),
+                          if (myController.text.isNotEmpty)
+                            {this.widget.addPost(myController.text)},
                           myController.clear(),
                         },
                         child: Text("OPUBLIKUJ",
