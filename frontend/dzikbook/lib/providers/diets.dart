@@ -207,4 +207,15 @@ class Diets with ChangeNotifier {
   List<Diet> get diets {
     return [..._diets];
   }
+
+  Future<double> sumCalories(List<Food> food) async {
+    return food
+        .map((e) => e.calories)
+        .reduce((value, element) => value + element);
+  }
+
+  Future<void> addDiet(Diet diet) {
+    _diets.add(diet);
+    notifyListeners();
+  }
 }

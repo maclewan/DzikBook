@@ -1,3 +1,4 @@
+import 'package:dzikbook/screens/add_diet_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -56,6 +57,7 @@ class MyApp extends StatelessWidget {
               DietListScreen.routeName: (ctx) => DietListScreen(),
               DietScreen.routeName: (ctx) => DietScreen(),
               AddWorkoutScreen.routeName: (ctx) => AddWorkoutScreen(),
+              AddDietScreen.routeName: (ctx) => AddDietScreen(),
             },
           ),
         ));

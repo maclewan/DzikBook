@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:dzikbook/providers/diets.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -8,55 +9,65 @@ import '../providers/workouts.dart';
 
 import '../widgets/data_detail_tile.dart';
 
-class AddWorkoutScreen extends StatefulWidget {
-  static final routeName = '/addWorkout';
+class AddDietScreen extends StatefulWidget {
+  static final routeName = '/addDiet';
   @override
-  _AddWorkoutScreenState createState() => _AddWorkoutScreenState();
+  _AddDietScreenState createState() => _AddDietScreenState();
 }
 
-class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
+class _AddDietScreenState extends State<AddDietScreen> {
   TextEditingController _nameController;
-  TextEditingController _exerciseController;
-  TextEditingController _seriesController;
-  TextEditingController _repsController;
-  TextEditingController _breakTimeController;
-  List<Exercise> _exercises = [];
+  TextEditingController _foodController;
+  TextEditingController _proteinController;
+  TextEditingController _kcalController;
+  TextEditingController _carbsController;
+  TextEditingController _fatController;
+  TextEditingController _weightController;
+  List<Food> _food = [];
   bool _cardVisible = false;
-  String exerciseName = 'Wybierz ćwiczenie';
-  final _exerciseForm = GlobalKey<FormState>();
-  final _workoutForm = GlobalKey<FormState>();
+  final _foodForm = GlobalKey<FormState>();
+  final _dietForm = GlobalKey<FormState>();
 
   @override
   void initState() {
     _nameController = TextEditingController();
-    _exerciseController = TextEditingController();
-    _seriesController = TextEditingController();
-    _repsController = TextEditingController();
-    _breakTimeController = TextEditingController();
+    _foodController = TextEditingController();
+    _proteinController = TextEditingController();
+    _kcalController = TextEditingController();
+    _carbsController = TextEditingController();
+    _fatController = TextEditingController();
+    _weightController = TextEditingController();
     super.initState();
   }
 
   @override
   void dispose() {
     _nameController.dispose();
-    _exerciseController.dispose();
+    _foodController.dispose();
+    _proteinController.dispose();
+    _kcalController.dispose();
+    _carbsController.dispose();
+    _fatController.dispose();
+    _weightController.dispose();
     super.dispose();
   }
 
-  Future<void> _addExercise() async {
-    final isValid = _exerciseForm.currentState.validate();
+  Future<void> _addFood() async {
+    final isValid = _foodForm.currentState.validate();
     if (!isValid) {
       return;
     }
-    _exerciseForm.currentState.save();
-    Exercise newExercise = Exercise(
+    _foodForm.currentState.save();
+    Food newFood = Food(
       id: DateTime.now().toIso8601String(),
-      name: _exerciseController.text,
-      series: int.parse(_seriesController.text.toString()),
-      reps: int.parse(_repsController.text.toString()),
-      breakTime: int.parse(_breakTimeController.text.toString()),
+      name: _foodController.text,
+      weight: roundToFixed(_weightController.text, 2),
+      protein: roundToFixed(_proteinController.text, 2),
+      calories: roundToFixed(_kcalController.text, 2),
+      carbs: roundToFixed(_carbsController.text, 2),
+      fat: roundToFixed(_fatController.text, 2),
     );
-    _exercises.add(newExercise);
+    _food.add(newFood);
     _clearControllers();
     setState(() {
       _cardVisible = false;
@@ -64,24 +75,31 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
   }
 
   void _clearControllers() {
-    _exerciseController.text = '';
-    _seriesController.text = '';
-    _repsController.text = '';
-    _breakTimeController.text = '';
+    _foodController.text = '';
+    _proteinController.text = '';
+    _kcalController.text = '';
+    _carbsController.text = '';
+    _fatController.text = '';
+    _weightController.text = '';
   }
 
-  Future<void> _addWorkout() async {
-    final isValid = _workoutForm.currentState.validate();
+  double roundToFixed(String number, int places) {
+    return double.parse(double.parse(number).toStringAsFixed(places));
+  }
+
+  Future<void> _addDiet() async {
+    final isValid = _dietForm.currentState.validate();
     if (!isValid) {
       return;
     }
-    final _workoutProvider = Provider.of<Workouts>(context, listen: false);
-    final workoutTime = await _workoutProvider.countWorkoutLength(_exercises);
-    Workout newWorkout = Workout(
-        name: _nameController.text,
-        workoutLength: (workoutTime / 60).ceil(),
-        exercises: _exercises);
-    _workoutProvider.addWorkout(newWorkout);
+    final _dietProvider = Provider.of<Diets>(context, listen: false);
+    final totalCalories = await _dietProvider.sumCalories(_food);
+    Diet newDiet = Diet(
+      name: _nameController.text,
+      dietCalories: totalCalories.round(),
+      foodList: _food,
+    );
+    _dietProvider.addDiet(newDiet);
     Navigator.of(context).pop();
   }
 
@@ -89,13 +107,12 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 20),
             child: Form(
-              key: _workoutForm,
+              key: _dietForm,
               child: Column(
                 children: [
                   SizedBox(
@@ -127,7 +144,7 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
                   ),
                   ListTile(
                     title: Text(
-                      "Ćwiczenia",
+                      "Jedzenie",
                       style: TextStyle(fontSize: 30),
                     ),
                     trailing: GestureDetector(
@@ -141,17 +158,17 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
                   ),
                   Flexible(
                     child: ListView.builder(
-                      itemCount: _exercises.length,
+                      itemCount: _food.length,
                       itemBuilder: (context, id) {
                         return ListTile(
-                          title: Text(_exercises[id].name),
+                          title: Text(_food[id].name),
                           trailing: IconButton(
                             icon: Icon(
                               Icons.delete,
                               color: Colors.redAccent,
                             ),
                             onPressed: () {
-                              _exercises.removeAt(id);
+                              _food.removeAt(id);
                               setState(() {});
                             },
                           ),
@@ -190,13 +207,13 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
                 ),
                 RaisedButton(
                   onPressed: () {
-                    if (_exercises.isEmpty) {
+                    if (_food.isEmpty) {
                       return showDialog(
                           context: context,
                           builder: (ctx) => AlertDialog(
                                 title: Text("Błąd!"),
                                 content: Text(
-                                    "Nie dodano żadnych ćwiczeń do tego treningu!"),
+                                    "Nie dodano żadnych posiłków do tej diety!"),
                                 actions: [
                                   FlatButton(
                                       onPressed: () {
@@ -206,7 +223,7 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
                                 ],
                               ));
                     } else {
-                      _addWorkout();
+                      _addDiet();
                     }
                   },
                   child: Text(
@@ -222,14 +239,14 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
             ),
           ),
           Positioned(
-            top: deviceSize.height * 0.25,
+            top: deviceSize.height * 0.23,
             left: deviceSize.width * 0.1,
             child: Visibility(
               visible: _cardVisible,
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
                 child: Container(
-                  height: deviceSize.height * 0.5,
+                  height: deviceSize.height * 0.64,
                   width: deviceSize.width * 0.8,
                   child: Card(
                     elevation: 4,
@@ -238,23 +255,14 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
                         horizontal: 0,
                       ),
                       child: Form(
-                        key: _exerciseForm,
+                        key: _foodForm,
                         child: ListView(
                           children: [
                             ListTile(
-                              onTap: () async {
-                                final response = await showSearch(
-                                  context: context,
-                                  delegate: ExerciseSearch(),
-                                );
-                                if (response != null)
-                                  _exerciseController.text = response;
-                              },
                               title: TextFormField(
-                                controller: _exerciseController,
-                                enabled: false,
+                                controller: _foodController,
                                 decoration: InputDecoration(
-                                  hintText: 'Wybierz ćwiczenie',
+                                  hintText: 'Nazwa posiłku',
                                 ),
                                 validator: (value) {
                                   if (value.isEmpty) {
@@ -263,28 +271,34 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
                                   return null;
                                 },
                               ),
-                              trailing: Icon(
-                                Icons.search,
-                                color: Theme.of(context).primaryColor,
-                              ),
                             ),
                             SizedBox(
                               height: 10,
                             ),
                             DataDetailTile(
                               deviceSize: deviceSize,
-                              textController: _seriesController,
-                              title: "Serie",
+                              textController: _weightController,
+                              title: "Waga (g)",
                             ),
                             DataDetailTile(
                               deviceSize: deviceSize,
-                              textController: _repsController,
-                              title: "Powtórzenia",
+                              textController: _proteinController,
+                              title: "Białko (g)",
                             ),
                             DataDetailTile(
                               deviceSize: deviceSize,
-                              textController: _breakTimeController,
-                              title: "Przerwa (sek)",
+                              textController: _kcalController,
+                              title: "Kalorie",
+                            ),
+                            DataDetailTile(
+                              deviceSize: deviceSize,
+                              textController: _carbsController,
+                              title: "Węgle (g)",
+                            ),
+                            DataDetailTile(
+                              deviceSize: deviceSize,
+                              textController: _fatController,
+                              title: "Tłuszcz (g)",
                             ),
                             SizedBox(
                               height: 50,
@@ -309,7 +323,7 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
                                   ),
                                 ),
                                 FlatButton(
-                                  onPressed: _addExercise,
+                                  onPressed: _addFood,
                                   child: Text(
                                     'Dodaj',
                                     style: TextStyle(
@@ -334,66 +348,4 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
       ),
     );
   }
-}
-
-class ExerciseSearch extends SearchDelegate<String> {
-  @override
-  List<Widget> buildActions(BuildContext context) {
-    return [
-      IconButton(
-        icon: Icon(Icons.clear),
-        onPressed: () {
-          query = "";
-        },
-      ),
-    ];
-  }
-
-  @override
-  Widget buildLeading(BuildContext context) {
-    return IconButton(
-      icon: Icon(Icons.arrow_back),
-      onPressed: () {
-        close(context, null);
-      },
-    );
-  }
-
-  @override
-  Widget buildResults(BuildContext context) {
-    return null;
-  }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    final allItems = Provider.of<Static>(context, listen: false).exerciseNames;
-    final suggestions = query.isEmpty
-        ? allItems
-        : allItems
-            .where((element) =>
-                element.toLowerCase().contains(query.toLowerCase()))
-            .toList();
-
-    return suggestions.isEmpty
-        ? Text(
-            'Nie znaleziono...',
-            style: TextStyle(
-              fontSize: 20,
-            ),
-          )
-        : ListView.builder(
-            itemCount: suggestions.length,
-            itemBuilder: (context, index) {
-              return ListTile(
-                title: Text(suggestions[index]),
-                onTap: () {
-                  close(context, suggestions[index]);
-                },
-              );
-            },
-          );
-  }
-
-  @override
-  String get searchFieldLabel => "Szukaj ćwiczenia...";
 }
