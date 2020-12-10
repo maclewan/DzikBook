@@ -6,9 +6,15 @@ import 'package:english_words/english_words.dart';
 class PostModel {
   final String description;
   final String id, userImg, userName, timeTaken;
+  final String loadedImg;
 
   PostModel(
-      {this.description, this.id, this.userImg, this.userName, this.timeTaken});
+      {this.description,
+      this.id,
+      this.userImg,
+      this.userName,
+      this.timeTaken,
+      this.loadedImg = ""});
 }
 
 class PostFetcher {

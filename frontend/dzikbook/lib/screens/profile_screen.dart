@@ -14,20 +14,24 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   List<PostModel> _posts = [
     PostModel(
-      description: "Cześć i czołem, sprzedam opla!",
+      description: "Cześć i czołem, Oto zdjęcie w 4k!",
       id: '2',
       userImg:
           "https://scontent-waw1-1.cdninstagram.com/v/t51.2885-15/sh0.08/e35/p640x640/100932251_571933510393075_7245450438890519547_n.jpg?_nc_ht=scontent-waw1-1.cdninstagram.com&_nc_cat=107&_nc_ohc=qGVRrRvO0H4AX_Zrzea&tp=1&oh=71895bb42cf5ddc0b6be9d770cdd3ace&oe=5FF6CF63",
       userName: "Aleksandra",
       timeTaken: "36m",
+      loadedImg:
+          "https://external-preview.redd.it/GOkP8onbuyjGmN9Rc8Que5mw21CdSw6OuXpAKUuE6-4.jpg?auto=webp&s=2bc0e522d1f2fa887333286d557466b2be00fa5e",
     ),
     PostModel(
-      description: "Kupię 3 Ople!\n" * 3,
+      description: "O M G  ale super fotka",
       id: '3',
       userImg:
           "https://scontent-waw1-1.xx.fbcdn.net/v/t1.0-9/71234841_2546282945431303_4647513029292851200_o.jpg?_nc_cat=104&ccb=2&_nc_sid=09cbfe&_nc_ohc=BysYn0HX6UsAX8r23I8&_nc_ht=scontent-waw1-1.xx&oh=a9e74690edc8800402b331d5d1954c98&oe=5FF2575B",
       userName: "Paweł",
       timeTaken: "1h15m",
+      loadedImg:
+          "https://scontent-waw1-1.cdninstagram.com/v/t51.2885-15/sh0.08/e35/p640x640/67877813_382156209038925_8513675155840603087_n.jpg?_nc_ht=scontent-waw1-1.cdninstagram.com&_nc_cat=109&_nc_ohc=u-LKXxK-arsAX9rJagO&tp=1&oh=1a5c2d444061b2bf8a3ca1b037167de1&oe=5FFA1A58",
     ),
     PostModel(
       description:
@@ -142,9 +146,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: SizedBox(
-                    child: CircularProgressIndicator(
-                      backgroundColor: Colors.green,
-                    ),
+                    child: CircularProgressIndicator(),
                     height: 24,
                     width: 24,
                   ),
@@ -157,6 +159,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               timeTaken: _posts[index - 1].timeTaken,
               userImg: _posts[index - 1].userImg,
               userName: _posts[index - 1].userName,
+              loadedImg: _posts[index - 1].loadedImg,
             );
           },
         ));

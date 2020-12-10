@@ -6,8 +6,14 @@ class Post extends StatelessWidget {
   final String userName;
   final String description;
   final String timeTaken;
+  final String loadedImg;
   Post(
-      {this.id, this.userName, this.description, this.userImg, this.timeTaken});
+      {this.id,
+      this.userName,
+      this.description,
+      this.userImg,
+      this.timeTaken,
+      this.loadedImg = ""});
 
   @override
   Widget build(BuildContext context) {
@@ -83,6 +89,16 @@ class Post extends StatelessWidget {
               color: Colors.grey[100],
             ),
           ),
+          this.loadedImg == ""
+              ? Container()
+              : Image.network(
+                  this.loadedImg,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    return loadingProgress == null
+                        ? child
+                        : LinearProgressIndicator();
+                  },
+                ),
         ],
       ),
     );
