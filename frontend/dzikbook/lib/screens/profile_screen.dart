@@ -1,3 +1,4 @@
+import 'package:dzikbook/screens/calendar_plans_screen.dart';
 import 'package:dzikbook/screens/diet_list_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -36,7 +37,20 @@ class ProfileScreen extends StatelessWidget {
               "Diety",
               style: TextStyle(color: Colors.white),
             ),
-          )
+          ),
+          SizedBox(
+            height: 30,
+          ),
+          FlatButton(
+            color: Theme.of(context).primaryColor,
+            onPressed: () {
+              Navigator.of(context).pushNamed(CalendarPlansScreen.routeName);
+            },
+            child: Text(
+              "Kalendarz",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
         ],
       ),
     );
