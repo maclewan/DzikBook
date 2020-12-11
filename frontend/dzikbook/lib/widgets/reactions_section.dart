@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ReactionsSections extends StatefulWidget {
-  final int likes;
+  int likes;
   ReactionsSections({this.likes});
 
   @override
@@ -9,13 +9,7 @@ class ReactionsSections extends StatefulWidget {
 }
 
 class _ReactionsSectionsState extends State<ReactionsSections> {
-  int reactions;
   bool hasReacted = false;
-  @override
-  void initState() {
-    reactions = this.widget.likes;
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,10 +26,10 @@ class _ReactionsSectionsState extends State<ReactionsSections> {
             onPressed: () {
               this.setState(() {
                 if (this.hasReacted) {
-                  this.reactions--;
+                  this.widget.likes--;
                   this.hasReacted = false;
                 } else {
-                  this.reactions++;
+                  this.widget.likes++;
                   this.hasReacted = true;
                 }
               });
@@ -46,7 +40,7 @@ class _ReactionsSectionsState extends State<ReactionsSections> {
             child: RichText(
                 text: TextSpan(children: [
               TextSpan(
-                  text: '${this.reactions}',
+                  text: '${this.widget.likes}',
                   style: TextStyle(color: Colors.grey[400])),
               WidgetSpan(
                 child: Padding(

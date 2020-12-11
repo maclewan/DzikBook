@@ -154,6 +154,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               );
             }
+
             return Post(
               description: _posts[index - 1].description,
               id: index.toString(),

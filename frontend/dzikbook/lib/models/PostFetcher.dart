@@ -27,8 +27,8 @@ class PostModel {
 }
 
 class PostFetcher {
-  final _count = 40;
-  final _itemsPerPage = 10;
+  final _count = 30;
+  final _itemsPerPage = 30;
   int _currentPage = 0;
   Random random = new Random();
 

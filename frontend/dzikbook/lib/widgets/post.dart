@@ -23,7 +23,7 @@ class Post extends StatelessWidget {
     @required this.hasImage,
     this.loadedImg,
     this.comments,
-    this.likes = 0,
+    @required this.likes,
   });
 
   @override
