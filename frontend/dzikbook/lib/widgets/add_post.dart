@@ -18,7 +18,7 @@ class _AddPostState extends State<AddPost> {
   File _image;
   final picker = ImagePicker();
   Future getImage() async {
-    final pickedFile = await picker.getImage(source: ImageSource.camera);
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
 
     setState(() {
       if (pickedFile != null) {
@@ -139,11 +139,11 @@ class _AddPostState extends State<AddPost> {
                         ),
                         onPressed: getImage,
                         child: Text(
-                          "zdjęcie/film",
+                          "zdjęcie",
                           style: TextStyle(
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
-                              fontSize: 10),
+                              fontSize: 11),
                         ),
                         color: Color.fromRGBO(126, 213, 111, 1.0),
                       ),
@@ -164,7 +164,7 @@ class _AddPostState extends State<AddPost> {
                           style: TextStyle(
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
-                              fontSize: 10),
+                              fontSize: 11),
                         ),
                         color: Color.fromRGBO(126, 213, 111, 1.0),
                       ),
