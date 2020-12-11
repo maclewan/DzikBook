@@ -19,15 +19,17 @@ class DataDetailTile extends StatelessWidget {
       title: Text(
         title,
         style: TextStyle(
-          fontSize: 20,
+          fontSize: 16,
         ),
       ),
       trailing: Container(
           width: deviceSize.width * 0.10,
           child: TextFormField(
             controller: _textController,
+            style: TextStyle(fontSize: 15),
             keyboardType: TextInputType.number,
             textInputAction: TextInputAction.next,
+            // decoration: InputDecoration(),
             validator: (value) {
               if (value.isEmpty ||
                   double.tryParse(value) == null ||

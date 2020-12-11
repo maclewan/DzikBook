@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import './workouts.dart';
 import './diets.dart';
 import 'package:flutter/foundation.dart';
-import "package:merge_map/merge_map.dart";
 
 class dayPlan {
   final String id;

@@ -128,7 +128,7 @@ class _AddDietScreenState extends State<AddDietScreen> {
                       textAlign: TextAlign.center,
                       cursorColor: Theme.of(context).primaryColor,
                       style: TextStyle(
-                        fontSize: 36,
+                        fontSize: 25,
                         color: Color.fromRGBO(0, 0, 0, 1),
                       ),
                       validator: (value) {
@@ -145,7 +145,7 @@ class _AddDietScreenState extends State<AddDietScreen> {
                   ListTile(
                     title: Text(
                       "Jedzenie",
-                      style: TextStyle(fontSize: 30),
+                      style: TextStyle(fontSize: 22),
                     ),
                     trailing: GestureDetector(
                       onTap: () {
@@ -153,7 +153,10 @@ class _AddDietScreenState extends State<AddDietScreen> {
                           _cardVisible = true;
                         });
                       },
-                      child: Icon(Icons.add),
+                      child: Icon(
+                        Icons.add,
+                        color: Theme.of(context).primaryColor,
+                      ),
                     ),
                   ),
                   Flexible(
@@ -186,9 +189,9 @@ class _AddDietScreenState extends State<AddDietScreen> {
             right: 0,
             // left: deviceSize.width * 0.5,
             child: ButtonBar(
-              buttonHeight: 50,
-              buttonMinWidth: 150,
-              alignment: MainAxisAlignment.spaceAround,
+              buttonHeight: 40,
+              buttonMinWidth: 100,
+              alignment: MainAxisAlignment.spaceEvenly,
               children: [
                 RaisedButton(
                   onPressed: () {
@@ -305,7 +308,7 @@ class _AddDietScreenState extends State<AddDietScreen> {
                               height: deviceSize.height * 0.01,
                             ),
                             ButtonBar(
-                              alignment: MainAxisAlignment.spaceAround,
+                              alignment: MainAxisAlignment.spaceEvenly,
                               // buttonHeight: 30,
                               children: [
                                 FlatButton(
@@ -319,7 +322,7 @@ class _AddDietScreenState extends State<AddDietScreen> {
                                     'Anuluj',
                                     style: TextStyle(
                                       color: Colors.redAccent,
-                                      fontSize: 18,
+                                      fontSize: 16,
                                     ),
                                   ),
                                 ),
@@ -330,7 +333,7 @@ class _AddDietScreenState extends State<AddDietScreen> {
                                     style: TextStyle(
                                       color: Theme.of(context).primaryColor,
                                       fontWeight: FontWeight.w500,
-                                      fontSize: 18,
+                                      fontSize: 16,
                                     ),
                                   ),
                                 ),

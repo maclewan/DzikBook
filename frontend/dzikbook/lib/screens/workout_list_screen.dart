@@ -27,7 +27,7 @@ class WorkoutListScreen extends StatelessWidget {
               style: TextStyle(
                   fontFamily: 'Montserrat',
                   fontWeight: FontWeight.w700,
-                  fontSize: 36),
+                  fontSize: 25),
               textAlign: TextAlign.start,
             ),
             trailing: IconButton(
@@ -37,7 +37,7 @@ class WorkoutListScreen extends StatelessWidget {
               icon: Icon(
                 Icons.add,
                 color: Theme.of(context).primaryColor,
-                size: 35,
+                size: 25,
               ),
             ),
           )),

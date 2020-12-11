@@ -12,7 +12,7 @@ class FoodItem extends StatelessWidget {
       key: PageStorageKey<Food>(root),
       title: Text(
         root.name,
-        style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
       ),
       children: [
         StaticDetailTile(

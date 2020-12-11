@@ -111,7 +111,7 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
                       textAlign: TextAlign.center,
                       cursorColor: Theme.of(context).primaryColor,
                       style: TextStyle(
-                        fontSize: 36,
+                        fontSize: 25,
                         color: Color.fromRGBO(0, 0, 0, 1),
                       ),
                       validator: (value) {
@@ -128,7 +128,7 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
                   ListTile(
                     title: Text(
                       "Ćwiczenia",
-                      style: TextStyle(fontSize: 30),
+                      style: const TextStyle(fontSize: 22),
                     ),
                     trailing: GestureDetector(
                       onTap: () {
@@ -136,7 +136,10 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
                           _cardVisible = true;
                         });
                       },
-                      child: Icon(Icons.add),
+                      child: Icon(
+                        Icons.add,
+                        color: Theme.of(context).primaryColor,
+                      ),
                     ),
                   ),
                   Flexible(
@@ -169,25 +172,25 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
             right: 0,
             // left: deviceSize.width * 0.5,
             child: ButtonBar(
-              buttonHeight: 50,
-              buttonMinWidth: 150,
-              alignment: MainAxisAlignment.spaceAround,
+              buttonHeight: 40,
+              buttonMinWidth: 100,
+              alignment: MainAxisAlignment.spaceEvenly,
               children: [
-                RaisedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text(
-                    "Anuluj",
-                    style: TextStyle(
-                      fontSize: 20,
-                    ),
-                  ),
-                  color: Colors.redAccent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
+                // RaisedButton(
+                //   onPressed: () {
+                //     Navigator.of(context).pop();
+                //   },
+                //   child: Text(
+                //     "Anuluj",
+                //     style: TextStyle(
+                //       fontSize: 20,
+                //     ),
+                //   ),
+                //   color: Colors.redAccent,
+                //   shape: RoundedRectangleBorder(
+                //     borderRadius: BorderRadius.circular(18),
+                //   ),
+                // ),
                 RaisedButton(
                   onPressed: () {
                     if (_exercises.isEmpty) {
@@ -215,7 +218,7 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
                   ),
                   color: Theme.of(context).primaryColor,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(18),
                   ),
                 ),
               ],
@@ -291,7 +294,7 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
                               height: deviceSize.height * 0.03,
                             ),
                             ButtonBar(
-                              alignment: MainAxisAlignment.spaceAround,
+                              alignment: MainAxisAlignment.spaceEvenly,
                               // buttonHeight: 30,
                               children: [
                                 FlatButton(
@@ -305,7 +308,7 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
                                     'Anuluj',
                                     style: TextStyle(
                                       color: Colors.redAccent,
-                                      fontSize: 18,
+                                      fontSize: 16,
                                     ),
                                   ),
                                 ),
@@ -316,7 +319,7 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
                                     style: TextStyle(
                                       color: Theme.of(context).primaryColor,
                                       fontWeight: FontWeight.w500,
-                                      fontSize: 18,
+                                      fontSize: 16,
                                     ),
                                   ),
                                 ),

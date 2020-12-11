@@ -23,14 +23,14 @@ class StaticDetailTile extends StatelessWidget {
         child: ListTile(
           title: Text(
             categoryType,
-            style: TextStyle(fontSize: 18),
+            style: TextStyle(fontSize: 16),
           ),
           trailing: SizedBox(
             width: deviceSize.width * 0.20,
             child: Text(
               '$dataText $units',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 18),
+              style: TextStyle(fontSize: 16),
             ),
           ),
         ),

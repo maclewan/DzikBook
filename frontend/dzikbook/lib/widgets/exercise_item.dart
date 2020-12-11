@@ -12,9 +12,8 @@ class ExerciseItem extends StatelessWidget {
       key: PageStorageKey<Exercise>(root),
       title: Text(
         root.name,
-        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
       ),
-      backgroundColor: Colors.white,
       children: [
         StaticDetailTile(
           categoryType: "Serie",

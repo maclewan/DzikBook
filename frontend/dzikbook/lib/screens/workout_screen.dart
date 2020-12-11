@@ -23,7 +23,7 @@ class WorkoutScreen extends StatelessWidget {
             Text(
               workoutData.name,
               style: TextStyle(
-                fontSize: 36,
+                fontSize: 25,
                 fontWeight: FontWeight.w500,
               ),
               textAlign: TextAlign.center,

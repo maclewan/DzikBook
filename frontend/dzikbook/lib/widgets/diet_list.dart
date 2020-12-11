@@ -32,11 +32,12 @@ class DietList extends StatelessWidget {
               child: ListTile(
                 leading: SvgPicture.asset(
                   'assets/images/diet.svg',
+                  height: 30,
                 ),
                 title: Text(
                   diets[i].name,
                   style: TextStyle(
-                      fontSize: 22,
+                      fontSize: 18,
                       color: Color.fromRGBO(0, 0, 0, 0.7),
                       fontWeight: FontWeight.w500),
                 ),
@@ -46,7 +47,7 @@ class DietList extends StatelessWidget {
                     Text(
                       '${diets[i].dietCalories} kcal',
                       style: TextStyle(
-                          fontSize: 20, color: Color.fromRGBO(0, 0, 0, 0.7)),
+                          fontSize: 16, color: Color.fromRGBO(0, 0, 0, 0.7)),
                     ),
                     Visibility(
                         visible: addToPlans,
@@ -54,6 +55,7 @@ class DietList extends StatelessWidget {
                           icon: Icon(
                             Icons.add,
                             color: Theme.of(context).primaryColor,
+                            size: 22,
                           ),
                           onPressed: () {
                             Navigator.of(context).pop(diets[i]);

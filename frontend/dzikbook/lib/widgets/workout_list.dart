@@ -16,11 +16,8 @@ class WorkoutList extends StatelessWidget {
     final workoutsData = Provider.of<Workouts>(context);
     final workouts = workoutsData.workouts;
     return ListView.builder(
-      // shrinkWrap: true,
-      // scrollDirection: Axis.horizontal,
       itemCount: workouts.length,
       itemBuilder: (context, i) {
-        // return Text(workouts[i].name);
         return Column(
           children: [
             GestureDetector(
@@ -31,11 +28,14 @@ class WorkoutList extends StatelessWidget {
                 );
               },
               child: ListTile(
-                leading: SvgPicture.asset('assets/images/dumbbell.svg'),
+                leading: SvgPicture.asset(
+                  'assets/images/dumbbell.svg',
+                  height: 30,
+                ),
                 title: Text(
                   workouts[i].name,
                   style: TextStyle(
-                      fontSize: 22,
+                      fontSize: 18,
                       color: Color.fromRGBO(0, 0, 0, 0.7),
                       fontWeight: FontWeight.w500),
                 ),
@@ -45,7 +45,7 @@ class WorkoutList extends StatelessWidget {
                     Text(
                       '${workouts[i].workoutLength} min',
                       style: TextStyle(
-                          fontSize: 20, color: Color.fromRGBO(0, 0, 0, 0.7)),
+                          fontSize: 16, color: Color.fromRGBO(0, 0, 0, 0.7)),
                     ),
                     Visibility(
                       visible: addToPlans,
@@ -53,6 +53,7 @@ class WorkoutList extends StatelessWidget {
                         icon: Icon(
                           Icons.add,
                           color: Theme.of(context).primaryColor,
+                          size: 22,
                         ),
                         onPressed: () {
                           Navigator.of(context).pop(workouts[i]);
@@ -65,7 +66,6 @@ class WorkoutList extends StatelessWidget {
             ),
             Divider(
               thickness: 0,
-              height: 20,
             ),
           ],
         );

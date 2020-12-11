@@ -1,4 +1,7 @@
 import 'package:dzikbook/models/PostFetcher.dart';
+import 'package:dzikbook/screens/calendar_plans_screen.dart';
+import 'package:dzikbook/screens/diet_list_screen.dart';
+import 'package:dzikbook/screens/workout_list_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'package:dzikbook/widgets/add_post.dart';
@@ -130,9 +133,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
         appBar: AppBar(
           title: Text("Twój profil"),
           actions: [
-            IconButton(icon: Icon(Icons.home), onPressed: () => {}),
-            IconButton(icon: Icon(Icons.food_bank), onPressed: () => {}),
-            IconButton(icon: Icon(Icons.fitness_center), onPressed: () => {}),
+            IconButton(
+                icon: Icon(Icons.home),
+                onPressed: () => {
+                      Navigator.of(context)
+                          .pushNamed(CalendarPlansScreen.routeName)
+                    }),
+            IconButton(
+                icon: Icon(Icons.food_bank),
+                onPressed: () => {
+                      Navigator.of(context).pushNamed(DietListScreen.routeName,
+                          arguments: false),
+                    }),
+            IconButton(
+                icon: Icon(Icons.fitness_center),
+                onPressed: () => {
+                      Navigator.of(context).pushNamed(
+                          WorkoutListScreen.routeName,
+                          arguments: false)
+                    }),
           ],
         ),
         body: ListView.builder(
