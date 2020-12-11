@@ -1,10 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AddPost extends StatefulWidget {
-  String userImage;
+  final String userImage;
   final void Function(String) addPost;
 
-  AddPost(this.addPost, this.userImage);
+  const AddPost(this.addPost, this.userImage);
 
   @override
   _AddPostState createState() => _AddPostState();
@@ -12,6 +15,19 @@ class AddPost extends StatefulWidget {
 
 class _AddPostState extends State<AddPost> {
   final myController = TextEditingController();
+  File _image;
+  final picker = ImagePicker();
+  Future getImage() async {
+    final pickedFile = await picker.getImage(source: ImageSource.camera);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      } else {
+        print('No image selected.');
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -120,7 +136,7 @@ class _AddPostState extends State<AddPost> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(0),
                         ),
-                        onPressed: () => {},
+                        onPressed: getImage,
                         child: Text(
                           "zdjęcie/film",
                           style: TextStyle(

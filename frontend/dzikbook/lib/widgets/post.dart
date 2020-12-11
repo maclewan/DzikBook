@@ -1,4 +1,8 @@
+import 'package:dzikbook/models/CommentModel.dart';
+import 'package:dzikbook/widgets/comments_section.dart';
 import 'package:flutter/material.dart';
+
+import 'reactions_section.dart';
 
 class Post extends StatelessWidget {
   final String id;
@@ -6,13 +10,24 @@ class Post extends StatelessWidget {
   final String userName;
   final String description;
   final String timeTaken;
-  Post(
-      {this.id, this.userName, this.description, this.userImg, this.timeTaken});
+  final String loadedImg;
+  final List<CommentModel> comments;
+  final int likes;
+  Post({
+    @required this.id,
+    @required this.userName,
+    @required this.description,
+    @required this.userImg,
+    @required this.timeTaken,
+    this.loadedImg = "",
+    this.comments,
+    this.likes = 0,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(5),
         border: Border.all(
@@ -37,9 +52,9 @@ class Post extends StatelessWidget {
                       decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           image: DecorationImage(
-                            image: NetworkImage(this.userImg),
-                            fit: BoxFit.cover,
-                          )),
+                              image: NetworkImage(this.userImg),
+                              fit: BoxFit.cover,
+                              alignment: Alignment.topCenter)),
                     ),
                     Text(
                       this.userName,
@@ -80,9 +95,24 @@ class Post extends StatelessWidget {
             ),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(5),
-              color: Colors.grey[100],
+              color: Colors.grey[50],
             ),
           ),
+          this.loadedImg == ""
+              ? Container()
+              : Image.network(
+                  this.loadedImg,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    return loadingProgress == null
+                        ? child
+                        : LinearProgressIndicator(
+                            value: loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes,
+                          );
+                  },
+                ),
+          ReactionsSections(likes: this.likes),
+          CommentsSection(this.comments),
         ],
       ),
     );

@@ -28,6 +28,9 @@ dependencies:
   http: ^0.12.2
   flutter_svg: ^0.18.0
   english_words: ^3.1.5
+  image_picker: ^0.6.7+14
+  cached_network_image: ^2.4.1
+  scrollable_positioned_list: ^0.1.8
 
 
   # The following adds the Cupertino Icons font to your application.
