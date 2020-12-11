@@ -15,6 +15,7 @@ import './screens/workout_screen.dart';
 import './screens/diet_screen.dart';
 import './screens/diet_list_screen.dart';
 import 'screens/add_workout_screen.dart';
+import 'screens/search_people_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -48,7 +49,7 @@ class MyApp extends StatelessWidget {
               fontFamily: 'Montserrat',
               visualDensity: VisualDensity.adaptivePlatformDensity,
             ),
-            home: ProfileScreen(),
+            home: PersonsListScreen(),
             routes: {
               ProfileScreen.routeName: (ctx) => ProfileScreen(),
               AuthScreen.routeName: (ctx) => AuthScreen(),
@@ -58,6 +59,7 @@ class MyApp extends StatelessWidget {
               DietScreen.routeName: (ctx) => DietScreen(),
               AddWorkoutScreen.routeName: (ctx) => AddWorkoutScreen(),
               AddDietScreen.routeName: (ctx) => AddDietScreen(),
+              PersonsListScreen.routeName: (ctx) => PersonsListScreen(),
             },
           ),
         ));
