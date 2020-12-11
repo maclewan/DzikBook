@@ -38,7 +38,6 @@ class _CommentsSectionState extends State<CommentsSection> {
 
   @override
   Widget build(BuildContext context) {
-    print(this.widget.comments.length);
     return Container(
       padding: EdgeInsets.only(top: 10),
       decoration: BoxDecoration(
@@ -54,7 +53,6 @@ class _CommentsSectionState extends State<CommentsSection> {
               itemScrollController: this.itemScrollController,
               itemPositionsListener: this.itemPositionsListener,
               itemBuilder: (context, index) {
-                print(index);
                 if (index == -1) return null;
                 return Container(
                   decoration: BoxDecoration(

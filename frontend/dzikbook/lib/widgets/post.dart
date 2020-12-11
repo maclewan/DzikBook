@@ -111,7 +111,7 @@ class Post extends StatelessWidget {
                           );
                   },
                 ),
-          ReactionsSections(reactions: this.likes),
+          ReactionsSections(likes: this.likes),
           CommentsSection(this.comments),
         ],
       ),

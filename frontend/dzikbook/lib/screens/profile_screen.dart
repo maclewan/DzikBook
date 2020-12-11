@@ -1,4 +1,3 @@
-import 'package:dzikbook/models/CommentModel.dart';
 import 'package:dzikbook/models/PostFetcher.dart';
 import 'package:flutter/material.dart';
 
