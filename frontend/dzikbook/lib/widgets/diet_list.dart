@@ -6,6 +6,10 @@ import 'package:provider/provider.dart';
 import '../providers/diets.dart';
 
 class DietList extends StatelessWidget {
+  final bool addToPlans;
+
+  DietList({this.addToPlans});
+
   @override
   Widget build(BuildContext context) {
     final dietsData = Provider.of<Diets>(context);
@@ -36,10 +40,26 @@ class DietList extends StatelessWidget {
                       color: Color.fromRGBO(0, 0, 0, 0.7),
                       fontWeight: FontWeight.w500),
                 ),
-                trailing: Text(
-                  '${diets[i].dietCalories} kcal',
-                  style: TextStyle(
-                      fontSize: 20, color: Color.fromRGBO(0, 0, 0, 0.7)),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '${diets[i].dietCalories} kcal',
+                      style: TextStyle(
+                          fontSize: 20, color: Color.fromRGBO(0, 0, 0, 0.7)),
+                    ),
+                    Visibility(
+                        visible: addToPlans,
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.add,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pop(diets[i]);
+                          },
+                        ))
+                  ],
                 ),
               ),
             ),

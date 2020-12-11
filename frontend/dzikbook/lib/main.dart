@@ -65,9 +65,7 @@ class MyApp extends StatelessWidget {
               DietScreen.routeName: (ctx) => DietScreen(),
               AddWorkoutScreen.routeName: (ctx) => AddWorkoutScreen(),
               AddDietScreen.routeName: (ctx) => AddDietScreen(),
-              CalendarPlansScreen.routeName: (ctx) => CalendarPlansScreen(
-                    title: "Plan",
-                  ),
+              CalendarPlansScreen.routeName: (ctx) => CalendarPlansScreen(),
             },
           ),
         ));

@@ -23,18 +23,19 @@ class DayPlans with ChangeNotifier {
   final Map<DateTime, List<Object>> _workoutPlans = {};
   final Map<DateTime, List<Object>> _dietPlans = {};
 
-  void addWorkoutPlan(Workout plan, DateTime date) {
+  Future<void> addWorkoutPlan(Workout plan, DateTime date) async {
     _workoutPlans.containsKey(date)
         ? _workoutPlans[date].add(plan)
         : _workoutPlans[date] = [plan];
-    // notifyListeners();
+    print(_workoutPlans[date]);
+    notifyListeners();
   }
 
   void addDietPlan(Diet plan, DateTime date) {
     _dietPlans.containsKey(date)
         ? _dietPlans[date].add(plan)
         : _dietPlans[date] = [plan];
-    // notifyListeners();
+    notifyListeners();
   }
 
   Map<DateTime, List<Object>> get dietPlans {

@@ -14,7 +14,6 @@ class ExerciseItem extends StatelessWidget {
         root.name,
         style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
       ),
-      // tilePadding: EdgeInsets.symmetric(horizontal: 30),
       backgroundColor: Colors.white,
       children: [
         StaticDetailTile(

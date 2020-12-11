@@ -18,27 +18,29 @@ class ProfileScreen extends StatelessWidget {
           FlatButton(
             color: Theme.of(context).primaryColor,
             onPressed: () {
-              Navigator.of(context).pushNamed(WorkoutListScreen.routeName);
+              Navigator.of(context)
+                  .pushNamed(WorkoutListScreen.routeName, arguments: false);
             },
             child: Text(
               "Treningi",
               style: TextStyle(color: Colors.white),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 30,
           ),
           FlatButton(
             color: Theme.of(context).primaryColor,
             onPressed: () {
-              Navigator.of(context).pushNamed(DietListScreen.routeName);
+              Navigator.of(context)
+                  .pushNamed(DietListScreen.routeName, arguments: false);
             },
             child: Text(
               "Diety",
               style: TextStyle(color: Colors.white),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 30,
           ),
           FlatButton(

@@ -110,12 +110,12 @@ class _AddDietScreenState extends State<AddDietScreen> {
       body: Stack(
         children: [
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Form(
               key: _dietForm,
               child: Column(
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     height: 80,
                   ),
                   Container(
@@ -139,7 +139,7 @@ class _AddDietScreenState extends State<AddDietScreen> {
                       },
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 50,
                   ),
                   ListTile(
@@ -251,12 +251,13 @@ class _AddDietScreenState extends State<AddDietScreen> {
                   child: Card(
                     elevation: 4,
                     child: Padding(
-                      padding: EdgeInsets.symmetric(
+                      padding: const EdgeInsets.symmetric(
                         horizontal: 0,
                       ),
                       child: Form(
                         key: _foodForm,
                         child: ListView(
+                          padding: const EdgeInsets.all(0),
                           children: [
                             ListTile(
                               title: TextFormField(
@@ -272,7 +273,7 @@ class _AddDietScreenState extends State<AddDietScreen> {
                                 },
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 10,
                             ),
                             DataDetailTile(
@@ -301,7 +302,7 @@ class _AddDietScreenState extends State<AddDietScreen> {
                               title: "Tłuszcz (g)",
                             ),
                             SizedBox(
-                              height: 50,
+                              height: deviceSize.height * 0.01,
                             ),
                             ButtonBar(
                               alignment: MainAxisAlignment.spaceAround,

@@ -10,21 +10,14 @@ class WorkoutListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final workoutsData = Provider.of<Workouts>(context);
-    // final workouts = workoutsData.workouts;
+    final addToPlan = ModalRoute.of(context).settings.arguments as bool;
+
     return Scaffold(
-        // floatingActionButton: FloatingActionButton(
-        //   child: Icon(Icons.add),
-        //   onPressed: () {
-        //     Navigator.of(context).pushNamed(AddWorkoutScreen.routeName);
-        //   },
-        // ),
         body: Container(
-      // padding: EdgeInsets.only(left: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
+          const SizedBox(
             height: 40,
           ),
           Flexible(
@@ -50,7 +43,9 @@ class WorkoutListScreen extends StatelessWidget {
           )),
           Flexible(
             flex: 10,
-            child: WorkoutList(),
+            child: WorkoutList(
+              addToPlans: addToPlan,
+            ),
           ),
         ],
       ),

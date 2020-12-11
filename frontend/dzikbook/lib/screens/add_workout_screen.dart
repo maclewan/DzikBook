@@ -93,12 +93,12 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
       body: Stack(
         children: [
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Form(
               key: _workoutForm,
               child: Column(
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     height: 80,
                   ),
                   Container(
@@ -122,7 +122,7 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
                       },
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 50,
                   ),
                   ListTile(
@@ -234,12 +234,13 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
                   child: Card(
                     elevation: 4,
                     child: Padding(
-                      padding: EdgeInsets.symmetric(
+                      padding: const EdgeInsets.symmetric(
                         horizontal: 0,
                       ),
                       child: Form(
                         key: _exerciseForm,
                         child: ListView(
+                          padding: const EdgeInsets.all(0),
                           children: [
                             ListTile(
                               onTap: () async {
@@ -268,7 +269,7 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
                                 color: Theme.of(context).primaryColor,
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 10,
                             ),
                             DataDetailTile(
@@ -287,7 +288,7 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
                               title: "Przerwa (sek)",
                             ),
                             SizedBox(
-                              height: 50,
+                              height: deviceSize.height * 0.03,
                             ),
                             ButtonBar(
                               alignment: MainAxisAlignment.spaceAround,

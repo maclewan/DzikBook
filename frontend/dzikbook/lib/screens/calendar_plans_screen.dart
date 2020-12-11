@@ -1,7 +1,9 @@
 //  Copyright (c) 2019 Aleksander Woźniak
 //  Licensed under Apache License v2.0
 
+import 'package:dzikbook/screens/diet_list_screen.dart';
 import 'package:dzikbook/screens/diet_screen.dart';
+import 'package:dzikbook/screens/workout_list_screen.dart';
 import 'package:dzikbook/screens/workout_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -39,6 +41,10 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
   DateTime _selectedDay;
   AnimationController _animationController;
   CalendarController _calendarController;
+  bool _workoutButton = false;
+  bool _allButton = true;
+  bool _dietButton = false;
+  bool owner = true;
 
   @override
   void initState() {
@@ -46,60 +52,60 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
     final _nowDate = DateTime.now();
     _selectedDay = DateTime(_nowDate.year, _nowDate.month, _nowDate.day);
     final plansData = Provider.of<DayPlans>(context, listen: false);
-    Workout plan = Workout(name: "Trening 2", workoutLength: 30, exercises: [
-      Exercise(id: "1", name: "ex1", series: 3, reps: 4, breakTime: 90),
-      Exercise(id: "2", name: "ex2", series: 3, reps: 4, breakTime: 90),
-      Exercise(id: "3", name: "ex3", series: 3, reps: 4, breakTime: 90),
-      Exercise(id: "4", name: "ex4", series: 3, reps: 4, breakTime: 90),
-      Exercise(id: "5", name: "ex5", series: 3, reps: 4, breakTime: 90),
-    ]);
+    // Workout plan = Workout(name: "Trening 2", workoutLength: 30, exercises: [
+    //   Exercise(id: "1", name: "ex1", series: 3, reps: 4, breakTime: 90),
+    //   Exercise(id: "2", name: "ex2", series: 3, reps: 4, breakTime: 90),
+    //   Exercise(id: "3", name: "ex3", series: 3, reps: 4, breakTime: 90),
+    //   Exercise(id: "4", name: "ex4", series: 3, reps: 4, breakTime: 90),
+    //   Exercise(id: "5", name: "ex5", series: 3, reps: 4, breakTime: 90),
+    // ]);
 
-    Diet plan2 = Diet(name: "Dieta 1", dietCalories: 30, foodList: [
-      Food(
-          id: "1",
-          name: "ex1",
-          calories: 3,
-          weight: 4,
-          protein: 90,
-          carbs: 30,
-          fat: 20),
-      Food(
-          id: "2",
-          name: "ex2",
-          calories: 3,
-          weight: 4,
-          protein: 90,
-          carbs: 30,
-          fat: 20),
-      Food(
-          id: "3",
-          name: "ex3",
-          calories: 3,
-          weight: 4,
-          protein: 90,
-          carbs: 30,
-          fat: 20),
-      Food(
-          id: "4",
-          name: "ex4",
-          calories: 3,
-          weight: 4,
-          protein: 90,
-          carbs: 30,
-          fat: 20),
-      Food(
-          id: "5",
-          name: "ex5",
-          calories: 3,
-          weight: 4,
-          protein: 90,
-          carbs: 30,
-          fat: 20),
-    ]);
-    DateTime date = DateTime(_nowDate.year, _nowDate.month, _nowDate.day);
-    // print(date);
-    plansData.addWorkoutPlan(plan, date);
-    plansData.addDietPlan(plan2, date);
+    // Diet plan2 = Diet(name: "Dieta 1", dietCalories: 30, foodList: [
+    //   Food(
+    //       id: "1",
+    //       name: "ex1",
+    //       calories: 3,
+    //       weight: 4,
+    //       protein: 90,
+    //       carbs: 30,
+    //       fat: 20),
+    //   Food(
+    //       id: "2",
+    //       name: "ex2",
+    //       calories: 3,
+    //       weight: 4,
+    //       protein: 90,
+    //       carbs: 30,
+    //       fat: 20),
+    //   Food(
+    //       id: "3",
+    //       name: "ex3",
+    //       calories: 3,
+    //       weight: 4,
+    //       protein: 90,
+    //       carbs: 30,
+    //       fat: 20),
+    //   Food(
+    //       id: "4",
+    //       name: "ex4",
+    //       calories: 3,
+    //       weight: 4,
+    //       protein: 90,
+    //       carbs: 30,
+    //       fat: 20),
+    //   Food(
+    //       id: "5",
+    //       name: "ex5",
+    //       calories: 3,
+    //       weight: 4,
+    //       protein: 90,
+    //       carbs: 30,
+    //       fat: 20),
+    // ]);
+    // DateTime date = DateTime(_nowDate.year, _nowDate.month, _nowDate.day);
+    // // print(date);
+    // plansData.addWorkoutPlan(plan, date);
+    // plansData.addDietPlan(plan2, date);
     _events = plansData.allPlans;
     // print(_events);
     // _events = {
@@ -197,13 +203,10 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
           const SizedBox(
             height: 20,
           ),
-          // Switch out 2 lines below to play with TableCalendar's settings
-          //-----------------------
-          // _buildTableCalendar(),
           _buildTableCalendarWithBuilders(),
           const SizedBox(height: 8.0),
           _buildButtons(),
-          const SizedBox(height: 30.0),
+          const SizedBox(height: 20.0),
           Expanded(child: _buildEventList()),
         ],
       ),
@@ -250,8 +253,6 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
                 color: Theme.of(context).primaryColor,
               ),
               margin: const EdgeInsets.all(4.0),
-              // padding: const EdgeInsets.only(top: 5.0, left: 6.0),
-              // color: Theme.of(context).primaryColor,
               width: 100,
               height: 100,
               child: Center(
@@ -269,8 +270,6 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
         todayDayBuilder: (context, date, _) {
           return Container(
             margin: const EdgeInsets.all(4.0),
-            // padding: const EdgeInsets.only(top: 5.0, left: 6.0),
-            // color: Colors.lightGreen,
             width: 100,
             height: 100,
             decoration: BoxDecoration(
@@ -358,6 +357,21 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
   Widget _buildButtons() {
     final plansData = Provider.of<DayPlans>(context);
 
+    void _toActive(String name) {
+      setState(() {
+        _workoutButton = false;
+        _allButton = false;
+        _dietButton = false;
+        if (name == "workout") {
+          _workoutButton = true;
+        } else if (name == "all") {
+          _allButton = true;
+        } else if (name == "diet") {
+          _dietButton = true;
+        }
+      });
+    }
+
     void _setEvents(events) {
       setState(() {
         _events = events;
@@ -373,6 +387,28 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
       });
     }
 
+    Future<void> _addWorkoutPlan() async {
+      Workout workout = await Navigator.of(context)
+          .pushNamed(WorkoutListScreen.routeName, arguments: true) as Workout;
+      if (workout == null) return;
+      DateTime newDate =
+          DateTime(_selectedDay.year, _selectedDay.month, _selectedDay.day);
+      plansData.addWorkoutPlan(workout, newDate);
+      _toActive("all");
+      _setEvents(plansData.allPlans);
+    }
+
+    Future<void> _addDietPlan() async {
+      Diet diet = await Navigator.of(context)
+          .pushNamed(DietListScreen.routeName, arguments: true) as Diet;
+      if (diet == null) return;
+      DateTime newDate =
+          DateTime(_selectedDay.year, _selectedDay.month, _selectedDay.day);
+      plansData.addDietPlan(diet, newDate);
+      _toActive("all");
+      _setEvents(plansData.allPlans);
+    }
+
     return Column(
       children: <Widget>[
         Row(
@@ -382,8 +418,11 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
             RaisedButton(
               onPressed: () {
                 _setEvents(plansData.workoutPlans);
+                _toActive("workout");
               },
-              color: Theme.of(context).primaryColor,
+              color: _workoutButton
+                  ? Colors.pink[500]
+                  : Theme.of(context).primaryColor,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(18),
               ),
@@ -395,9 +434,12 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
             // RaisedButton(
             RaisedButton(
               onPressed: () {
+                _toActive("all");
                 _setEvents(plansData.allPlans);
               },
-              color: Colors.pink[500],
+              color: _allButton
+                  ? Colors.pink[500]
+                  : Theme.of(context).primaryColor,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(18),
               ),
@@ -409,8 +451,11 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
             RaisedButton(
               onPressed: () {
                 _setEvents(plansData.dietPlans);
+                _toActive("diet");
               },
-              color: Theme.of(context).primaryColor,
+              color: _dietButton
+                  ? Colors.pink[500]
+                  : Theme.of(context).primaryColor,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(18),
               ),
@@ -421,86 +466,103 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
             ),
           ],
         ),
+        Visibility(
+          visible: owner,
+          child: ButtonBar(
+            alignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              FlatButton(
+                onPressed: _addWorkoutPlan,
+                child: Text("dodaj trening"),
+              ),
+              FlatButton(
+                onPressed: _addDietPlan,
+                child: Text("dodaj dietę"),
+              ),
+            ],
+          ),
+        )
       ],
     );
   }
 
   Widget _buildEventList() {
-    return Container(
-      padding: const EdgeInsets.only(top: 10),
-      margin: const EdgeInsets.symmetric(horizontal: 10),
-      decoration: BoxDecoration(
-        color: _selectedEvents.isEmpty
-            ? Colors.transparent
-            : Theme.of(context).primaryColor,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(18),
-          topRight: Radius.circular(18),
-        ),
-      ),
-      child: Column(
-        children: [
-          Center(
-              child: Text(
-            "Plany",
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w500,
-              fontSize: 30,
-            ),
-          )),
-          SizedBox(
-            height: 10,
+    return Visibility(
+      visible: _selectedEvents.isNotEmpty,
+      child: Container(
+        padding: const EdgeInsets.only(top: 10),
+        margin: const EdgeInsets.symmetric(horizontal: 10),
+        decoration: BoxDecoration(
+          color: Theme.of(context).primaryColor,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(18),
+            topRight: Radius.circular(18),
           ),
-          Flexible(
-            child: ListView.builder(
-              itemCount: _selectedEvents.length,
-              itemBuilder: (context, id) {
-                final event = _selectedEvents[id];
-                String picture = 'assets/images/diet.svg';
-                String trailingData = 'xd';
-                var nav;
-                if (event is Workout) {
-                  picture = 'assets/images/dumbbell.svg';
-                  trailingData = '${event.workoutLength} min';
-                  nav = () {
-                    Navigator.of(context)
-                        .pushNamed(WorkoutScreen.routeName, arguments: event);
-                  };
-                } else {
-                  trailingData = '${event.dietCalories} kcal';
-                  nav = () {
-                    Navigator.of(context)
-                        .pushNamed(DietScreen.routeName, arguments: event);
-                  };
-                }
-                return ListTile(
-                  onTap: nav,
-                  leading: SvgPicture.asset(
-                    picture,
-                    color: Colors.black,
-                    height: 40,
-                  ),
-                  title: Text(
-                    event.name,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  trailing: Text(
-                    trailingData,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 17,
-                    ),
-                  ),
-                );
-              },
+        ),
+        child: Column(
+          children: [
+            Center(
+                child: Text(
+              "Plany",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+                fontSize: 30,
+              ),
+            )),
+            const SizedBox(
+              height: 10,
             ),
-          )
-        ],
+            Flexible(
+              child: ListView.builder(
+                itemCount: _selectedEvents.length,
+                itemBuilder: (context, id) {
+                  final event = _selectedEvents[id];
+                  String picture = 'assets/images/diet.svg';
+                  String trailingData = 'xd';
+                  var nav;
+                  if (event is Workout) {
+                    picture = 'assets/images/dumbbell.svg';
+                    trailingData = '${event.workoutLength} min';
+                    nav = () {
+                      Navigator.of(context)
+                          .pushNamed(WorkoutScreen.routeName, arguments: event);
+                    };
+                  } else {
+                    trailingData = '${event.dietCalories} kcal';
+                    nav = () {
+                      Navigator.of(context)
+                          .pushNamed(DietScreen.routeName, arguments: event);
+                    };
+                  }
+                  return ListTile(
+                    onTap: nav,
+                    leading: SvgPicture.asset(
+                      picture,
+                      color: Colors.black,
+                      height: 40,
+                    ),
+                    title: Text(
+                      event.name,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    trailing: Text(
+                      trailingData,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 17,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
