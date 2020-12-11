@@ -2,19 +2,26 @@ import 'dart:convert' show utf8, json;
 import 'dart:io';
 import 'dart:math';
 import 'package:english_words/english_words.dart';
+import 'package:flutter/material.dart';
+
+import 'CommentModel.dart';
 
 class PostModel {
   final String description;
   final String id, userImg, userName, timeTaken;
   final String loadedImg;
+  final List<CommentModel> comments;
+  final int likes;
 
   PostModel(
-      {this.description,
-      this.id,
-      this.userImg,
-      this.userName,
-      this.timeTaken,
-      this.loadedImg = ""});
+      {@required this.description,
+      @required this.id,
+      @required this.userImg,
+      @required this.userName,
+      @required this.timeTaken,
+      this.loadedImg = "",
+      this.comments,
+      @required this.likes});
 }
 
 class PostFetcher {
@@ -32,7 +39,6 @@ class PostFetcher {
     if (n <= 0) {
       return [];
     }
-    print('Now on page $_currentPage');
     try {
       await Future.delayed(Duration(seconds: 1));
       var request = await httpClient.getUrl(Uri.parse(url));
@@ -47,11 +53,24 @@ class PostFetcher {
               objName['first'].toString() + " " + objName['last'].toString();
           var objImage = res['picture'];
           String profileUrl = objImage['large'].toString();
+          List<CommentModel> comments = [];
+          int n = random.nextInt(6);
+          for (var i = 0; i < n; i++) {
+            comments.add(CommentModel(
+                description: generateWordPairs()
+                    .take(random.nextInt(5) + 20)
+                    .toList()
+                    .join(" "),
+                imgSource:
+                    'https://picsum.photos/200?random=${random.nextInt(15)}'));
+          }
           PostModel post = new PostModel(
               id: "1",
               timeTaken: '${random.nextInt(24) + 1}h${random.nextInt(60) + 1}m',
               userImg: profileUrl,
               userName: name,
+              comments: comments,
+              likes: random.nextInt(100),
               loadedImg: random.nextInt(4) == 1
                   ? 'https://picsum.photos/400?random=${random.nextInt(10)}'
                   : "",

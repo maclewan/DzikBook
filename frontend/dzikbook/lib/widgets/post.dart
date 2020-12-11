@@ -2,6 +2,8 @@ import 'package:dzikbook/models/CommentModel.dart';
 import 'package:dzikbook/widgets/comments_section.dart';
 import 'package:flutter/material.dart';
 
+import 'reactions_section.dart';
+
 class Post extends StatelessWidget {
   final String id;
   final String userImg;
@@ -9,8 +11,8 @@ class Post extends StatelessWidget {
   final String description;
   final String timeTaken;
   final String loadedImg;
-  final List<String> comments;
-  final int reactions;
+  final List<CommentModel> comments;
+  final int likes;
   Post({
     @required this.id,
     @required this.userName,
@@ -19,7 +21,7 @@ class Post extends StatelessWidget {
     @required this.timeTaken,
     this.loadedImg = "",
     this.comments,
-    this.reactions = 0,
+    this.likes = 0,
   });
 
   @override
@@ -109,16 +111,8 @@ class Post extends StatelessWidget {
                           );
                   },
                 ),
-          CommentsSection([
-            CommentModel(
-                description: "Bardzo fajnie!", imgSource: this.userImg),
-            // CommentModel(description: "X" * 100 + "D", imgSource: this.userImg),
-            // CommentModel(description: "X" * 100 + "D", imgSource: this.userImg),
-            // CommentModel(description: "X" * 100 + "D", imgSource: this.userImg),
-            // CommentModel(description: "X" * 100 + "D", imgSource: this.userImg),
-            // CommentModel(description: "X" * 100 + "D", imgSource: this.userImg),
-            // CommentModel(description: "X" * 300 + "D", imgSource: this.userImg),
-          ])
+          ReactionsSections(reactions: this.likes),
+          CommentsSection(this.comments),
         ],
       ),
     );
