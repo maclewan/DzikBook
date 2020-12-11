@@ -126,6 +126,7 @@ class _AddPostState extends State<AddPost> {
                         child: Text("OPUBLIKUJ",
                             style: TextStyle(
                               color: Colors.white,
+                              fontSize: 12,
                             )),
                         color: Color.fromRGBO(33, 150, 83, 1.0),
                       ),
@@ -140,7 +141,9 @@ class _AddPostState extends State<AddPost> {
                         child: Text(
                           "zdjęcie/film",
                           style: TextStyle(
-                              fontWeight: FontWeight.w700, color: Colors.white),
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                              fontSize: 10),
                         ),
                         color: Color.fromRGBO(126, 213, 111, 1.0),
                       ),
@@ -159,7 +162,9 @@ class _AddPostState extends State<AddPost> {
                         child: Text(
                           "trening",
                           style: TextStyle(
-                              fontWeight: FontWeight.w700, color: Colors.white),
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                              fontSize: 10),
                         ),
                         color: Color.fromRGBO(126, 213, 111, 1.0),
                       ),
