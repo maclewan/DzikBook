@@ -10,7 +10,8 @@ class Post extends StatelessWidget {
   final String userName;
   final String description;
   final String timeTaken;
-  final String loadedImg;
+  final Image loadedImg;
+  final bool hasImage;
   final List<CommentModel> comments;
   final int likes;
   Post({
@@ -19,7 +20,8 @@ class Post extends StatelessWidget {
     @required this.description,
     @required this.userImg,
     @required this.timeTaken,
-    this.loadedImg = "",
+    @required this.hasImage,
+    this.loadedImg,
     this.comments,
     this.likes = 0,
   });
@@ -98,10 +100,10 @@ class Post extends StatelessWidget {
               color: Colors.grey[50],
             ),
           ),
-          this.loadedImg == ""
+          this.hasImage == false
               ? Container()
-              : Image.network(
-                  this.loadedImg,
+              : Image(
+                  image: this.loadedImg.image,
                   loadingBuilder: (context, child, loadingProgress) {
                     return loadingProgress == null
                         ? child

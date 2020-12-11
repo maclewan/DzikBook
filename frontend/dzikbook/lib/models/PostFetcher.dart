@@ -9,9 +9,10 @@ import 'CommentModel.dart';
 class PostModel {
   final String description;
   final String id, userImg, userName, timeTaken;
-  final String loadedImg;
+  final Image loadedImg;
   final List<CommentModel> comments;
   final int likes;
+  final bool hasImage;
 
   PostModel(
       {@required this.description,
@@ -19,7 +20,8 @@ class PostModel {
       @required this.userImg,
       @required this.userName,
       @required this.timeTaken,
-      this.loadedImg = "",
+      @required this.hasImage,
+      this.loadedImg,
       this.comments,
       @required this.likes});
 }
@@ -55,6 +57,7 @@ class PostFetcher {
           String profileUrl = objImage['large'].toString();
           List<CommentModel> comments = [];
           int n = random.nextInt(6);
+          bool hasImg = random.nextInt(4) == 1;
           for (var i = 0; i < n; i++) {
             comments.add(CommentModel(
                 description: generateWordPairs()
@@ -71,9 +74,12 @@ class PostFetcher {
               userName: name,
               comments: comments,
               likes: random.nextInt(100),
-              loadedImg: random.nextInt(4) == 1
-                  ? 'https://picsum.photos/400?random=${random.nextInt(10)}'
-                  : "",
+              hasImage: hasImg,
+              loadedImg: hasImg
+                  ? Image(
+                      image: NetworkImage(
+                          'https://picsum.photos/400?random=${random.nextInt(10)}'))
+                  : null,
               description: generateWordPairs()
                   .take(random.nextInt(10) + 10)
                   .toList()

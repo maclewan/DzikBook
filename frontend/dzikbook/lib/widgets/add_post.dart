@@ -5,7 +5,7 @@ import 'package:image_picker/image_picker.dart';
 
 class AddPost extends StatefulWidget {
   final String userImage;
-  final void Function(String) addPost;
+  final void Function(String, File, bool) addPost;
 
   const AddPost(this.addPost, this.userImage);
 
@@ -120,7 +120,16 @@ class _AddPostState extends State<AddPost> {
                         ),
                         onPressed: () => {
                           if (myController.text.isNotEmpty)
-                            {this.widget.addPost(myController.text)},
+                            {
+                              this._image != null
+                                  ? this
+                                      .widget
+                                      .addPost(myController.text, _image, true)
+                                  : this
+                                      .widget
+                                      .addPost(myController.text, null, false)
+                            },
+                          this._image = null,
                           myController.clear(),
                         },
                         child: Text("OPUBLIKUJ",
