@@ -1,6 +1,8 @@
 //  Copyright (c) 2019 Aleksander Woźniak
 //  Licensed under Apache License v2.0
 
+import 'package:dzikbook/screens/diet_screen.dart';
+import 'package:dzikbook/screens/workout_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -34,13 +36,15 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
     with TickerProviderStateMixin {
   Map<DateTime, List<Object>> _events;
   List _selectedEvents;
+  DateTime _selectedDay;
   AnimationController _animationController;
   CalendarController _calendarController;
 
   @override
   void initState() {
     super.initState();
-    final _selectedDay = DateTime.now();
+    final _nowDate = DateTime.now();
+    _selectedDay = DateTime(_nowDate.year, _nowDate.month, _nowDate.day);
     final plansData = Provider.of<DayPlans>(context, listen: false);
     Workout plan = Workout(name: "Trening 2", workoutLength: 30, exercises: [
       Exercise(id: "1", name: "ex1", series: 3, reps: 4, breakTime: 90),
@@ -92,13 +96,12 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
           carbs: 30,
           fat: 20),
     ]);
-    DateTime date =
-        DateTime(_selectedDay.year, _selectedDay.month, _selectedDay.day);
-    print(date);
+    DateTime date = DateTime(_nowDate.year, _nowDate.month, _nowDate.day);
+    // print(date);
     plansData.addWorkoutPlan(plan, date);
     plansData.addDietPlan(plan2, date);
     _events = plansData.allPlans;
-    print(_events);
+    // print(_events);
     // _events = {
     //   _selectedDay.subtract(Duration(days: 30)): [
     //     'Event A0',
@@ -173,24 +176,17 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
   }
 
   void _onDaySelected(DateTime day, List events, List holidays) {
-    print('CALLBACK: _onDaySelected');
-    print(day);
-    print(events);
-    print(holidays);
     setState(() {
+      _selectedDay = day;
       _selectedEvents = events;
     });
   }
 
   void _onVisibleDaysChanged(
-      DateTime first, DateTime last, CalendarFormat format) {
-    print('CALLBACK: _onVisibleDaysChanged');
-  }
+      DateTime first, DateTime last, CalendarFormat format) {}
 
   void _onCalendarCreated(
-      DateTime first, DateTime last, CalendarFormat format) {
-    print('CALLBACK: _onCalendarCreated');
-  }
+      DateTime first, DateTime last, CalendarFormat format) {}
 
   @override
   Widget build(BuildContext context) {
@@ -207,37 +203,10 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
           _buildTableCalendarWithBuilders(),
           const SizedBox(height: 8.0),
           _buildButtons(),
-          const SizedBox(height: 50.0),
+          const SizedBox(height: 30.0),
           Expanded(child: _buildEventList()),
         ],
       ),
-    );
-  }
-
-  // Simple TableCalendar configuration (using Styles)
-  Widget _buildTableCalendar() {
-    return TableCalendar(
-      calendarController: _calendarController,
-      events: _events,
-      holidays: _holidays,
-      startingDayOfWeek: StartingDayOfWeek.monday,
-      calendarStyle: CalendarStyle(
-        selectedColor: Colors.deepOrange[400],
-        todayColor: Theme.of(context).primaryColor,
-        markersColor: Colors.brown[700],
-        outsideDaysVisible: false,
-      ),
-      headerStyle: HeaderStyle(
-        formatButtonTextStyle:
-            TextStyle().copyWith(color: Colors.white, fontSize: 15.0),
-        formatButtonDecoration: BoxDecoration(
-          color: Colors.deepOrange[400],
-          borderRadius: BorderRadius.circular(16.0),
-        ),
-      ),
-      onDaySelected: _onDaySelected,
-      onVisibleDaysChanged: _onVisibleDaysChanged,
-      onCalendarCreated: _onCalendarCreated,
     );
   }
 
@@ -323,7 +292,6 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
           final children = <Widget>[];
 
           if (events.isNotEmpty) {
-            // print(_events);
             children.add(
               Positioned(
                 right: 1,
@@ -342,7 +310,6 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
               ),
             );
           }
-
           return children;
         },
       ),
@@ -389,8 +356,22 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
   }
 
   Widget _buildButtons() {
-    final dateTime = DateTime.now();
     final plansData = Provider.of<DayPlans>(context);
+
+    void _setEvents(events) {
+      setState(() {
+        _events = events;
+        List tempEvents;
+        DateTime tempDate =
+            DateTime(_selectedDay.year, _selectedDay.month, _selectedDay.day);
+        if (_events.containsKey(tempDate)) {
+          tempEvents = _events[tempDate];
+        } else {
+          tempEvents = [];
+        }
+        _onDaySelected(tempDate, tempEvents, []);
+      });
+    }
 
     return Column(
       children: <Widget>[
@@ -400,9 +381,7 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
           children: <Widget>[
             RaisedButton(
               onPressed: () {
-                setState(() {
-                  _events = plansData.workoutPlans;
-                });
+                _setEvents(plansData.workoutPlans);
               },
               color: Theme.of(context).primaryColor,
               shape: RoundedRectangleBorder(
@@ -416,10 +395,7 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
             // RaisedButton(
             RaisedButton(
               onPressed: () {
-                setState(() {
-                  _events = plansData.allPlans;
-                  // _selectedEvents = _events;
-                });
+                _setEvents(plansData.allPlans);
               },
               color: Colors.pink[500],
               shape: RoundedRectangleBorder(
@@ -432,9 +408,7 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
             ),
             RaisedButton(
               onPressed: () {
-                setState(() {
-                  _events = plansData.dietPlans;
-                });
+                _setEvents(plansData.dietPlans);
               },
               color: Theme.of(context).primaryColor,
               shape: RoundedRectangleBorder(
@@ -447,89 +421,87 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
             ),
           ],
         ),
-        // const SizedBox(height: 8.0),
-        // RaisedButton(
-        //   child: Text(
-        //     'Wróć do dnia dzisiejszego',
-        //     style: TextStyle(color: Colors.white),
-        //   ),
-        //   onPressed: () {
-        //     _calendarController.setSelectedDay(
-        //       DateTime(dateTime.year, dateTime.month, dateTime.day),
-        //       runCallback: true,
-        //     );
-        //   },
-        //   shape:
-        //       RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        //   color: Colors.pink[300],
-        // ),
-        SizedBox(
-          height: 40,
-        ),
       ],
     );
   }
 
   Widget _buildEventList() {
     return Container(
+      padding: const EdgeInsets.only(top: 10),
       margin: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
         color: _selectedEvents.isEmpty
-            ? Colors.white
+            ? Colors.transparent
             : Theme.of(context).primaryColor,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(18),
           topRight: Radius.circular(18),
         ),
       ),
-      child: ListView(children: [
-        Center(
-            child: Text(
-          "Plany",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w500,
-            fontSize: 30,
+      child: Column(
+        children: [
+          Center(
+              child: Text(
+            "Plany",
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w500,
+              fontSize: 30,
+            ),
+          )),
+          SizedBox(
+            height: 10,
           ),
-        )),
-        SizedBox(
-          height: 15,
-        ),
-        ..._selectedEvents.map(
-          (event) {
-            String picture = 'assets/images/diet.svg';
-            String trailingData = 'xd';
-            if (event is Workout) {
-              picture = 'assets/images/dumbbell.svg';
-              trailingData = '${event.workoutLength} min';
-            } else {
-              trailingData = '${event.dietCalories} kcal';
-            }
-            return ListTile(
-              leading: SvgPicture.asset(
-                picture,
-                color: Colors.black,
-                height: 40,
-              ),
-              title: Text(
-                event.name,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              trailing: Text(
-                trailingData,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 17,
-                ),
-              ),
-            );
-          },
-        ),
-      ]),
+          Flexible(
+            child: ListView.builder(
+              itemCount: _selectedEvents.length,
+              itemBuilder: (context, id) {
+                final event = _selectedEvents[id];
+                String picture = 'assets/images/diet.svg';
+                String trailingData = 'xd';
+                var nav;
+                if (event is Workout) {
+                  picture = 'assets/images/dumbbell.svg';
+                  trailingData = '${event.workoutLength} min';
+                  nav = () {
+                    Navigator.of(context)
+                        .pushNamed(WorkoutScreen.routeName, arguments: event);
+                  };
+                } else {
+                  trailingData = '${event.dietCalories} kcal';
+                  nav = () {
+                    Navigator.of(context)
+                        .pushNamed(DietScreen.routeName, arguments: event);
+                  };
+                }
+                return ListTile(
+                  onTap: nav,
+                  leading: SvgPicture.asset(
+                    picture,
+                    color: Colors.black,
+                    height: 40,
+                  ),
+                  title: Text(
+                    event.name,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  trailing: Text(
+                    trailingData,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 17,
+                    ),
+                  ),
+                );
+              },
+            ),
+          )
+        ],
+      ),
     );
   }
 }
