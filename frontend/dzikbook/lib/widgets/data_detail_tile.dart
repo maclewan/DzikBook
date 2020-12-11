@@ -37,7 +37,7 @@ class DataDetailTile extends StatelessWidget {
               return null;
             },
           )),
-      contentPadding: EdgeInsets.symmetric(
+      contentPadding: const EdgeInsets.symmetric(
         horizontal: 40,
       ),
     );

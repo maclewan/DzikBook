@@ -20,8 +20,8 @@ class SocialIcon extends StatelessWidget {
     return GestureDetector(
       onTap: press,
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 12),
-        padding: EdgeInsets.only(top: 5),
+        margin: const EdgeInsets.symmetric(horizontal: 12),
+        padding: const EdgeInsets.only(top: 5),
         width: deviceSize.width * 0.11,
         decoration: BoxDecoration(
           color: color,

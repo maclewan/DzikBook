@@ -7,6 +7,10 @@ import 'package:provider/provider.dart';
 import '../providers/workouts.dart';
 
 class WorkoutList extends StatelessWidget {
+  final bool addToPlans;
+
+  WorkoutList({this.addToPlans});
+
   @override
   Widget build(BuildContext context) {
     final workoutsData = Provider.of<Workouts>(context);
@@ -35,10 +39,27 @@ class WorkoutList extends StatelessWidget {
                       color: Color.fromRGBO(0, 0, 0, 0.7),
                       fontWeight: FontWeight.w500),
                 ),
-                trailing: Text(
-                  '${workouts[i].workoutLength} min',
-                  style: TextStyle(
-                      fontSize: 20, color: Color.fromRGBO(0, 0, 0, 0.7)),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '${workouts[i].workoutLength} min',
+                      style: TextStyle(
+                          fontSize: 20, color: Color.fromRGBO(0, 0, 0, 0.7)),
+                    ),
+                    Visibility(
+                      visible: addToPlans,
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.add,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop(workouts[i]);
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

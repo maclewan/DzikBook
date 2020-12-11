@@ -5,31 +5,17 @@ import '../widgets/diet_list.dart';
 
 class DietListScreen extends StatelessWidget {
   static final routeName = '/dietsList';
-
   @override
   Widget build(BuildContext context) {
+    final addToPlan = ModalRoute.of(context).settings.arguments as bool;
+
     return Scaffold(
-      // floatingActionButton: FloatingActionButton(
-      //   child: Icon(Icons.add),
-      //   onPressed: () {},
-      // ),
       body: Container(
         child: Column(
           children: [
-            SizedBox(
+            const SizedBox(
               height: 40,
             ),
-            // Align(
-            //   alignment: Alignment(-0.9, 0.0),
-            //   child: Text(
-            //     "Diety",
-            //     style: TextStyle(
-            //         fontFamily: 'Montserrat',
-            //         fontWeight: FontWeight.w700,
-            //         fontSize: 36),
-            //     textAlign: TextAlign.start,
-            //   ),
-            // ),
             Flexible(
               child: ListTile(
                 leading: Text(
@@ -54,7 +40,9 @@ class DietListScreen extends StatelessWidget {
             ),
             Flexible(
               flex: 10,
-              child: DietList(),
+              child: DietList(
+                addToPlans: addToPlan,
+              ),
             )
           ],
         ),

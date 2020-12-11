@@ -1,11 +1,12 @@
-import 'package:dzikbook/screens/add_diet_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import './providers/auth.dart';
 import './providers/workouts.dart';
 import './providers/diets.dart';
 import './providers/static.dart';
+import './providers/dayPlans.dart';
 
 import './screens/auth_screen.dart';
 import './screens/profile_screen.dart';
@@ -14,10 +15,13 @@ import './screens/workout_list_screen.dart';
 import './screens/workout_screen.dart';
 import './screens/diet_screen.dart';
 import './screens/diet_list_screen.dart';
-import 'screens/add_workout_screen.dart';
+import './screens/add_workout_screen.dart';
+import './screens/add_diet_screen.dart';
+import './screens/calendar_plans_screen.dart';
 
 void main() {
-  runApp(MyApp());
+  initializeDateFormatting().then((_) => runApp(MyApp()));
+  // runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -37,7 +41,10 @@ class MyApp extends StatelessWidget {
           ),
           ChangeNotifierProvider(
             create: (context) => Static(),
-          )
+          ),
+          ChangeNotifierProvider(
+            create: (context) => DayPlans(),
+          ),
         ],
         child: Consumer<Auth>(
           builder: (ctx, auth, _) => MaterialApp(
@@ -58,6 +65,7 @@ class MyApp extends StatelessWidget {
               DietScreen.routeName: (ctx) => DietScreen(),
               AddWorkoutScreen.routeName: (ctx) => AddWorkoutScreen(),
               AddDietScreen.routeName: (ctx) => AddDietScreen(),
+              CalendarPlansScreen.routeName: (ctx) => CalendarPlansScreen(),
             },
           ),
         ));

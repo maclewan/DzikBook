@@ -34,7 +34,7 @@ class AuthScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
-                    margin: EdgeInsets.only(bottom: 20),
+                    margin: const EdgeInsets.only(bottom: 20),
                     child: Align(
                       alignment: Alignment(-0.75, 0),
                       child: Column(
@@ -207,7 +207,7 @@ class _AuthCardState extends State<AuthCard> {
                           decoration: InputDecoration(
                             labelText: 'E-mail',
                             contentPadding:
-                                EdgeInsets.only(bottom: -2, top: -5),
+                                const EdgeInsets.only(bottom: -2, top: -5),
                             icon: Icon(Icons.email),
                           ),
                           keyboardType: TextInputType.emailAddress,
@@ -228,7 +228,7 @@ class _AuthCardState extends State<AuthCard> {
                           decoration: InputDecoration(
                             labelText: 'Hasło',
                             contentPadding:
-                                EdgeInsets.only(bottom: -2, top: -5),
+                                const EdgeInsets.only(bottom: -2, top: -5),
                             icon: Icon(Icons.lock),
                             suffixIcon: IconButton(
                               icon: _visibility,
@@ -268,7 +268,7 @@ class _AuthCardState extends State<AuthCard> {
                             decoration: InputDecoration(
                               labelText: 'Imię',
                               contentPadding:
-                                  EdgeInsets.only(bottom: -2, top: -5),
+                                  const EdgeInsets.only(bottom: -2, top: -5),
                               icon: Icon(Icons.person),
                             ),
                             validator: (value) {
@@ -290,7 +290,7 @@ class _AuthCardState extends State<AuthCard> {
                             decoration: InputDecoration(
                               labelText: 'Nazwisko',
                               contentPadding:
-                                  EdgeInsets.only(bottom: -2, top: -5),
+                                  const EdgeInsets.only(bottom: -2, top: -5),
                               icon: Icon(Icons.person),
                             ),
                             validator: (value) {

@@ -13,13 +13,11 @@ class WorkoutScreen extends StatelessWidget {
     final deviceSize = MediaQuery.of(context).size;
     return Scaffold(
       body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 30),
+        padding: const EdgeInsets.symmetric(horizontal: 30),
         width: deviceSize.width,
         child: Column(
-          // crossAxisAlignment: CrossAxisAlignment.start,
-          // mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(
+            const SizedBox(
               height: 80,
             ),
             Text(
@@ -30,7 +28,7 @@ class WorkoutScreen extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(
+            const SizedBox(
               height: 15,
             ),
             Flexible(
@@ -48,25 +46,3 @@ class WorkoutScreen extends StatelessWidget {
     );
   }
 }
-// Flexible(
-//                   // width: 100,
-//                   child: ListTile(
-//                 leading: Text(
-//                   "Treningi",
-//                   style: TextStyle(
-//                       fontFamily: 'Montserrat',
-//                       fontWeight: FontWeight.w700,
-//                       fontSize: 36),
-//                   textAlign: TextAlign.start,
-//                 ),
-//                 trailing: IconButton(
-//                   onPressed: () {
-//                     Navigator.of(context).pushNamed(AddWorkoutScreen.routeName);
-//                   },
-//                   icon: Icon(
-//                     Icons.add,
-//                     color: Theme.of(context).primaryColor,
-//                     size: 35,
-//                   ),
-//                 ),
-//               )),
