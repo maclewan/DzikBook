@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -19,15 +20,20 @@ import './screens/add_workout_screen.dart';
 import './screens/add_diet_screen.dart';
 import './screens/calendar_plans_screen.dart';
 
+import './services/push_notification_service.dart';
+
 void main() {
   initializeDateFormatting().then((_) => runApp(MyApp()));
   // runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  static final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final pushNotificationService = PushNotificationService(_firebaseMessaging);
+    pushNotificationService.initialise();
     return MultiProvider(
         providers: [
           ChangeNotifierProvider(
