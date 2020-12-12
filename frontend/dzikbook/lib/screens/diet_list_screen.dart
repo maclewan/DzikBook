@@ -19,7 +19,7 @@ class DietListScreen extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(
-              height: 40,
+              height: 10,
             ),
             Flexible(
               child: ListTile(
@@ -28,7 +28,7 @@ class DietListScreen extends StatelessWidget {
                   style: TextStyle(
                       fontFamily: 'Montserrat',
                       fontWeight: FontWeight.w700,
-                      fontSize: 25),
+                      fontSize: 30),
                   textAlign: TextAlign.start,
                 ),
                 trailing: IconButton(

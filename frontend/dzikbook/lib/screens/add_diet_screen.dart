@@ -4,9 +4,6 @@ import 'package:dzikbook/providers/diets.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/static.dart';
-import '../providers/workouts.dart';
-
 import '../widgets/data_detail_tile.dart';
 
 class AddDietScreen extends StatefulWidget {
@@ -19,7 +16,6 @@ class _AddDietScreenState extends State<AddDietScreen> {
   TextEditingController _nameController;
   TextEditingController _foodController;
   TextEditingController _proteinController;
-  TextEditingController _kcalController;
   TextEditingController _carbsController;
   TextEditingController _fatController;
   TextEditingController _weightController;
@@ -27,13 +23,15 @@ class _AddDietScreenState extends State<AddDietScreen> {
   bool _cardVisible = false;
   final _foodForm = GlobalKey<FormState>();
   final _dietForm = GlobalKey<FormState>();
+  final _protein = 4;
+  final _fat = 9;
+  final _carbs = 4;
 
   @override
   void initState() {
     _nameController = TextEditingController();
     _foodController = TextEditingController();
     _proteinController = TextEditingController();
-    _kcalController = TextEditingController();
     _carbsController = TextEditingController();
     _fatController = TextEditingController();
     _weightController = TextEditingController();
@@ -45,11 +43,14 @@ class _AddDietScreenState extends State<AddDietScreen> {
     _nameController.dispose();
     _foodController.dispose();
     _proteinController.dispose();
-    _kcalController.dispose();
     _carbsController.dispose();
     _fatController.dispose();
     _weightController.dispose();
     super.dispose();
+  }
+
+  double countCalories(double carbs, double fat, double protein) {
+    return carbs * _carbs + fat * _fat + protein * _protein;
   }
 
   Future<void> _addFood() async {
@@ -58,12 +59,18 @@ class _AddDietScreenState extends State<AddDietScreen> {
       return;
     }
     _foodForm.currentState.save();
+
+    final _carbs = roundToFixed(_carbsController.text, 2);
+    final _proteins = roundToFixed(_proteinController.text, 2);
+    final _fat = roundToFixed(_fatController.text, 2);
+    final _weight = roundToFixed(_weightController.text, 2);
+    final _sum = _carbs + _proteins + _fat;
     Food newFood = Food(
       id: DateTime.now().toIso8601String(),
       name: _foodController.text,
-      weight: roundToFixed(_weightController.text, 2),
+      weight: _weight >= _sum ? _weight : _sum,
       protein: roundToFixed(_proteinController.text, 2),
-      calories: roundToFixed(_kcalController.text, 2),
+      calories: countCalories(_carbs, _fat, _proteins),
       carbs: roundToFixed(_carbsController.text, 2),
       fat: roundToFixed(_fatController.text, 2),
     );
@@ -77,7 +84,6 @@ class _AddDietScreenState extends State<AddDietScreen> {
   void _clearControllers() {
     _foodController.text = '';
     _proteinController.text = '';
-    _kcalController.text = '';
     _carbsController.text = '';
     _fatController.text = '';
     _weightController.text = '';
@@ -242,14 +248,14 @@ class _AddDietScreenState extends State<AddDietScreen> {
             ),
           ),
           Positioned(
-            top: deviceSize.height * 0.23,
+            top: deviceSize.height * 0.25,
             left: deviceSize.width * 0.1,
             child: Visibility(
               visible: _cardVisible,
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
                 child: Container(
-                  height: deviceSize.height * 0.64,
+                  height: deviceSize.height * 0.5,
                   width: deviceSize.width * 0.8,
                   child: Card(
                     elevation: 4,
@@ -291,11 +297,6 @@ class _AddDietScreenState extends State<AddDietScreen> {
                             ),
                             DataDetailTile(
                               deviceSize: deviceSize,
-                              textController: _kcalController,
-                              title: "Kalorie",
-                            ),
-                            DataDetailTile(
-                              deviceSize: deviceSize,
                               textController: _carbsController,
                               title: "Węgle (g)",
                             ),
@@ -305,7 +306,7 @@ class _AddDietScreenState extends State<AddDietScreen> {
                               title: "Tłuszcz (g)",
                             ),
                             SizedBox(
-                              height: deviceSize.height * 0.01,
+                              height: deviceSize.height * 0.02,
                             ),
                             ButtonBar(
                               alignment: MainAxisAlignment.spaceEvenly,

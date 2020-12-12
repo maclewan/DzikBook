@@ -1,4 +1,3 @@
-import 'package:dzikbook/widgets/navbar.dart';
 import 'package:flutter/material.dart';
 
 import '../providers/diets.dart';

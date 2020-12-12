@@ -70,7 +70,7 @@ class Workouts with ChangeNotifier {
         .reduce((value, element) => value + element);
   }
 
-  void addWorkout(Workout newWorkout) {
+  Future<void> addWorkout(Workout newWorkout) async {
     _workouts.add(newWorkout);
     notifyListeners();
   }
