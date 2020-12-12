@@ -27,11 +27,17 @@ class PostModel {
 }
 
 class PostFetcher {
-  final _count = 30;
-  final _itemsPerPage = 30;
+  final _count = 100;
+  final _itemsPerPage = 10;
+  final bool specificUser;
+  final String specificUserName;
+  final String specificUserImageUrl;
+  PostFetcher(
+      {this.specificUser = false,
+      this.specificUserImageUrl = "",
+      this.specificUserName = ""});
   int _currentPage = 0;
   Random random = new Random();
-
   Future<List<PostModel>> fetchPostsList(int amount) async {
     var url = 'https://randomuser.me/api/?results=$amount&nat=us';
     var httpClient = new HttpClient();
@@ -70,8 +76,9 @@ class PostFetcher {
           PostModel post = new PostModel(
               id: "1",
               timeTaken: '${random.nextInt(24) + 1}h${random.nextInt(60) + 1}m',
-              userImg: profileUrl,
-              userName: name,
+              userImg:
+                  this.specificUser ? this.specificUserImageUrl : profileUrl,
+              userName: this.specificUser ? this.specificUserName : name,
               comments: comments,
               likes: random.nextInt(100),
               hasImage: hasImg,

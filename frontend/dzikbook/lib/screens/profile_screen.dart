@@ -104,20 +104,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _hasMore = true;
 
   void _loadMore() {
-    _isLoading = true;
-    _postFetcher.fetchPostsList(10).then((List<PostModel> fetchedPosts) {
-      if (fetchedPosts.isEmpty) {
-        setState(() {
-          _isLoading = false;
-          _hasMore = false;
-        });
-      } else {
-        setState(() {
-          _isLoading = false;
-          _posts.addAll(fetchedPosts);
-        });
-      }
-    });
+    if (mounted) {
+      _isLoading = true;
+      _postFetcher.fetchPostsList(10).then((List<PostModel> fetchedPosts) {
+        if (fetchedPosts.isEmpty) {
+          setState(() {
+            _isLoading = false;
+            _hasMore = false;
+          });
+        } else {
+          setState(() {
+            _isLoading = false;
+            _posts.addAll(fetchedPosts);
+          });
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _posts.clear();
   }
 
   @override
@@ -131,7 +139,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Twój profil"),
+          title: Text("Twoja Tablica"),
           actions: [
             IconButton(
                 icon: Icon(Icons.home),

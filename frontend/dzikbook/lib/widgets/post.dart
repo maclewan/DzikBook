@@ -1,4 +1,5 @@
 import 'package:dzikbook/models/CommentModel.dart';
+import 'package:dzikbook/screens/user_profile_screen.dart';
 import 'package:dzikbook/widgets/comments_section.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +15,8 @@ class Post extends StatelessWidget {
   final bool hasImage;
   final List<CommentModel> comments;
   final int likes;
-  Post({
+  final bool clickable;
+  const Post({
     @required this.id,
     @required this.userName,
     @required this.description,
@@ -23,6 +25,7 @@ class Post extends StatelessWidget {
     @required this.hasImage,
     this.loadedImg,
     this.comments,
+    this.clickable = true,
     @required this.likes,
   });
 
@@ -45,25 +48,38 @@ class Post extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 50,
-                      height: 50,
-                      margin: EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                              image: NetworkImage(this.userImg),
-                              fit: BoxFit.cover,
-                              alignment: Alignment.topCenter)),
-                    ),
-                    Text(
-                      this.userName,
-                      style:
-                          TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
-                    ),
-                  ],
+                GestureDetector(
+                  onTap: () {
+                    if (this.clickable) {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => UserProfileScreen(
+                                    userImage: this.userImg,
+                                    userName: this.userName,
+                                  )));
+                    }
+                  },
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 50,
+                        height: 50,
+                        margin: EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                                image: NetworkImage(this.userImg),
+                                fit: BoxFit.cover,
+                                alignment: Alignment.topCenter)),
+                      ),
+                      Text(
+                        this.userName,
+                        style: TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.w300),
+                      ),
+                    ],
+                  ),
                 ),
                 Row(
                   children: [
