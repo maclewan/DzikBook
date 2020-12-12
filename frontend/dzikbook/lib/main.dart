@@ -19,6 +19,8 @@ import './screens/diet_list_screen.dart';
 import './screens/add_workout_screen.dart';
 import './screens/add_diet_screen.dart';
 import './screens/calendar_plans_screen.dart';
+import 'screens/add_workout_screen.dart';
+import 'screens/search_people_screen.dart';
 
 void main() {
   initializeDateFormatting().then((_) => runApp(MyApp()));
@@ -56,7 +58,7 @@ class MyApp extends StatelessWidget {
               fontFamily: 'Montserrat',
               visualDensity: VisualDensity.adaptivePlatformDensity,
             ),
-            home: ProfileScreen(),
+            home: PersonsListScreen(),
             routes: {
               ProfileScreen.routeName: (ctx) => ProfileScreen(),
               AuthScreen.routeName: (ctx) => AuthScreen(),
@@ -67,6 +69,7 @@ class MyApp extends StatelessWidget {
               AddWorkoutScreen.routeName: (ctx) => AddWorkoutScreen(),
               AddDietScreen.routeName: (ctx) => AddDietScreen(),
               CalendarPlansScreen.routeName: (ctx) => CalendarPlansScreen(),
+              PersonsListScreen.routeName: (ctx) => PersonsListScreen(),
             },
           ),
         ));
