@@ -1,4 +1,5 @@
 import 'package:dzikbook/screens/user_profile_screen.dart';
+import 'package:dzikbook/widgets/navbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_search_bar/flutter_search_bar.dart';
 import 'package:flutter_svg/svg.dart';
@@ -58,13 +59,16 @@ class _PersonsListScreenState extends State<PersonsListScreen> {
 
   SearchBar searchBar;
   AppBar buildAppBar(BuildContext context) {
-    return new AppBar(
-        title: new Text('Wyszukaj znajomych na dzikbooku'),
-        actions: [searchBar.getSearchAction(context)]);
+    return buildNavBar(
+        context: context,
+        title: "Wyszukaj",
+        routeName: PersonsListScreen.routeName,
+        children: [searchBar.getSearchAction(context)]);
   }
 
   _PersonsListScreenState() {
     searchBar = new SearchBar(
+        hintText: "Wyszukaj użytkownika Dzikbooka",
         inBar: false,
         setState: setState,
         onSubmitted: (s) {

@@ -2,6 +2,7 @@ import 'package:dzikbook/models/PostFetcher.dart';
 import 'package:dzikbook/screens/calendar_plans_screen.dart';
 import 'package:dzikbook/screens/diet_list_screen.dart';
 import 'package:dzikbook/screens/workout_list_screen.dart';
+import 'package:dzikbook/widgets/navbar.dart';
 import 'package:flutter/material.dart';
 
 import 'package:dzikbook/widgets/add_post.dart';
@@ -138,30 +139,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("Twoja Tablica"),
-          actions: [
-            IconButton(
-                icon: Icon(Icons.home),
-                onPressed: () => {
-                      Navigator.of(context)
-                          .pushNamed(CalendarPlansScreen.routeName)
-                    }),
-            IconButton(
-                icon: Icon(Icons.food_bank),
-                onPressed: () => {
-                      Navigator.of(context).pushNamed(DietListScreen.routeName,
-                          arguments: false),
-                    }),
-            IconButton(
-                icon: Icon(Icons.fitness_center),
-                onPressed: () => {
-                      Navigator.of(context).pushNamed(
-                          WorkoutListScreen.routeName,
-                          arguments: false)
-                    }),
-          ],
-        ),
+        appBar: buildNavBar(
+            context: context,
+            title: "Dzikbook",
+            routeName: ProfileScreen.routeName),
         body: ListView.builder(
           itemCount: _hasMore ? _posts.length + 1 : _posts.length,
           itemBuilder: (BuildContext context, int index) {
