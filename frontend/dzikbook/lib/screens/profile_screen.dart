@@ -1,7 +1,4 @@
 import 'package:dzikbook/models/PostFetcher.dart';
-import 'package:dzikbook/screens/calendar_plans_screen.dart';
-import 'package:dzikbook/screens/diet_list_screen.dart';
-import 'package:dzikbook/screens/workout_list_screen.dart';
 import 'package:dzikbook/widgets/navbar.dart';
 import 'package:flutter/material.dart';
 

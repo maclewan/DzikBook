@@ -214,7 +214,7 @@ class Diets with ChangeNotifier {
         .reduce((value, element) => value + element);
   }
 
-  Future<void> addDiet(Diet diet) {
+  Future<void> addDiet(Diet diet) async {
     _diets.add(diet);
     notifyListeners();
   }

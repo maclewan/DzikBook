@@ -1,6 +1,3 @@
-//  Copyright (c) 2019 Aleksander Woźniak
-//  Licensed under Apache License v2.0
-
 import 'package:dzikbook/screens/diet_list_screen.dart';
 import 'package:dzikbook/screens/diet_screen.dart';
 import 'package:dzikbook/screens/workout_list_screen.dart';
@@ -15,7 +12,6 @@ import '../providers/dayPlans.dart';
 import '../providers/workouts.dart';
 import '../providers/diets.dart';
 
-// Example holidays
 final Map<DateTime, List> _holidays = {
   DateTime(2020, 1, 1): ['New Year\'s Day'],
   DateTime(2020, 1, 6): ['Epiphany'],

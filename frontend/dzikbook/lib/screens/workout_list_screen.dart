@@ -1,9 +1,7 @@
 import 'package:dzikbook/screens/add_workout_screen.dart';
 import 'package:dzikbook/widgets/navbar.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-import '../providers/workouts.dart';
 import '../widgets/workout_list.dart';
 
 class WorkoutListScreen extends StatelessWidget {
@@ -23,7 +21,7 @@ class WorkoutListScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(
-                height: 40,
+                height: 10,
               ),
               Flexible(
                   child: ListTile(
@@ -32,7 +30,7 @@ class WorkoutListScreen extends StatelessWidget {
                   style: TextStyle(
                       fontFamily: 'Montserrat',
                       fontWeight: FontWeight.w700,
-                      fontSize: 25),
+                      fontSize: 30),
                   textAlign: TextAlign.start,
                 ),
                 trailing: IconButton(
