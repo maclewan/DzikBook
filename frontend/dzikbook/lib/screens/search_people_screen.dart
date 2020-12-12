@@ -1,5 +1,7 @@
+import 'package:dzikbook/screens/user_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_search_bar/flutter_search_bar.dart';
+import 'package:flutter_svg/svg.dart';
 
 class PersonsListScreen extends StatefulWidget {
   static final routeName = '/persons-list';
@@ -78,48 +80,79 @@ class _PersonsListScreenState extends State<PersonsListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: searchBar.build(context),
-      body: ListView(
-        children: [
-          ...persons.map(
-            (person) => ListTile(
-              title: Text(person.userName),
-              leading: CircleAvatar(
-                backgroundImage: NetworkImage(person.userImg),
-              ),
-              trailing: IconButton(
-                  icon: Icon(Icons.more_horiz),
-                  onPressed: () {
-                    showModalBottomSheet(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return Container(
-                            height: 100,
-                            color: Colors.white,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  child: FlatButton(
-                                      minWidth: double.infinity,
-                                      onPressed: () {},
-                                      child: Text("Dodaj do znajomych")),
-                                ),
-                                Expanded(
-                                  child: FlatButton(
-                                      minWidth: double.infinity,
-                                      onPressed: () {},
-                                      child: Text("Pokaż profil")),
-                                ),
-                              ],
-                            ),
-                          );
-                        });
-                  }),
-              dense: true,
+      body: persons.isEmpty
+          ? Center(
+              child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SvgPicture.asset(
+                  'assets/images/dzik.svg',
+                  width: 200,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 20.0, horizontal: 40),
+                  child: Text(
+                    "Wpisz imię i nazwisko użytkownika, którego chcesz znaleźć na Dzikbooku",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                  ),
+                )
+              ],
+            ))
+          : ListView(
+              children: [
+                ...persons.map(
+                  (person) => ListTile(
+                    title: Text(person.userName),
+                    leading: CircleAvatar(
+                      backgroundImage: NetworkImage(person.userImg),
+                    ),
+                    trailing: IconButton(
+                        icon: Icon(Icons.more_horiz),
+                        onPressed: () {
+                          showModalBottomSheet(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return Container(
+                                  height: 100,
+                                  color: Colors.white,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Expanded(
+                                        child: FlatButton(
+                                            minWidth: double.infinity,
+                                            onPressed: () {},
+                                            child: Text("Dodaj do znajomych")),
+                                      ),
+                                      Expanded(
+                                        child: FlatButton(
+                                            minWidth: double.infinity,
+                                            onPressed: () {
+                                              Navigator.pushReplacement(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          UserProfileScreen(
+                                                            userImage:
+                                                                person.userImg,
+                                                            userName:
+                                                                person.userName,
+                                                          )));
+                                            },
+                                            child: Text("Pokaż profil")),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              });
+                        }),
+                    dense: true,
+                  ),
+                )
+              ],
             ),
-          )
-        ],
-      ),
     );
   }
 }
