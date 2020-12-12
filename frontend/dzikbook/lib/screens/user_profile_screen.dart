@@ -2,16 +2,17 @@ import 'package:dzikbook/models/PostFetcher.dart';
 import 'package:dzikbook/screens/calendar_plans_screen.dart';
 import 'package:dzikbook/screens/diet_list_screen.dart';
 import 'package:dzikbook/screens/workout_list_screen.dart';
+import 'package:dzikbook/widgets/user_profile_info.dart';
 import 'package:flutter/material.dart';
 
 import 'package:dzikbook/widgets/post.dart';
 import '../models/dummyData.dart';
 
+//TODO: memory leaks?
 class UserProfileScreen extends StatefulWidget {
-  static final routeName = '/user-profile';
   final String userName;
   final String userImage;
-  UserProfileScreen(
+  const UserProfileScreen(
       {this.userImage = mainUserImage, this.userName = mainUserName});
   @override
   _UserProfileScreenState createState() => _UserProfileScreenState();
@@ -19,6 +20,9 @@ class UserProfileScreen extends StatefulWidget {
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
   List<PostModel> _posts = [];
+  PostFetcher _postFetcher;
+  bool _isLoading = true;
+  bool _hasMore = true;
 
   @override
   void initState() {
@@ -31,28 +35,25 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     _loadMore();
   }
 
-  PostFetcher _postFetcher;
-
-  bool _isLoading = true;
-  bool _hasMore = true;
-
   void _loadMore() {
-    if (mounted) {
-      _isLoading = true;
-      _postFetcher.fetchPostsList(10).then((List<PostModel> fetchedPosts) {
-        if (fetchedPosts.isEmpty) {
+    _isLoading = true;
+    _postFetcher.fetchPostsList(10).then((List<PostModel> fetchedPosts) {
+      if (fetchedPosts.isEmpty) {
+        if (mounted) {
           setState(() {
             _isLoading = false;
             _hasMore = false;
           });
-        } else {
+        }
+      } else {
+        if (mounted) {
           setState(() {
             _isLoading = false;
             _posts.addAll(fetchedPosts);
           });
         }
-      });
-    }
+      }
+    });
   }
 
   @override
@@ -91,6 +92,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         body: ListView.builder(
           itemCount: _hasMore ? _posts.length + 1 : _posts.length,
           itemBuilder: (BuildContext context, int index) {
+            if (index == 0)
+              return UserProfileInfo(
+                userImg: this.widget.userImage,
+                userName: this.widget.userName,
+              );
             if (index >= _posts.length) {
               if (!_isLoading) {
                 _loadMore();
@@ -109,16 +115,17 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
             return Post(
               clickable: false,
-              description: _posts[index].description,
+              description: _posts[index - 1].description,
               id: index.toString(),
-              timeTaken: _posts[index].timeTaken,
-              userName: _posts[index].userName,
-              comments: _posts[index].comments,
-              likes: _posts[index].likes,
-              hasImage: _posts[index].hasImage,
-              userImg: _posts[index].userImg,
-              loadedImg:
-                  _posts[index].hasImage ? _posts[index].loadedImg : null,
+              timeTaken: _posts[index - 1].timeTaken,
+              userName: _posts[index - 1].userName,
+              comments: _posts[index - 1].comments,
+              likes: _posts[index - 1].likes,
+              hasImage: _posts[index - 1].hasImage,
+              userImg: _posts[index - 1].userImg,
+              loadedImg: _posts[index - 1].hasImage
+                  ? _posts[index - 1].loadedImg
+                  : null,
             );
           },
         ));

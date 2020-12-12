@@ -152,7 +152,7 @@ class _AddPostState extends State<AddPost> {
                           style: TextStyle(
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
-                              fontSize: 11),
+                              fontSize: 12),
                         ),
                         color: Color.fromRGBO(126, 213, 111, 1.0),
                       ),
@@ -173,7 +173,7 @@ class _AddPostState extends State<AddPost> {
                           style: TextStyle(
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
-                              fontSize: 11),
+                              fontSize: 12),
                         ),
                         color: Color.fromRGBO(126, 213, 111, 1.0),
                       ),
