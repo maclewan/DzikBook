@@ -5,6 +5,7 @@ import 'package:dzikbook/screens/diet_list_screen.dart';
 import 'package:dzikbook/screens/diet_screen.dart';
 import 'package:dzikbook/screens/workout_list_screen.dart';
 import 'package:dzikbook/screens/workout_screen.dart';
+import 'package:dzikbook/widgets/navbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -88,6 +89,10 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: buildNavBar(
+          context: context,
+          routeName: CalendarPlansScreen.routeName,
+          title: 'Kalendarz'),
       body: Column(
         mainAxisSize: MainAxisSize.max,
         children: <Widget>[

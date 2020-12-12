@@ -2,6 +2,7 @@ import 'package:dzikbook/models/PostFetcher.dart';
 import 'package:dzikbook/screens/calendar_plans_screen.dart';
 import 'package:dzikbook/screens/diet_list_screen.dart';
 import 'package:dzikbook/screens/workout_list_screen.dart';
+import 'package:dzikbook/widgets/navbar.dart';
 import 'package:dzikbook/widgets/user_profile_info.dart';
 import 'package:flutter/material.dart';
 
@@ -10,10 +11,14 @@ import '../models/dummyData.dart';
 
 //TODO: memory leaks?
 class UserProfileScreen extends StatefulWidget {
+  static const routeName = '/user-profile';
   final String userName;
   final String userImage;
+  final bool rootUser;
   const UserProfileScreen(
-      {this.userImage = mainUserImage, this.userName = mainUserName});
+      {this.userImage = mainUserImage,
+      this.userName = mainUserName,
+      this.rootUser = true});
   @override
   _UserProfileScreenState createState() => _UserProfileScreenState();
 }
@@ -65,30 +70,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("Profil"),
-          actions: [
-            IconButton(
-                icon: Icon(Icons.home),
-                onPressed: () => {
-                      Navigator.of(context)
-                          .pushNamed(CalendarPlansScreen.routeName)
-                    }),
-            IconButton(
-                icon: Icon(Icons.food_bank),
-                onPressed: () => {
-                      Navigator.of(context).pushNamed(DietListScreen.routeName,
-                          arguments: false),
-                    }),
-            IconButton(
-                icon: Icon(Icons.fitness_center),
-                onPressed: () => {
-                      Navigator.of(context).pushNamed(
-                          WorkoutListScreen.routeName,
-                          arguments: false)
-                    }),
-          ],
-        ),
+        appBar: buildNavBar(
+            context: context,
+            routeName: UserProfileScreen.routeName,
+            title: 'Profil'),
         body: ListView.builder(
           itemCount: _hasMore ? _posts.length + 1 : _posts.length,
           itemBuilder: (BuildContext context, int index) {

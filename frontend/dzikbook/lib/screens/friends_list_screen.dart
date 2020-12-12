@@ -1,4 +1,5 @@
 import 'package:dzikbook/widgets/friend.dart';
+import 'package:dzikbook/widgets/navbar.dart';
 import 'package:flutter/material.dart';
 
 class FriendsListScreen extends StatefulWidget {
@@ -56,14 +57,10 @@ class _FriendsListScreenState extends State<FriendsListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Znajomi"),
-        actions: [
-          IconButton(icon: Icon(Icons.home), onPressed: () => {}),
-          IconButton(icon: Icon(Icons.food_bank), onPressed: () => {}),
-          IconButton(icon: Icon(Icons.fitness_center), onPressed: () => {}),
-        ],
-      ),
+      appBar: buildNavBar(
+          context: context,
+          routeName: FriendsListScreen.routeName,
+          title: 'Znajomi'),
       body: ListView(
         children: [
           ...friends.map(

@@ -1,4 +1,5 @@
 import 'package:dzikbook/screens/add_diet_screen.dart';
+import 'package:dzikbook/widgets/navbar.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/diet_list.dart';
@@ -10,6 +11,10 @@ class DietListScreen extends StatelessWidget {
     final addToPlan = ModalRoute.of(context).settings.arguments as bool;
 
     return Scaffold(
+      appBar: buildNavBar(
+          context: context,
+          routeName: DietListScreen.routeName,
+          title: 'Diety'),
       body: Container(
         child: Column(
           children: [
