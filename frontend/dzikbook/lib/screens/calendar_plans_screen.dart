@@ -143,7 +143,7 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
             child: Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Theme.of(context).primaryColor,
+                border: Border.all(color: Colors.green[800], width: 2),
               ),
               margin: const EdgeInsets.all(4.0),
               width: 100,
@@ -152,9 +152,9 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
                 child: Text(
                   '${date.day}',
                   style: TextStyle().copyWith(
-                    fontSize: 16.0,
-                    color: Colors.white,
-                  ),
+                      fontSize: 16.0,
+                      color: Colors.green[800],
+                      fontWeight: FontWeight.w600),
                 ),
               ),
             ),
@@ -167,7 +167,7 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
             height: 100,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.orange,
+              color: Colors.green[800],
             ),
             child: Center(
               child: Text(
@@ -313,9 +313,7 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
                 _setEvents(plansData.workoutPlans);
                 _toActive("workout");
               },
-              color: _workoutButton
-                  ? Colors.pink[500]
-                  : Theme.of(context).primaryColor,
+              color: _workoutButton ? Colors.green[800] : Colors.green[300],
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(18),
               ),
@@ -330,9 +328,7 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
                 _toActive("all");
                 _setEvents(plansData.allPlans);
               },
-              color: _allButton
-                  ? Colors.pink[500]
-                  : Theme.of(context).primaryColor,
+              color: _allButton ? Colors.green[800] : Colors.green[300],
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(18),
               ),
@@ -346,9 +342,7 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
                 _setEvents(plansData.dietPlans);
                 _toActive("diet");
               },
-              color: _dietButton
-                  ? Colors.pink[500]
-                  : Theme.of(context).primaryColor,
+              color: _dietButton ? Colors.green[800] : Colors.green[300],
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(18),
               ),
