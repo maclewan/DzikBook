@@ -85,6 +85,7 @@ class _UserProfileInfoState extends State<UserProfileInfo> {
                     children: [
                       Expanded(
                         child: Container(
+                          padding: EdgeInsets.all(3),
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
                             color: Colors.white,
@@ -94,12 +95,18 @@ class _UserProfileInfoState extends State<UserProfileInfo> {
                               width: 1.5,
                             ),
                           ),
-                          child: Text(
-                            this.widget.userName,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: Colors.green,
-                                fontWeight: FontWeight.w500),
+                          child: FittedBox(
+                            fit: BoxFit.fitWidth,
+                            child: Text(
+                              this
+                                  .widget
+                                  .userName
+                                  .replaceAll(new RegExp(r' '), '\n'),
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.w500),
+                            ),
                           ),
                         ),
                       ),
