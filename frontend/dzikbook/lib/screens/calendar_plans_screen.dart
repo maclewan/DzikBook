@@ -219,11 +219,7 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
       duration: const Duration(milliseconds: 300),
       decoration: BoxDecoration(
         shape: BoxShape.rectangle,
-        color: _calendarController.isSelected(date)
-            ? Colors.pink[500]
-            : _calendarController.isToday(date)
-                ? Colors.pink[300]
-                : Colors.blue[400],
+        color: Colors.pink[500],
       ),
       width: 16.0,
       height: 16.0,
@@ -377,7 +373,7 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
     return Visibility(
       visible: _selectedEvents.isNotEmpty,
       child: Container(
-        padding: const EdgeInsets.only(top: 10),
+        padding: const EdgeInsets.only(top: 10, left: 8, right: 8),
         margin: const EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(
           color: Theme.of(context).primaryColor,
@@ -401,12 +397,15 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
               height: 10,
             ),
             Flexible(
-              child: ListView.builder(
+              child: ListView.separated(
+                separatorBuilder: (context, index) => SizedBox(
+                  height: 15,
+                ),
                 itemCount: _selectedEvents.length,
                 itemBuilder: (context, id) {
                   final event = _selectedEvents[id];
                   String picture = 'assets/images/diet.svg';
-                  String trailingData = 'xd';
+                  String trailingData = '';
                   var nav;
                   if (event is Workout) {
                     picture = 'assets/images/dumbbell.svg';
@@ -422,26 +421,36 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
                           .pushNamed(DietScreen.routeName, arguments: event);
                     };
                   }
-                  return ListTile(
-                    onTap: nav,
-                    leading: SvgPicture.asset(
-                      picture,
-                      color: Colors.black,
-                      height: 40,
+                  return Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(18),
+                      color: Colors.white,
                     ),
-                    title: Text(
-                      event.name,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
+                    child: ListTile(
+                      dense: true,
+                      // shape: RoundedRectangleBorder(
+                      //     borderRadius: BorderRadius.circular(10)),
+                      // tileColor: Colors.white,
+                      onTap: nav,
+                      leading: SvgPicture.asset(
+                        picture,
+                        color: Colors.green[700],
+                        height: 30,
                       ),
-                    ),
-                    trailing: Text(
-                      trailingData,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 17,
+                      title: Text(
+                        event.name,
+                        style: TextStyle(
+                          color: Colors.grey[700],
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      trailing: Text(
+                        trailingData,
+                        style: TextStyle(
+                          color: Colors.grey[700],
+                          fontSize: 17,
+                        ),
                       ),
                     ),
                   );

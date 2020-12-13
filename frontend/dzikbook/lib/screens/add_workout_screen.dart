@@ -89,6 +89,37 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Tworzenie treningu"),
+        backgroundColor: Theme.of(context).primaryColor,
+        actions: [
+          IconButton(
+              icon: Icon(
+                Icons.done,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                if (_exercises.isEmpty) {
+                  return showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                            title: Text("Błąd!"),
+                            content: Text(
+                                "Nie dodano żadnych ćwiczeń do tego treningu!"),
+                            actions: [
+                              FlatButton(
+                                  onPressed: () {
+                                    Navigator.of(ctx).pop();
+                                  },
+                                  child: Text("Okej"))
+                            ],
+                          ));
+                } else {
+                  _addWorkout();
+                }
+              })
+        ],
+      ),
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
@@ -97,21 +128,24 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
             child: Form(
               key: _workoutForm,
               child: Column(
+                // mainAxisAlignment: MainAxisAlignment.start,
+                // crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(
-                    height: 80,
+                    height: 30,
                   ),
                   Container(
+                    padding: const EdgeInsets.only(left: 10),
                     width: deviceSize.width * 0.6,
                     child: TextFormField(
                       controller: _nameController,
                       decoration: InputDecoration(
-                        hintText: 'Nazwa',
+                        hintText: 'Nazwa treningu',
                       ),
                       textAlign: TextAlign.center,
                       cursorColor: Theme.of(context).primaryColor,
                       style: TextStyle(
-                        fontSize: 25,
+                        fontSize: 24,
                         color: Color.fromRGBO(0, 0, 0, 1),
                       ),
                       validator: (value) {
@@ -130,13 +164,15 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
                       "Ćwiczenia",
                       style: const TextStyle(fontSize: 22),
                     ),
-                    trailing: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _cardVisible = true;
-                        });
+                    trailing: IconButton(
+                      onPressed: () {
+                        setState(
+                          () {
+                            _cardVisible = true;
+                          },
+                        );
                       },
-                      child: Icon(
+                      icon: Icon(
                         Icons.add,
                         color: Theme.of(context).primaryColor,
                       ),
@@ -151,7 +187,7 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
                           trailing: IconButton(
                             icon: Icon(
                               Icons.delete,
-                              color: Colors.redAccent,
+                              color: Colors.grey[700],
                             ),
                             onPressed: () {
                               _exercises.removeAt(id);
@@ -167,64 +203,6 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
             ),
           ),
           Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            // left: deviceSize.width * 0.5,
-            child: ButtonBar(
-              buttonHeight: 40,
-              buttonMinWidth: 100,
-              alignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                // RaisedButton(
-                //   onPressed: () {
-                //     Navigator.of(context).pop();
-                //   },
-                //   child: Text(
-                //     "Anuluj",
-                //     style: TextStyle(
-                //       fontSize: 20,
-                //     ),
-                //   ),
-                //   color: Colors.redAccent,
-                //   shape: RoundedRectangleBorder(
-                //     borderRadius: BorderRadius.circular(18),
-                //   ),
-                // ),
-                RaisedButton(
-                  onPressed: () {
-                    if (_exercises.isEmpty) {
-                      return showDialog(
-                          context: context,
-                          builder: (ctx) => AlertDialog(
-                                title: Text("Błąd!"),
-                                content: Text(
-                                    "Nie dodano żadnych ćwiczeń do tego treningu!"),
-                                actions: [
-                                  FlatButton(
-                                      onPressed: () {
-                                        Navigator.of(ctx).pop();
-                                      },
-                                      child: Text("Okej"))
-                                ],
-                              ));
-                    } else {
-                      _addWorkout();
-                    }
-                  },
-                  child: Text(
-                    "Dodaj",
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  color: Theme.of(context).primaryColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Positioned(
             top: deviceSize.height * 0.25,
             left: deviceSize.width * 0.1,
             child: Visibility(
@@ -232,7 +210,7 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
                 child: Container(
-                  height: deviceSize.height * 0.5,
+                  height: deviceSize.height * 0.45,
                   width: deviceSize.width * 0.8,
                   child: Card(
                     elevation: 4,

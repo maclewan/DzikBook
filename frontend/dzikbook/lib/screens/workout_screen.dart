@@ -11,25 +11,14 @@ class WorkoutScreen extends StatelessWidget {
     final workoutData = ModalRoute.of(context).settings.arguments as Workout;
     final deviceSize = MediaQuery.of(context).size;
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).primaryColor,
+        title: Text(workoutData.name),
+      ),
       body: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 30),
         width: deviceSize.width,
         child: Column(
           children: [
-            const SizedBox(
-              height: 80,
-            ),
-            Text(
-              workoutData.name,
-              style: TextStyle(
-                fontSize: 25,
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(
-              height: 15,
-            ),
             Flexible(
               child: ListView.builder(
                 shrinkWrap: true,

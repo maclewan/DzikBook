@@ -113,6 +113,34 @@ class _AddDietScreenState extends State<AddDietScreen> {
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Tworzenie diety"),
+        backgroundColor: Theme.of(context).primaryColor,
+        actions: [
+          IconButton(
+              icon: Icon(Icons.done),
+              onPressed: () {
+                if (_food.isEmpty) {
+                  return showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                            title: Text("Błąd!"),
+                            content: Text(
+                                "Nie dodano żadnych posiłków do tej diety!"),
+                            actions: [
+                              FlatButton(
+                                  onPressed: () {
+                                    Navigator.of(ctx).pop();
+                                  },
+                                  child: Text("Okej"))
+                            ],
+                          ));
+                } else {
+                  _addDiet();
+                }
+              })
+        ],
+      ),
       body: Stack(
         children: [
           Padding(
@@ -122,7 +150,7 @@ class _AddDietScreenState extends State<AddDietScreen> {
               child: Column(
                 children: [
                   const SizedBox(
-                    height: 80,
+                    height: 30,
                   ),
                   Container(
                     width: deviceSize.width * 0.6,
@@ -134,7 +162,7 @@ class _AddDietScreenState extends State<AddDietScreen> {
                       textAlign: TextAlign.center,
                       cursorColor: Theme.of(context).primaryColor,
                       style: TextStyle(
-                        fontSize: 25,
+                        fontSize: 24,
                         color: Color.fromRGBO(0, 0, 0, 1),
                       ),
                       validator: (value) {
@@ -150,16 +178,16 @@ class _AddDietScreenState extends State<AddDietScreen> {
                   ),
                   ListTile(
                     title: Text(
-                      "Jedzenie",
+                      "Posiłki",
                       style: TextStyle(fontSize: 22),
                     ),
-                    trailing: GestureDetector(
-                      onTap: () {
+                    trailing: IconButton(
+                      onPressed: () {
                         setState(() {
                           _cardVisible = true;
                         });
                       },
-                      child: Icon(
+                      icon: Icon(
                         Icons.add,
                         color: Theme.of(context).primaryColor,
                       ),
@@ -174,7 +202,7 @@ class _AddDietScreenState extends State<AddDietScreen> {
                           trailing: IconButton(
                             icon: Icon(
                               Icons.delete,
-                              color: Colors.redAccent,
+                              color: Colors.grey[700],
                             ),
                             onPressed: () {
                               _food.removeAt(id);
@@ -187,64 +215,6 @@ class _AddDietScreenState extends State<AddDietScreen> {
                   ),
                 ],
               ),
-            ),
-          ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            // left: deviceSize.width * 0.5,
-            child: ButtonBar(
-              buttonHeight: 40,
-              buttonMinWidth: 100,
-              alignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                RaisedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text(
-                    "Anuluj",
-                    style: TextStyle(
-                      fontSize: 20,
-                    ),
-                  ),
-                  color: Colors.redAccent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                RaisedButton(
-                  onPressed: () {
-                    if (_food.isEmpty) {
-                      return showDialog(
-                          context: context,
-                          builder: (ctx) => AlertDialog(
-                                title: Text("Błąd!"),
-                                content: Text(
-                                    "Nie dodano żadnych posiłków do tej diety!"),
-                                actions: [
-                                  FlatButton(
-                                      onPressed: () {
-                                        Navigator.of(ctx).pop();
-                                      },
-                                      child: Text("Okej"))
-                                ],
-                              ));
-                    } else {
-                      _addDiet();
-                    }
-                  },
-                  child: Text(
-                    "Dodaj",
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  color: Theme.of(context).primaryColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ],
             ),
           ),
           Positioned(
