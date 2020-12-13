@@ -5,8 +5,13 @@ import 'package:image_picker/image_picker.dart';
 
 class UserProfileInfo extends StatefulWidget {
   final String userName, userImg;
+  final bool rootUser, isFriend;
   const UserProfileInfo(
-      {Key key, @required this.userImg, @required this.userName})
+      {Key key,
+      @required this.userImg,
+      @required this.userName,
+      @required this.rootUser,
+      @required this.isFriend})
       : super(key: key);
 
   @override
@@ -44,25 +49,28 @@ class _UserProfileInfoState extends State<UserProfileInfo> {
                       image: NetworkImage(this.widget.userImg),
                       fit: BoxFit.cover,
                       alignment: Alignment.center)),
-              child: GestureDetector(
-                onTap: getImage,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black54,
-                    borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(5),
-                        bottomRight: Radius.circular(5)),
-                  ),
-                  height: 40,
-                  width: double.infinity,
-                  alignment: Alignment.center,
-                  child: Text(
-                    "EDYTUJ",
-                    style: TextStyle(
-                        color: Colors.grey[100], fontWeight: FontWeight.w100),
-                  ),
-                ),
-              ),
+              child: this.widget.rootUser
+                  ? GestureDetector(
+                      onTap: getImage,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black54,
+                          borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(5),
+                              bottomRight: Radius.circular(5)),
+                        ),
+                        height: 40,
+                        width: double.infinity,
+                        alignment: Alignment.center,
+                        child: Text(
+                          "EDYTUJ",
+                          style: TextStyle(
+                              color: Colors.grey[100],
+                              fontWeight: FontWeight.w100),
+                        ),
+                      ),
+                    )
+                  : Container(),
             ),
           ),
           Expanded(
@@ -77,6 +85,7 @@ class _UserProfileInfoState extends State<UserProfileInfo> {
                     children: [
                       Expanded(
                         child: Container(
+                          padding: EdgeInsets.all(3),
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
                             color: Colors.white,
@@ -86,12 +95,18 @@ class _UserProfileInfoState extends State<UserProfileInfo> {
                               width: 1.5,
                             ),
                           ),
-                          child: Text(
-                            this.widget.userName,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: Colors.green,
-                                fontWeight: FontWeight.w500),
+                          child: FittedBox(
+                            fit: BoxFit.fitWidth,
+                            child: Text(
+                              this
+                                  .widget
+                                  .userName
+                                  .replaceAll(new RegExp(r' '), '\n'),
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.w500),
+                            ),
                           ),
                         ),
                       ),
@@ -182,22 +197,31 @@ class _UserProfileInfoState extends State<UserProfileInfo> {
                   ),
                   Expanded(
                     child: Container(
-                      margin: EdgeInsets.only(top: 8),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: Colors.green[800],
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: MaterialButton(
-                        onPressed: () {},
-                        height: double.infinity,
-                        minWidth: double.infinity,
-                        child: Text(
-                          "Dodaj użytkownika",
-                          style: TextStyle(color: Colors.white),
+                        margin: EdgeInsets.only(top: 8),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: Colors.green[800],
+                          borderRadius: BorderRadius.circular(5),
                         ),
-                      ),
-                    ),
+                        child: MaterialButton(
+                          onPressed: () {},
+                          height: double.infinity,
+                          minWidth: double.infinity,
+                          child: this.widget.rootUser
+                              ? Text(
+                                  "Ustawienia",
+                                  style: TextStyle(color: Colors.white),
+                                )
+                              : this.widget.isFriend
+                                  ? Text(
+                                      "Usuń znajomego",
+                                      style: TextStyle(color: Colors.white),
+                                    )
+                                  : Text(
+                                      "Dodaj do znajomych",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                        )),
                   ),
                 ],
               ),

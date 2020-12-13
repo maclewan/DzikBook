@@ -143,6 +143,8 @@ class _PersonsListScreenState extends State<PersonsListScreen> {
                                                                 person.userImg,
                                                             userName:
                                                                 person.userName,
+                                                            rootUser: false,
+                                                            friend: false,
                                                           )));
                                             },
                                             child: Text("Pokaż profil")),
