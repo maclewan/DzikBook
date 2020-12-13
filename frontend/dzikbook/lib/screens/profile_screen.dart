@@ -102,9 +102,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _hasMore = true;
 
   void _loadMore() {
-    if (mounted) {
-      _isLoading = true;
-      _postFetcher.fetchPostsList(10).then((List<PostModel> fetchedPosts) {
+    _isLoading = true;
+    _postFetcher.fetchPostsList(10).then((List<PostModel> fetchedPosts) {
+      if (mounted) {
         if (fetchedPosts.isEmpty) {
           setState(() {
             _isLoading = false;
@@ -116,8 +116,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _posts.addAll(fetchedPosts);
           });
         }
-      });
-    }
+      }
+    });
   }
 
   @override

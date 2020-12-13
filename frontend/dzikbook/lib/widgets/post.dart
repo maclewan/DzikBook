@@ -57,6 +57,8 @@ class Post extends StatelessWidget {
                               builder: (context) => UserProfileScreen(
                                     userImage: this.userImg,
                                     userName: this.userName,
+                                    rootUser: false,
+                                    friend: true,
                                   )));
                     }
                   },

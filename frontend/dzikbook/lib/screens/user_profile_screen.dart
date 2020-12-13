@@ -6,16 +6,17 @@ import 'package:flutter/material.dart';
 import 'package:dzikbook/widgets/post.dart';
 import '../models/dummyData.dart';
 
-//TODO: memory leaks?
 class UserProfileScreen extends StatefulWidget {
   static const routeName = '/user-profile';
   final String userName;
   final String userImage;
   final bool rootUser;
+  final bool friend;
   const UserProfileScreen(
       {this.userImage = mainUserImage,
       this.userName = mainUserName,
-      this.rootUser = true});
+      this.rootUser = true,
+      this.friend = false});
   @override
   _UserProfileScreenState createState() => _UserProfileScreenState();
 }
@@ -78,6 +79,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               return UserProfileInfo(
                 userImg: this.widget.userImage,
                 userName: this.widget.userName,
+                rootUser: this.widget.rootUser,
+                isFriend: this.widget.friend,
               );
             if (index >= _posts.length) {
               if (!_isLoading) {
