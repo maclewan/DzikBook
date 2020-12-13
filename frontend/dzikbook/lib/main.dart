@@ -58,7 +58,7 @@ class MyApp extends StatelessWidget {
               fontFamily: 'Montserrat',
               visualDensity: VisualDensity.adaptivePlatformDensity,
             ),
-            home: CalendarPlansScreen(),
+            home: PersonsListScreen(),
             routes: {
               ProfileScreen.routeName: (ctx) => ProfileScreen(),
               AuthScreen.routeName: (ctx) => AuthScreen(),
