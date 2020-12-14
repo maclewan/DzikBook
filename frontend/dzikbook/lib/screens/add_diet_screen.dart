@@ -69,10 +69,10 @@ class _AddDietScreenState extends State<AddDietScreen> {
       id: DateTime.now().toIso8601String(),
       name: _foodController.text,
       weight: _weight >= _sum ? _weight : _sum,
-      protein: roundToFixed(_proteinController.text, 2),
+      protein: _proteins,
       calories: countCalories(_carbs, _fat, _proteins),
-      carbs: roundToFixed(_carbsController.text, 2),
-      fat: roundToFixed(_fatController.text, 2),
+      carbs: _carbs,
+      fat: _fat,
     );
     _food.add(newFood);
     _clearControllers();
