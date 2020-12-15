@@ -40,6 +40,28 @@ def authenticate(f):
 
     return validate
 
+def internal(f):
+    def validate(*args, **kwargs):
+        request = args[1]
+        if 'Flag' in request.headers:
+            # If service will communicate just with another service
+
+            try:
+                id = request.headers["Uid"]
+                flag = request.headers["Flag"]
+
+                if not valid_hash(flag, id):
+                    raise Exception
+
+            except Exception as e:
+                return Response("Not authorised!", status=status.HTTP_401_UNAUTHORIZED)
+        else:
+            return Response("Not authorised!", status=status.HTTP_401_UNAUTHORIZED)
+
+        request.user = get_user(int(id))
+        return f(*args, **kwargs)
+
+    return validate
 
 def get_user(id):
     new_user = User()

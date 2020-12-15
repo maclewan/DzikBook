@@ -117,6 +117,7 @@ class SigInUserPostsListView(APIView):
     def get(self, request):
         try:
             posts = Post.objects.filter(author=request.user)
+            posts = posts.order_by('-timestamp')
             type = request.GET.get('type', None)
             offset = int(request.GET.get('offset', 0))
             amount = int(request.GET.get('amount', 10))
@@ -139,6 +140,7 @@ class PostsListView(APIView):
     def get(self, request, user_id):
         try:
             posts = Post.objects.filter(author=User(pk=user_id))
+            posts = posts.order_by('-timestamp')
             offset = int(request.GET.get('offset', 0))
             amount = int(request.GET.get('amount', 10))
             type = request.GET.get('type', None)
@@ -149,4 +151,44 @@ class PostsListView(APIView):
             context = PostSerializer(posts, many=True).data
         except Exception as e:
             return Response("User with given id doesn't exist!", status=status.HTTP_404_NOT_FOUND)
+        return Response(context)
+
+
+# Main wall
+
+class MainWallListView(APIView):
+    authentication_classes = []
+
+    @authenticate
+    def get(self, request):
+        try:
+            user_id = str(request.user.id)
+
+            headers = {"Uid": user_id, "Flag": hash_user(user_id)}
+            try:
+                response = requests.get(f'http://127.0.0.1:8000/friends/id_list/', headers=headers)
+                response_json = response.json()
+            except Exception as e:
+                return Response("Internal server error!", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            if 'friends_list' not in response_json:
+                return Response(response.content, status=response.status_code)
+
+            friends_id_list = list(response_json['friends_list'])
+            friends_id_list.extend(user_id)
+            users_list = [User(int(id)) for id in friends_id_list]
+            all_posts = Post.objects.filter(author__in=users_list).order_by('-timestamp')
+
+            type = request.GET.get('type', None)
+            offset = int(request.GET.get('offset', 0))
+            amount = int(request.GET.get('amount', 10))
+
+            if type is not None:
+                all_posts = all_posts.filter(type=type)
+
+            all_posts = all_posts[offset:offset + amount]
+
+            context = PostSerializer(all_posts, many=True).data
+        except Exception as e:
+            return Response("Post with given id doesn't exist!", status=status.HTTP_404_NOT_FOUND)
         return Response(context)

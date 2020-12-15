@@ -23,7 +23,6 @@ class PostSerializer(serializers.Serializer):
         """
         Create and return a new `Comment` instance, given the validated data.
         """
-        print(repr(self))
         return Post.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
