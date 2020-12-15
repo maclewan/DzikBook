@@ -26,6 +26,7 @@ class PhotoManagementView(APIView):
 
     @internal
     def post(self, request):
+        print('jestesmy w srodku media')
         response = save_inmemory_image(request)
         return response
 

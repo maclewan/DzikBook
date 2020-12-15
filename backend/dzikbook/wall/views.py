@@ -1,3 +1,4 @@
+import requests
 from django.contrib.auth.models import User
 from django.shortcuts import render
 from django.db import models
@@ -10,7 +11,7 @@ from .models import Post
 from .serializers import PostSerializer
 
 # create your views here
-from .decorators import authenticate
+from .decorators import authenticate, hash_user
 
 
 class SigInUserPostsView(APIView):
@@ -22,7 +23,6 @@ class SigInUserPostsView(APIView):
             post = Post.objects.get(pk=post_id)
             context = PostSerializer(post).data
         except Exception as e:
-            print(e)
             return Response("Post with given id doesn't exist!", status=status.HTTP_404_NOT_FOUND)
         return Response(context)
 
@@ -32,16 +32,27 @@ class SigInUserPostsView(APIView):
             data = {
                 "author": request.user,
                 "description": request.POST.get('description', ''),
+                "additional_data": request.POST.get('additional_data', ''),
                 "visibility": request.POST.get('visibility', 1),
+                "type": request.POST.get('type', 'text')
             }
 
             if request.FILES:
-                img = list(request.FILES.values())[0].read()  # select the first image
-                img_b64 = b64encode(img)
+                user_id = str(request.user.id)
+                headers = {"Uid": user_id, "Flag": hash_user(user_id)}
+                files = {'photo': list(request.FILES.values())[0]}
 
-                # TODO make a request to the image microservice which returns image_id
-                image_path = 'path from image microservice'
-                data['image'] = image_path
+                try:
+                    response = requests.post('http://127.0.0.1:8000/media/photo/', headers=headers, files=files)
+                    response_json = response.json()
+                except Exception:
+                    return Response("Internal server error!", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+                if 'photo' not in response_json:
+                    return Response(response.content, status=response.status_code)
+
+                image_path = response_json['photo']['photo']
+                data['photo'] = image_path
 
             post_serializer = PostSerializer()
             post = post_serializer.create(validated_data=data)
@@ -61,13 +72,26 @@ class SigInUserPostsView(APIView):
             if description is not None:
                 data['description'] = description
 
-            if request.FILES:
-                img = list(request.FILES.values())[0].read()  # select the first image
-                img_b64 = b64encode(img)
+            additional_data = request.POST.get('additional_data', None)
+            if additional_data is not None:
+                data['additional_data'] = additional_data
 
-                # TODO make a request to the image microservice which returns image_id
-                image_path = 'edited path from image microservice'
-                data['image'] = image_path
+            if request.FILES:
+                user_id = str(request.user.id)
+                headers = {"Uid": user_id, "Flag": hash_user(user_id)}
+                files = {'photo': list(request.FILES.values())[0]}
+
+                try:
+                    response = requests.post('http://127.0.0.1:8000/media/photo/', headers=headers, files=files)
+                    response_json = response.json()
+                except Exception:
+                    return Response("Internal server error!", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+                if 'photo' not in response_json:
+                    return Response(response.content, status=response.status_code)
+
+                image_path = response_json['photo']['photo']
+                data['photo'] = image_path
 
             post_serializer = PostSerializer()
             post = post_serializer.update(instance=post, validated_data=data)
@@ -92,10 +116,18 @@ class SigInUserPostsListView(APIView):
     @authenticate
     def get(self, request):
         try:
-            post = Post.objects.filter(author=request.user)
-            context = PostSerializer(post, many=True).data
+            posts = Post.objects.filter(author=request.user)
+            type = request.GET.get('type', None)
+            offset = int(request.GET.get('offset', 0))
+            amount = int(request.GET.get('amount', 10))
+
+            if type is not None:
+                posts = posts.filter(type=type)
+
+            posts = posts[offset:offset + amount]
+
+            context = PostSerializer(posts, many=True).data
         except Exception as e:
-            print(e)
             return Response("Post with given id doesn't exist!", status=status.HTTP_404_NOT_FOUND)
         return Response(context)
 
@@ -106,9 +138,15 @@ class PostsListView(APIView):
     @authenticate
     def get(self, request, user_id):
         try:
-            post = Post.objects.filter(author=User(pk=user_id))
-            context = PostSerializer(post, many=True).data
+            posts = Post.objects.filter(author=User(pk=user_id))
+            offset = int(request.GET.get('offset', 0))
+            amount = int(request.GET.get('amount', 10))
+            type = request.GET.get('type', None)
+            if type is not None:
+                posts = posts.filter(type=type)
+
+            posts = posts[offset:offset + amount]
+            context = PostSerializer(posts, many=True).data
         except Exception as e:
-            print(e)
             return Response("User with given id doesn't exist!", status=status.HTTP_404_NOT_FOUND)
         return Response(context)
