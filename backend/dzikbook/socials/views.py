@@ -72,7 +72,7 @@ class CommentsView(APIView):
             data = {
                 "post": post_id,
                 "author": request.user,
-                "content": request.POST.get('description', ''),
+                "content": request.POST.get('content', ''),
             }
             comment_serializer = CommentSerializer()
             comment = comment_serializer.create(validated_data=data)
@@ -95,7 +95,7 @@ class CommentsView(APIView):
         try:
             comment = Comment.objects.get(pk=comment_id, author=request.user)
             data = {
-                "content": request.POST.get('description', ''),
+                "content": request.POST.get('content', ''),
             }
             comment_serializer = CommentSerializer()
             comment = comment_serializer.update(instance=comment, validated_data=data)

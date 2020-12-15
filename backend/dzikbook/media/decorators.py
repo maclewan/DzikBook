@@ -44,7 +44,6 @@ def authenticate(f):
 def internal(f):
     def validate(*args, **kwargs):
         request = args[1]
-
         if 'Flag' in request.headers:
             # If service will communicate just with another service
 
@@ -60,6 +59,7 @@ def internal(f):
         else:
             return Response("Not authorised!", status=status.HTTP_401_UNAUTHORIZED)
 
+        request.user = get_user(int(id))
         return f(*args, **kwargs)
 
     return validate

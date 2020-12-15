@@ -5,7 +5,8 @@ from .views import (
     InvitationsManagementView,
     SigInUserFriendsView,
     FriendsView,
-    SigInUserFriendInfo
+    FriendsListView,
+    SigInUserFriendInfo,
 )
 
 urlpatterns = [
@@ -15,7 +16,8 @@ urlpatterns = [
     path('request/manage/<int:invitation_id>/', InvitationsManagementView.as_view(), name='manage_invitation'),
     path('<int:user_id>/', SigInUserFriendInfo.as_view(), name='friendship_status'),
     path('list/', SigInUserFriendsView.as_view(), name='sig_in_user_friends'),
-    path('list/<int:user_id>/', FriendsView.as_view(), name='friends')
+    path('list/<int:user_id>/', FriendsView.as_view(), name='friends'),
+    path('id_list/', FriendsListView.as_view(), name='friends_id_list'),
 ]
 
 
