@@ -18,18 +18,18 @@ from io import BytesIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
 # create your views here
-from .decorators import authenticate
+from .decorators import authenticate, internal
 
 
 class PhotoManagementView(APIView):
     authentication_classes = []
 
-    @authenticate
+    @internal
     def post(self, request):
         response = save_inmemory_image(request)
         return response
 
-    @authenticate
+    @internal
     def delete(self, request, photo_id):
         try:
             photo = Photo.objects.get(id=photo_id, user=request.user.id)
@@ -78,22 +78,18 @@ class SigInUserProfilePhotoView(APIView):
 
         profile_photo.save()
 
-        context = {
-            'photo': ProfilePhotoSerializer(profile_photo).data,
-            'message': 'Photo uploaded successfully.'
-        }
+        context = ProfilePhotoSerializer(profile_photo).data,
+
         return Response(context)
 
     @authenticate
     def get(self, request):
         try:
             current_user = request.user
-            profile_photos = ProfilePhoto.objects.filter(user=current_user.pk)
-            context = {
-                'photos': ProfilePhotoSerializer(profile_photos, many=True).data,
-                'description': 'Looking great!'
-            }
-        except:
+            profile_photos = ProfilePhoto.objects.get(user=current_user.pk)
+            context = ProfilePhotoSerializer(profile_photos).data
+
+        except Exception as e:
             return Response("Error, could not retrive logged in user profile photos!",
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response(context)
@@ -116,10 +112,7 @@ class ProfilePhotoView(APIView):
     def get(self, request, user_id):
         try:
             photo = ProfilePhotoSerializer(ProfilePhoto.objects.get(user=user_id)).data
-            context = {
-                'photo': photo,
-                'description': ''
-            }
+            context = photo
         except:
             return Response("Error, could not retrive profile photo with id " + str(user_id) + "!",
                             status=status.HTTP_404_NOT_FOUND)
