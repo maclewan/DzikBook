@@ -1,16 +1,31 @@
 import 'package:flutter/material.dart';
 
+class DialogInfo {
+  final String title;
+  final String currLabel;
+  final String futureLabel;
+  final String hintText;
+  final String currState;
+
+  DialogInfo(this.title, this.currLabel, this.futureLabel, this.hintText,
+      this.currState);
+}
+
 class UserSettingsInfo extends StatelessWidget {
   final String propTitle, propDescription;
   final bool notEmpty;
-  final void Function(BuildContext, String, String, String, String, String)
-      editSetting;
+  final DialogInfo dialogInfo;
+  final void Function(void Function(int, String), BuildContext, String, String,
+      String, String, String) editSetting;
+  final void Function(int, String) updateState;
   const UserSettingsInfo(
       {Key key,
       this.propTitle,
       this.propDescription,
       this.notEmpty,
-      this.editSetting})
+      this.editSetting,
+      this.dialogInfo,
+      this.updateState})
       : super(key: key);
 
   @override
@@ -24,8 +39,14 @@ class UserSettingsInfo extends StatelessWidget {
           style: TextStyle(color: Colors.green),
         ),
         onPressed: () {
-          editSetting(context, this.propTitle, "Aktualnie", "Nowe",
-              "Wprowadź...", this.propDescription);
+          editSetting(
+              this.updateState,
+              context,
+              this.dialogInfo.title,
+              this.dialogInfo.currLabel,
+              this.dialogInfo.futureLabel,
+              this.dialogInfo.hintText,
+              this.dialogInfo.currState);
         },
       ),
     );

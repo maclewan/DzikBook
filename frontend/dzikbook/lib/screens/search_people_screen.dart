@@ -58,33 +58,13 @@ class _PersonsListScreenState extends State<PersonsListScreen> {
   ];
   final myController = TextEditingController();
 
-  SearchBar searchBar;
-  AppBar buildAppBar(BuildContext context) {
-    return buildNavBar(
-        context: context,
-        title: "Wyszukaj",
-        routeName: PersonsListScreen.routeName,
-        children: [searchBar.getSearchAction(context)]);
-  }
-
-  _PersonsListScreenState() {
-    searchBar = new SearchBar(
-        hintText: "Wyszukaj użytkownika Dzikbooka",
-        inBar: false,
-        setState: setState,
-        onSubmitted: (s) {
-          setState(() {
-            persons.removeWhere(
-                (p) => !p.userName.toLowerCase().contains(s.toLowerCase()));
-          });
-        },
-        buildDefaultAppBar: buildAppBar);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: searchBar.build(context),
+      appBar: buildNavBar(
+          context: context,
+          routeName: PersonsListScreen.routeName,
+          title: "Szukaj"),
       body: persons.isEmpty
           ? Center(
               child: Column(
