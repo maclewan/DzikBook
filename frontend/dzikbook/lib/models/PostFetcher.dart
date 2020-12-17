@@ -1,6 +1,7 @@
 import 'dart:convert' show utf8, json;
 import 'dart:io';
 import 'dart:math';
+import 'package:dzikbook/providers/workouts.dart';
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 
@@ -13,6 +14,8 @@ class PostModel {
   final List<CommentModel> comments;
   final int likes;
   final bool hasImage;
+  final bool hasTraining;
+  final Workout loadedTraining;
 
   PostModel(
       {@required this.description,
@@ -21,8 +24,10 @@ class PostModel {
       @required this.userName,
       @required this.timeTaken,
       @required this.hasImage,
+      @required this.hasTraining,
       this.loadedImg,
       this.comments,
+      this.loadedTraining,
       @required this.likes});
 }
 
@@ -90,7 +95,8 @@ class PostFetcher {
               description: generateWordPairs()
                   .take(random.nextInt(10) + 10)
                   .toList()
-                  .join(" "));
+                  .join(" "),
+              hasTraining: false);
           posts.add(post);
         }
       }

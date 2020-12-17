@@ -56,39 +56,45 @@ class _PersonsListScreenState extends State<PersonsListScreen> {
       userName: "Igor Cichecki",
     ),
   ];
-
-  SearchBar searchBar;
-  AppBar buildAppBar(BuildContext context) {
-    return buildNavBar(
-        context: context,
-        title: "Wyszukaj",
-        routeName: PersonsListScreen.routeName,
-        children: [searchBar.getSearchAction(context)]);
-  }
-
-  _PersonsListScreenState() {
-    searchBar = new SearchBar(
-        hintText: "Wyszukaj użytkownika Dzikbooka",
-        inBar: false,
-        setState: setState,
-        onSubmitted: (s) {
-          setState(() {
-            persons.removeWhere(
-                (p) => !p.userName.toLowerCase().contains(s.toLowerCase()));
-          });
-        },
-        buildDefaultAppBar: buildAppBar);
-  }
+  final myController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: searchBar.build(context),
+      appBar: buildNavBar(
+          context: context,
+          routeName: PersonsListScreen.routeName,
+          title: "Szukaj"),
       body: persons.isEmpty
           ? Center(
               child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
+                Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(100)),
+                      color: Colors.grey[300]),
+                  width: double.infinity,
+                  margin: EdgeInsets.only(
+                      top: 10, left: 10, right: 10, bottom: 100),
+                  alignment: Alignment.topCenter,
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: new TextFormField(
+                    onFieldSubmitted: (s) {
+                      setState(() {
+                        persons.removeWhere((p) => !p.userName
+                            .toLowerCase()
+                            .contains(s.toLowerCase()));
+                      });
+                      myController.clear();
+                    },
+                    controller: myController,
+                    decoration: new InputDecoration(
+                      border: InputBorder.none,
+                      hintText: 'Podaj imię i nazwisko',
+                    ),
+                  ),
+                ),
                 SvgPicture.asset(
                   'assets/images/dzik.svg',
                   width: 200,
@@ -106,6 +112,30 @@ class _PersonsListScreenState extends State<PersonsListScreen> {
             ))
           : ListView(
               children: [
+                Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(100)),
+                      color: Colors.grey[300]),
+                  width: double.infinity,
+                  margin: EdgeInsets.all(10),
+                  alignment: Alignment.topCenter,
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: new TextFormField(
+                    onFieldSubmitted: (s) {
+                      setState(() {
+                        persons.removeWhere((p) => !p.userName
+                            .toLowerCase()
+                            .contains(s.toLowerCase()));
+                      });
+                      myController.clear();
+                    },
+                    controller: myController,
+                    decoration: new InputDecoration(
+                      border: InputBorder.none,
+                      hintText: 'Podaj imię i nazwisko',
+                    ),
+                  ),
+                ),
                 ...persons.map(
                   (person) => ListTile(
                     title: Text(person.userName),

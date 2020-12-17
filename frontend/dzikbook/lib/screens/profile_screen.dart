@@ -1,4 +1,5 @@
 import 'package:dzikbook/models/PostFetcher.dart';
+import 'package:dzikbook/providers/workouts.dart';
 import 'package:dzikbook/widgets/navbar.dart';
 import 'package:flutter/material.dart';
 
@@ -16,6 +17,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   List<PostModel> _posts = [
     PostModel(
+        hasTraining: false,
         hasImage: true,
         comments: [],
         description: "Cześć i czołem, Oto zdjęcie w 4k!",
@@ -29,6 +31,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           "https://external-preview.redd.it/GOkP8onbuyjGmN9Rc8Que5mw21CdSw6OuXpAKUuE6-4.jpg?auto=webp&s=2bc0e522d1f2fa887333286d557466b2be00fa5e",
         )),
     PostModel(
+        hasTraining: false,
         hasImage: true,
         comments: [],
         description: "O M G  ale super fotka",
@@ -42,6 +45,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           "https://scontent-waw1-1.cdninstagram.com/v/t51.2885-15/sh0.08/e35/p640x640/67877813_382156209038925_8513675155840603087_n.jpg?_nc_ht=scontent-waw1-1.cdninstagram.com&_nc_cat=109&_nc_ohc=u-LKXxK-arsAX9rJagO&tp=1&oh=1a5c2d444061b2bf8a3ca1b037167de1&oe=5FFA1A58",
         )),
     PostModel(
+      hasTraining: false,
       hasImage: false,
       likes: 420,
       comments: [],
@@ -56,6 +60,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
       timeTaken: "1d",
     ),
     PostModel(
+      hasTraining: true,
+      loadedTraining: Workout(
+          name: "Trening u super długiej nazwie byczq",
+          workoutLength: 60,
+          exercises: [
+            Exercise(
+                id: "1",
+                name: "klatka płaska",
+                series: 4,
+                reps: 8,
+                breakTime: 0),
+            Exercise(
+                id: "2",
+                name: "klatka skośna",
+                series: 4,
+                reps: 15,
+                breakTime: 0),
+            Exercise(
+                id: "3",
+                name: "I TAKI POWINIEN BYĆ DUMMY DATA BYCZQ",
+                series: 4,
+                reps: 8,
+                breakTime: 15),
+            Exercise(
+                id: "4", name: "Rozpiętki", series: 4, reps: 8, breakTime: 15),
+          ]),
       hasImage: false,
       likes: 15,
       comments: [],
@@ -67,6 +97,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       timeTaken: "36m",
     ),
     PostModel(
+      hasTraining: false,
       hasImage: false,
       likes: 10,
       comments: [],
@@ -80,12 +111,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   ];
   final _postFetcher = PostFetcher();
 
-  void _addPost(postDescription, _file, hasImg) {
+  void _addPost(postDescription, _file, hasImg, hasTraining, training) {
     setState(() {
       _posts.insert(
           0,
           new PostModel(
             hasImage: hasImg,
+            hasTraining: hasTraining,
+            loadedTraining: training,
             description: postDescription,
             id: "15",
             timeTaken: "0m",
@@ -95,6 +128,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             likes: 0,
             comments: [],
           ));
+      print(training);
     });
   }
 
@@ -172,6 +206,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               loadedImg: _posts[index - 1].hasImage
                   ? _posts[index - 1].loadedImg
                   : null,
+              hasTraining: _posts[index - 1].hasTraining,
+              traning: _posts[index - 1].loadedTraining,
             );
           },
         ));

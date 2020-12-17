@@ -1,3 +1,4 @@
+import 'package:dzikbook/screens/calendar_plans_screen.dart';
 import 'package:dzikbook/screens/diet_list_screen.dart';
 import 'package:dzikbook/screens/profile_screen.dart';
 import 'package:dzikbook/screens/search_people_screen.dart';
@@ -10,49 +11,58 @@ AppBar buildNavBar(
     String title,
     String routeName,
     List<Widget> children}) {
-  return AppBar(title: new Text(title), actions: [
-    IconButton(
-        icon: Icon(Icons.home),
-        onPressed: () {
-          if (routeName != ProfileScreen.routeName) {
-            Navigator.of(context).pushReplacementNamed(ProfileScreen.routeName,
-                arguments: false);
-          }
-        }),
-    IconButton(
-        icon: Icon(Icons.person),
-        onPressed: () {
-          if (routeName != UserProfileScreen.routeName) {
-            Navigator.of(context).pushReplacementNamed(
-                UserProfileScreen.routeName,
-                arguments: false);
-          }
-        }),
-    IconButton(
-        icon: Icon(Icons.food_bank),
-        onPressed: () {
-          if (routeName != DietListScreen.routeName) {
-            Navigator.of(context).pushReplacementNamed(DietListScreen.routeName,
-                arguments: false);
-          }
-        }),
-    IconButton(
-        icon: Icon(Icons.fitness_center),
-        onPressed: () {
-          if (routeName != WorkoutListScreen.routeName) {
-            Navigator.of(context).pushReplacementNamed(
-                WorkoutListScreen.routeName,
-                arguments: false);
-          }
-        }),
-    if (routeName != PersonsListScreen.routeName)
-      IconButton(
-          icon: Icon(Icons.search),
-          onPressed: () {
-            Navigator.of(context).pushReplacementNamed(
-                PersonsListScreen.routeName,
-                arguments: false);
-          }),
-    if (children != null) ...children
-  ]);
+  return AppBar(
+      title: title.length == 0
+          ? null
+          : FittedBox(fit: BoxFit.contain, child: Text(title)),
+      actions: [
+        if (routeName != ProfileScreen.routeName)
+          IconButton(
+              icon: Icon(Icons.home),
+              onPressed: () {
+                Navigator.of(context).pushReplacementNamed(
+                    ProfileScreen.routeName,
+                    arguments: false);
+              }),
+        if (routeName != UserProfileScreen.routeName)
+          IconButton(
+              icon: Icon(Icons.person),
+              onPressed: () {
+                Navigator.of(context).pushReplacementNamed(
+                    UserProfileScreen.routeName,
+                    arguments: false);
+              }),
+        if (routeName != DietListScreen.routeName)
+          IconButton(
+              icon: Icon(Icons.food_bank),
+              onPressed: () {
+                Navigator.of(context).pushReplacementNamed(
+                    DietListScreen.routeName,
+                    arguments: false);
+              }),
+        if (routeName != WorkoutListScreen.routeName)
+          IconButton(
+              icon: Icon(Icons.fitness_center),
+              onPressed: () {
+                Navigator.of(context).pushReplacementNamed(
+                    WorkoutListScreen.routeName,
+                    arguments: false);
+              }),
+        if (routeName != PersonsListScreen.routeName)
+          IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () {
+                Navigator.of(context).pushReplacementNamed(
+                    PersonsListScreen.routeName,
+                    arguments: false);
+              }),
+        if (routeName != CalendarPlansScreen.routeName)
+          IconButton(
+              icon: Icon(Icons.calendar_today),
+              onPressed: () {
+                Navigator.of(context).pushReplacementNamed(
+                    CalendarPlansScreen.routeName,
+                    arguments: false);
+              }),
+      ]);
 }

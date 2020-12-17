@@ -1,6 +1,8 @@
 import 'package:dzikbook/models/CommentModel.dart';
+import 'package:dzikbook/providers/workouts.dart';
 import 'package:dzikbook/screens/user_profile_screen.dart';
 import 'package:dzikbook/widgets/comments_section.dart';
+import 'package:dzikbook/widgets/workout_post.dart';
 import 'package:flutter/material.dart';
 
 import 'reactions_section.dart';
@@ -13,6 +15,8 @@ class Post extends StatelessWidget {
   final String timeTaken;
   final Image loadedImg;
   final bool hasImage;
+  final bool hasTraining;
+  final Workout traning;
   final List<CommentModel> comments;
   final int likes;
   final bool clickable;
@@ -23,6 +27,8 @@ class Post extends StatelessWidget {
     @required this.userImg,
     @required this.timeTaken,
     @required this.hasImage,
+    @required this.hasTraining,
+    this.traning,
     this.loadedImg,
     this.comments,
     this.clickable = true,
@@ -99,6 +105,7 @@ class Post extends StatelessWidget {
             ),
           ),
           Container(
+            margin: EdgeInsets.only(bottom: 5),
             width: double.infinity,
             padding: EdgeInsets.only(top: 10, left: 15, bottom: 10, right: 15),
             child: Align(
@@ -114,8 +121,7 @@ class Post extends StatelessWidget {
               ),
             ),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(5),
-              color: Colors.grey[50],
+              color: Colors.grey[100],
             ),
           ),
           this.hasImage == false
@@ -131,6 +137,7 @@ class Post extends StatelessWidget {
                           );
                   },
                 ),
+          if (this.hasTraining) WorkoutPost(workout: this.traning),
           ReactionsSections(likes: this.likes),
           CommentsSection(this.comments),
         ],

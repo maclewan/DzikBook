@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dzikbook/screens/user_settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -204,22 +205,36 @@ class _UserProfileInfoState extends State<UserProfileInfo> {
                           borderRadius: BorderRadius.circular(5),
                         ),
                         child: MaterialButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            this.widget.rootUser
+                                ? Navigator.of(context)
+                                    .pushNamed(UserSettingsScreeen.routeName)
+                                : print("test");
+                          },
                           height: double.infinity,
                           minWidth: double.infinity,
                           child: this.widget.rootUser
-                              ? Text(
-                                  "Ustawienia",
-                                  style: TextStyle(color: Colors.white),
+                              ? FittedBox(
+                                  fit: BoxFit.contain,
+                                  child: Text(
+                                    "Ustawienia",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
                                 )
                               : this.widget.isFriend
-                                  ? Text(
-                                      "Usuń znajomego",
-                                      style: TextStyle(color: Colors.white),
+                                  ? FittedBox(
+                                      fit: BoxFit.contain,
+                                      child: Text(
+                                        "Usuń znajomego",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
                                     )
-                                  : Text(
-                                      "Dodaj do znajomych",
-                                      style: TextStyle(color: Colors.white),
+                                  : FittedBox(
+                                      fit: BoxFit.contain,
+                                      child: Text(
+                                        "Dodaj do znajomych",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
                                     ),
                         )),
                   ),

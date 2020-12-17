@@ -1,4 +1,5 @@
 import 'package:dzikbook/screens/user_profile_screen.dart';
+import 'package:dzikbook/screens/user_settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -71,6 +72,7 @@ class MyApp extends StatelessWidget {
               CalendarPlansScreen.routeName: (ctx) => CalendarPlansScreen(),
               PersonsListScreen.routeName: (ctx) => PersonsListScreen(),
               UserProfileScreen.routeName: (ctx) => UserProfileScreen(),
+              UserSettingsScreeen.routeName: (ctx) => UserSettingsScreeen(),
             },
           ),
         ));

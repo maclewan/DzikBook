@@ -17,7 +17,6 @@ class _AddCommentState extends State<AddComment> {
     super.dispose();
   }
 
-//TODO: strange text behaviour during scrolling
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -48,7 +47,7 @@ class _AddCommentState extends State<AddComment> {
                     child: SizedBox(
                       child: new TextField(
                         controller: myController,
-                        maxLines: 5,
+                        maxLines: null,
                         textAlign: TextAlign.left,
                         style: TextStyle(
                           fontSize: 12,

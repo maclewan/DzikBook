@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class ReactionsSections extends StatefulWidget {
   int likes;
@@ -19,22 +20,43 @@ class _ReactionsSectionsState extends State<ReactionsSections> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          IconButton(
-            icon: Icon(
-                this.hasReacted ? Icons.favorite : Icons.favorite_outline,
-                color: Colors.red[700]),
-            onPressed: () {
-              this.setState(() {
-                if (this.hasReacted) {
-                  this.widget.likes--;
-                  this.hasReacted = false;
-                } else {
-                  this.widget.likes++;
-                  this.hasReacted = true;
-                }
-              });
-            },
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: GestureDetector(
+              onTap: () {
+                this.setState(() {
+                  if (this.hasReacted) {
+                    this.widget.likes--;
+                    this.hasReacted = false;
+                  } else {
+                    this.widget.likes++;
+                    this.hasReacted = true;
+                  }
+                });
+              },
+              child: SvgPicture.asset(
+                'assets/images/${this.hasReacted ? 'dzik_reaction.svg' : 'dzik_reaction_outlined.svg'}',
+                width: 20,
+                height: 20,
+              ),
+            ),
           ),
+          // IconButton(
+          //   icon: Icon(
+          //       this.hasReacted ? Icons.favorite : Icons.favorite_outline,
+          //       color: Colors.red[700]),
+          //   onPressed: () {
+          //     this.setState(() {
+          //       if (this.hasReacted) {
+          //         this.widget.likes--;
+          //         this.hasReacted = false;
+          //       } else {
+          //         this.widget.likes++;
+          //         this.hasReacted = true;
+          //       }
+          //     });
+          //   },
+          // ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: RichText(
@@ -45,10 +67,10 @@ class _ReactionsSectionsState extends State<ReactionsSections> {
               WidgetSpan(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                  child: Icon(
-                    Icons.favorite,
-                    color: Colors.red[500],
-                    size: 15,
+                  child: SvgPicture.asset(
+                    'assets/images/dzik_reaction.svg',
+                    width: 12,
+                    height: 12,
                   ),
                 ),
               ),
