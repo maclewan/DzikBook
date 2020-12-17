@@ -1,3 +1,7 @@
+import json
+import time
+
+import requests
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -6,10 +10,12 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
+from .decorators import hash_user
 from .serializers import RegisterSerializer, LogoutPossibleTokenObtainPairSerializer
 
 
 # Create your views here.
+
 
 class RegisterView(APIView):
     def post(self, request):
@@ -31,9 +37,11 @@ class RegisterView(APIView):
             else:
                 raise Exception('Problem with data validation')
 
-            return Response("User Created Successfully. Now login to get your token")
+            createUserData(user)
+
+            return Response("User Created Successfully. Now login to get your token", status=status.HTTP_201_CREATED)
         except Exception as e:
-            return Response({str(e)})
+            return Response({str(e)}, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 
 class DeleteAccountView(APIView):
@@ -71,3 +79,14 @@ class ExistsUserView(APIView):
         else:
             return Response(False)
 
+
+def createUserData(user: User):
+    id = user.pk
+    # Send request to users service
+    url = 'http://localhost:8000/users/data/new/'
+    headers = {
+        "Uid": str(id),
+        "Flag": hash_user(id),
+    }
+    r = requests.post(url, headers=headers)
+    return r
