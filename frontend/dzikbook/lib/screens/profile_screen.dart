@@ -1,4 +1,5 @@
 import 'package:dzikbook/models/PostFetcher.dart';
+import 'package:dzikbook/providers/workouts.dart';
 import 'package:dzikbook/widgets/navbar.dart';
 import 'package:flutter/material.dart';
 
@@ -80,12 +81,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   ];
   final _postFetcher = PostFetcher();
 
-  void _addPost(postDescription, _file, hasImg) {
+  void _addPost(postDescription, _file, hasImg, hasTraining, training) {
     setState(() {
       _posts.insert(
           0,
           new PostModel(
             hasImage: hasImg,
+            hasTraining: hasTraining,
+            loadedTraining: training,
             description: postDescription,
             id: "15",
             timeTaken: "0m",
@@ -95,6 +98,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             likes: 0,
             comments: [],
           ));
+      print(training);
     });
   }
 

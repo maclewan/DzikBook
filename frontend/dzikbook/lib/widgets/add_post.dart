@@ -1,11 +1,13 @@
 import 'dart:io';
 
+import 'package:dzikbook/providers/workouts.dart';
+import 'package:dzikbook/screens/workout_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class AddPost extends StatefulWidget {
   final String userImage;
-  final void Function(String, File, bool) addPost;
+  final void Function(String, File, bool, bool, Workout) addPost;
 
   const AddPost(this.addPost, this.userImage);
 
@@ -16,6 +18,8 @@ class AddPost extends StatefulWidget {
 class _AddPostState extends State<AddPost> {
   final myController = TextEditingController();
   File _image;
+  Workout _workout;
+  bool _workoutNotNull = false, _imageNotNull = false;
   final picker = ImagePicker();
   Future getImage() async {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
@@ -23,9 +27,20 @@ class _AddPostState extends State<AddPost> {
     setState(() {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
+        _imageNotNull = true;
       } else {
         print('No image selected.');
       }
+    });
+  }
+
+  Future<void> _addWorkoutPlan() async {
+    Workout workout = await Navigator.of(context)
+        .pushNamed(WorkoutListScreen.routeName, arguments: true) as Workout;
+    if (workout == null) return;
+    setState(() {
+      _workoutNotNull = true;
+      _workout = workout;
     });
   }
 
@@ -33,6 +48,8 @@ class _AddPostState extends State<AddPost> {
   void dispose() {
     // Clean up the controller when the widget is disposed.
     myController.dispose();
+    this._image = null;
+    this._workout = null;
     super.dispose();
   }
 
@@ -121,15 +138,19 @@ class _AddPostState extends State<AddPost> {
                         onPressed: () => {
                           if (myController.text.isNotEmpty)
                             {
-                              this._image != null
-                                  ? this
-                                      .widget
-                                      .addPost(myController.text, _image, true)
-                                  : this
-                                      .widget
-                                      .addPost(myController.text, null, false)
+                              this._imageNotNull
+                                  ? this.widget.addPost(myController.text,
+                                      _image, true, false, null)
+                                  : this._workoutNotNull
+                                      ? this.widget.addPost(myController.text,
+                                          null, false, true, _workout)
+                                      : this.widget.addPost(myController.text,
+                                          null, false, false, null),
                             },
                           this._image = null,
+                          this._workout = null,
+                          this._imageNotNull = false,
+                          this._workoutNotNull = false,
                           myController.clear(),
                         },
                         child: Text("OPUBLIKUJ",
@@ -143,10 +164,11 @@ class _AddPostState extends State<AddPost> {
                     Expanded(
                       flex: 1,
                       child: FlatButton(
+                        disabledColor: Colors.grey[350],
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(0),
                         ),
-                        onPressed: getImage,
+                        onPressed: this._workoutNotNull ? null : getImage,
                         child: Text(
                           "zdjęcie",
                           style: TextStyle(
@@ -163,11 +185,12 @@ class _AddPostState extends State<AddPost> {
                     Expanded(
                       flex: 1,
                       child: FlatButton(
+                        disabledColor: Colors.grey[350],
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.only(
                               bottomRight: Radius.circular(10)),
                         ),
-                        onPressed: () => {},
+                        onPressed: this._imageNotNull ? null : _addWorkoutPlan,
                         child: Text(
                           "trening",
                           style: TextStyle(
