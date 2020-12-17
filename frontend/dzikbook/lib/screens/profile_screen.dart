@@ -45,6 +45,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           "https://scontent-waw1-1.cdninstagram.com/v/t51.2885-15/sh0.08/e35/p640x640/67877813_382156209038925_8513675155840603087_n.jpg?_nc_ht=scontent-waw1-1.cdninstagram.com&_nc_cat=109&_nc_ohc=u-LKXxK-arsAX9rJagO&tp=1&oh=1a5c2d444061b2bf8a3ca1b037167de1&oe=5FFA1A58",
         )),
     PostModel(
+      hasTraining: false,
       hasImage: false,
       likes: 420,
       comments: [],
@@ -60,7 +61,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ),
     PostModel(
       hasTraining: true,
-      loadedTraining: Workout(name: "XD", workoutLength: 60, exercises: []),
+      loadedTraining:
+          Workout(name: "Klatunia górna", workoutLength: 60, exercises: [
+        Exercise(
+            id: "1", name: "klatka płaska", series: 4, reps: 8, breakTime: 0),
+        Exercise(
+            id: "2", name: "klatka skośna", series: 4, reps: 15, breakTime: 0),
+        Exercise(
+            id: "3",
+            name: "I TAKI POWINIEN BYĆ DUMMY DATA BYCZQ",
+            series: 4,
+            reps: 8,
+            breakTime: 15),
+        Exercise(id: "4", name: "Rozpiętki", series: 4, reps: 8, breakTime: 15),
+      ]),
       hasImage: false,
       likes: 15,
       comments: [],
