@@ -12,6 +12,7 @@ urlpatterns = [
     #Internal
     path('multi/', MultipleUsersDataView.as_view(), name='multiple_user_data'),
     path('data/new/', CreateNewUserView.as_view(), name='sig_in_user_data')
+
 ]
 
 
