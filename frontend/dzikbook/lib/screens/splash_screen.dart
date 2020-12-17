@@ -24,7 +24,10 @@ class _SplashScreenState extends State<SplashScreen> {
       if (auth.isAuth) {
         Navigator.of(context).pushReplacementNamed(ProfileScreen.routeName);
       } else {
-        final autoLogin = await auth.tryAutoLogin();
+        final autoLogin = await auth.tryAutoLogin().catchError((error) {
+          print("Twoja sesja wygasła");
+          return false;
+        });
         if (autoLogin) {
           Navigator.of(context).pushReplacementNamed(ProfileScreen.routeName);
         } else {

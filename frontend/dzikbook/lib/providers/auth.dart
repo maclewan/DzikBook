@@ -1,9 +1,12 @@
 import 'dart:convert';
 import 'dart:async';
+// import 'package:universal_html/html.dart';
+import 'package:dio/dio.dart';
 
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:universal_html/prefer_universal/html.dart';
 
 import '../models/HttpException.dart';
 
@@ -13,6 +16,7 @@ class Auth with ChangeNotifier {
   String _refreshToken;
   Timer _authTimer;
   DateTime _expiryDate;
+  Dio dio = new Dio();
 
   bool get isAuth {
     return _token != null;
@@ -29,46 +33,52 @@ class Auth with ChangeNotifier {
 
   Future<void> _authentication(String password, String email, String urlSegment,
       String firstName, String lastName) async {
-    final url = "localhost:8000/auth/$urlSegment";
+    final url = "http://10.0.2.2:8000/auth/$urlSegment/";
+
+    Map<String, dynamic> body = {
+      'email': email,
+      'username': email,
+      'password': password,
+      'first_name': firstName,
+      'last_name': lastName,
+    };
+    FormData formData = new FormData.fromMap(body);
     try {
-      final response = await http.post(
+      final response = await dio.post(
         url,
-        body: json.encode(
-          {
-            'username': email,
-            'password': password,
-            'first_name': firstName,
-            'lastName': lastName,
+        options: Options(
+          headers: {
+            "Accept": "application/json",
           },
         ),
+        data: formData,
       );
       if (response.statusCode >= 400) {
-        throw HttpException("Operacja nie powiodłą się!");
+        throw HttpException("Operacja nie powiodła się!");
       }
-      final responseData = json.decode(response.body);
-
-      _token = responseData['accessToken'];
-      _refreshToken = responseData['refreshToken'];
-      _expiryDate = DateTime.now().add(
-        Duration(
-          seconds: int.parse(
-            responseData['expiresIn'],
+      if (urlSegment == 'login') {
+        final responseData = response.data;
+        _token = responseData['access'];
+        _refreshToken = responseData['refresh'];
+        _expiryDate = DateTime.now().add(
+          Duration(
+            seconds: 3600,
           ),
-        ),
-      );
-      _autoTokenRefresh();
-      notifyListeners();
-      final prefs = await SharedPreferences.getInstance();
-      final userData = json.encode(
-        {
-          'token': _token,
-          'refreshToken': _refreshToken,
-          'expiryDate': _expiryDate.toIso8601String(),
-        },
-      );
-      prefs.setString('userData', userData);
+        );
+        _autoTokenRefresh();
+        notifyListeners();
+        final prefs = await SharedPreferences.getInstance();
+        final userData = json.encode(
+          {
+            'token': _token,
+            'refreshToken': _refreshToken,
+            'expiryDate': _expiryDate.toIso8601String(),
+          },
+        );
+        prefs.setString('userData', userData);
+      }
     } catch (error) {
-      throw error;
+      throw HttpException("Operacja nie powiodła się!");
     }
   }
 
@@ -90,13 +100,12 @@ class Auth with ChangeNotifier {
       prefs.getString('userData'),
     ) as Map<String, Object>;
     final expiryDate = DateTime.parse(userData['expiryDate']);
-
-    if (expiryDate.isAfter(DateTime.now())) {
+    if (expiryDate.isBefore(DateTime.now())) {
       return false;
     }
 
-    _token = userData['token'];
-    _refreshToken = userData['refreshToken'];
+    _token = userData['access'];
+    _refreshToken = userData['refresh'];
     _expiryDate = expiryDate;
     notifyListeners();
     _autoTokenRefresh();
@@ -104,34 +113,36 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> refreshToken() async {
-    final url = 'localhost:8000/auth/login/refresh/';
+    final url = 'http://10.0.2.2:8000/auth/login/refresh/';
+    Map<String, dynamic> body = {
+      'refresh': _refreshToken,
+    };
+    FormData formData = new FormData.fromMap(body);
     try {
-      final response = await http.post(
+      final response = await dio.post(
         url,
-        body: json.encode(
-          {'refresh': _refreshToken},
+        options: Options(
+          headers: {
+            "Accept": "application/json",
+          },
         ),
+        data: formData,
       );
-      if (response.statusCode >= 400) {
-        throw HttpException('Twoja sesja wygasła. Zaloguj się ponownie');
-      }
 
-      final responseData = json.decode(response.body);
-      _token = responseData['accessToken'];
-      _refreshToken = responseData['refreshToken'];
+      final responseData = response.data;
+      _token = responseData['access'];
+      _refreshToken = responseData['refresh'];
       _expiryDate = DateTime.now().add(
         Duration(
-          seconds: int.parse(
-            responseData['expiresIn'],
-          ),
+          seconds: 3600,
         ),
       );
+      _autoTokenRefresh();
+      notifyListeners();
     } catch (error) {
+      print(error);
       throw HttpException('Twoja sesja wygasła. Zaloguj się ponownie');
     }
-    _autoTokenRefresh();
-    notifyListeners();
-
     final prefs = await SharedPreferences.getInstance();
     final userData = json.encode({
       'token': _token,
@@ -159,13 +170,11 @@ class Auth with ChangeNotifier {
     if (_authTimer != null) {
       _authTimer.cancel();
     }
+
     final timeToExpiry = _expiryDate.difference(DateTime.now()).inSeconds;
     _authTimer = Timer(Duration(seconds: timeToExpiry), refreshToken);
   }
 }
 
-// auth/login/
-
-// localhost:8000/auth/login/refresh/
-// body: {refresh: refreshToken}
-// 201 200
+// status code unathorized = 401
+// unauthorized ? response.isKey(code) and response[code] = 'token_not_valid'
