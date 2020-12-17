@@ -158,8 +158,8 @@ class _AuthCardState extends State<AuthCard> {
         await Provider.of<Auth>(context, listen: false).signup(
           _authData['email'],
           _authData['password'],
-          _authData['name'],
-          _authData['username'],
+          // _authData['name'],
+          // _authData['username],
         );
         _toggleAuthType();
       }
