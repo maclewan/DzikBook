@@ -1,3 +1,5 @@
+import 'package:dzikbook/providers/posts.dart';
+import 'package:dzikbook/providers/user_data.dart';
 import 'package:dzikbook/screens/user_profile_screen.dart';
 import 'package:dzikbook/screens/user_settings_screen.dart';
 import 'package:flutter/material.dart';
@@ -48,6 +50,16 @@ class MyApp extends StatelessWidget {
           ),
           ChangeNotifierProvider(
             create: (context) => DayPlans(),
+          ),
+          ChangeNotifierProxyProvider<Auth, Posts>(
+            create: (_) => Posts(),
+            update: (_, auth, posts) => posts
+              ..token = auth.token
+              ..refreshToken = auth.getRefreshToken,
+          ),
+          ChangeNotifierProxyProvider<Auth, UserData>(
+            create: (_) => UserData(),
+            update: (_, auth, userData) => userData..update(auth),
           ),
         ],
         child: Consumer<Auth>(

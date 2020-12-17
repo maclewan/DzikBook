@@ -1,15 +1,16 @@
 import 'dart:io';
 
+import 'package:dzikbook/providers/posts.dart';
 import 'package:dzikbook/providers/workouts.dart';
 import 'package:dzikbook/screens/workout_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 class AddPost extends StatefulWidget {
   final String userImage;
-  final void Function(String, File, bool, bool, Workout) addPost;
 
-  const AddPost(this.addPost, this.userImage);
+  const AddPost(this.userImage);
 
   @override
   _AddPostState createState() => _AddPostState();
@@ -139,13 +140,18 @@ class _AddPostState extends State<AddPost> {
                           if (myController.text.isNotEmpty)
                             {
                               this._imageNotNull
-                                  ? this.widget.addPost(myController.text,
-                                      _image, true, false, null)
+                                  ? Provider.of<Posts>(context, listen: false)
+                                      .addPost(myController.text, _image, true,
+                                          false, null)
                                   : this._workoutNotNull
-                                      ? this.widget.addPost(myController.text,
-                                          null, false, true, _workout)
-                                      : this.widget.addPost(myController.text,
-                                          null, false, false, null),
+                                      ? Provider.of<Posts>(context,
+                                              listen: false)
+                                          .addPost(myController.text, null,
+                                              false, true, _workout)
+                                      : Provider.of<Posts>(context,
+                                              listen: false)
+                                          .addPost(myController.text, null,
+                                              false, false, null),
                             },
                           this._image = null,
                           this._workout = null,

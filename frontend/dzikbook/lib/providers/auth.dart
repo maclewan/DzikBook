@@ -21,9 +21,20 @@ class Auth with ChangeNotifier {
     return _token != null;
   }
 
+  String get token {
+    if (_expiryDate != null &&
+        _expiryDate.isAfter(DateTime.now()) &&
+        _token != null) {
+      return _token;
+    }
+    return null;
+  }
+
+  String get getRefreshToken => _refreshToken;
+
   Future<void> _authentication(String password, String email, String urlSegment,
       String firstName, String lastName) async {
-    final url = "http://10.0.2.2:8000/auth/$urlSegment/";
+    final url = "http://10.0.3.2:8000/auth/$urlSegment/";
 
     Map<String, dynamic> body = {
       'email': email,
@@ -43,6 +54,7 @@ class Auth with ChangeNotifier {
         ),
         data: formData,
       );
+
       if (response.statusCode >= 400) {
         throw HttpException("Operacja nie powiodła się!");
       }
@@ -93,17 +105,16 @@ class Auth with ChangeNotifier {
     if (expiryDate.isBefore(DateTime.now())) {
       return false;
     }
-
-    _token = userData['access'];
-    _refreshToken = userData['refresh'];
+    _token = userData['token'];
+    _refreshToken = userData['refreshToken'];
     _expiryDate = expiryDate;
-    notifyListeners();
     _autoTokenRefresh();
+    notifyListeners();
     return true;
   }
 
   Future<void> refreshToken() async {
-    final url = 'http://10.0.2.2:8000/auth/login/refresh/';
+    final url = 'http://10.0.3.2:8000/auth/login/refresh/';
     Map<String, dynamic> body = {
       'refresh': _refreshToken,
     };
