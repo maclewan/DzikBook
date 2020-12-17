@@ -1,15 +1,17 @@
-from django import forms 
+from django import forms
 from .models import Photo, ProfilePhoto
 
-class PhotoForm(forms.ModelForm): 
-  
-    class Meta: 
-        model = Photo 
-        fields = ['photo', 'user']
+
+class PhotoForm(forms.ModelForm):
+    class Meta:
+        model = Photo
+        fields = ['photo']
 
 
-class ProfilePhotoForm(forms.ModelForm): 
-  
-    class Meta: 
+class ProfilePhotoForm(forms.ModelForm):
+    class Meta:
         model = ProfilePhoto
-        fields = ['original_photo', 'profile_photo', 'user']
+        fields = ['photo', 'downsized_photo']
+
+    def validate(self, value):
+        pass

@@ -5,7 +5,7 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .decorators import authenticate, hash_user
+from .decorators import authenticate, hash_user, internal
 
 # create your views here
 from .models import Invitation, Relation
@@ -176,6 +176,16 @@ class FriendsView(APIView):
         return Response(resp)
 
 
+class FriendsListView(APIView):
+    authentication_classes = []
+
+    @internal
+    def get(self, request):
+        user_id = request.user.id
+        friends_list = get_friends_id(user_id)
+        return Response({'friends_list' : friends_list})
+
+
 def check_friendship(user1, user2):
     return Relation.objects.filter(user1=user1, user2=user2).exists() or \
            Relation.objects.filter(user2=user1, user1=user2).exists()
@@ -200,7 +210,7 @@ def get_user_list(friends_list, id):
     payload = {'id_list': friends_list}
 
     # Send request to users service
-    url = 'http://localhost:8000/users/multi/'
+    url = 'http://127.0.0.1:8000/users/multi/'
     headers = {"Uid": str(id), "Flag": hash_user(id)}
     r = requests.post(url, data=json.dumps(payload), headers=headers)
 
