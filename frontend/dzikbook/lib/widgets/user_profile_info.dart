@@ -214,18 +214,27 @@ class _UserProfileInfoState extends State<UserProfileInfo> {
                           height: double.infinity,
                           minWidth: double.infinity,
                           child: this.widget.rootUser
-                              ? Text(
-                                  "Ustawienia",
-                                  style: TextStyle(color: Colors.white),
+                              ? FittedBox(
+                                  fit: BoxFit.contain,
+                                  child: Text(
+                                    "Ustawienia",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
                                 )
                               : this.widget.isFriend
-                                  ? Text(
-                                      "Usuń znajomego",
-                                      style: TextStyle(color: Colors.white),
+                                  ? FittedBox(
+                                      fit: BoxFit.contain,
+                                      child: Text(
+                                        "Usuń znajomego",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
                                     )
-                                  : Text(
-                                      "Dodaj do znajomych",
-                                      style: TextStyle(color: Colors.white),
+                                  : FittedBox(
+                                      fit: BoxFit.contain,
+                                      child: Text(
+                                        "Dodaj do znajomych",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
                                     ),
                         )),
                   ),

@@ -61,20 +61,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ),
     PostModel(
       hasTraining: true,
-      loadedTraining:
-          Workout(name: "Klatunia górna", workoutLength: 60, exercises: [
-        Exercise(
-            id: "1", name: "klatka płaska", series: 4, reps: 8, breakTime: 0),
-        Exercise(
-            id: "2", name: "klatka skośna", series: 4, reps: 15, breakTime: 0),
-        Exercise(
-            id: "3",
-            name: "I TAKI POWINIEN BYĆ DUMMY DATA BYCZQ",
-            series: 4,
-            reps: 8,
-            breakTime: 15),
-        Exercise(id: "4", name: "Rozpiętki", series: 4, reps: 8, breakTime: 15),
-      ]),
+      loadedTraining: Workout(
+          name: "Trening u super długiej nazwie byczq",
+          workoutLength: 60,
+          exercises: [
+            Exercise(
+                id: "1",
+                name: "klatka płaska",
+                series: 4,
+                reps: 8,
+                breakTime: 0),
+            Exercise(
+                id: "2",
+                name: "klatka skośna",
+                series: 4,
+                reps: 15,
+                breakTime: 0),
+            Exercise(
+                id: "3",
+                name: "I TAKI POWINIEN BYĆ DUMMY DATA BYCZQ",
+                series: 4,
+                reps: 8,
+                breakTime: 15),
+            Exercise(
+                id: "4", name: "Rozpiętki", series: 4, reps: 8, breakTime: 15),
+          ]),
       hasImage: false,
       likes: 15,
       comments: [],

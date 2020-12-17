@@ -11,52 +11,58 @@ AppBar buildNavBar(
     String title,
     String routeName,
     List<Widget> children}) {
-  return AppBar(title: new Text(title), actions: [
-    if (routeName != ProfileScreen.routeName)
-      IconButton(
-          icon: Icon(Icons.home),
-          onPressed: () {
-            Navigator.of(context).pushReplacementNamed(ProfileScreen.routeName,
-                arguments: false);
-          }),
-    if (routeName != UserProfileScreen.routeName)
-      IconButton(
-          icon: Icon(Icons.person),
-          onPressed: () {
-            Navigator.of(context).pushReplacementNamed(
-                UserProfileScreen.routeName,
-                arguments: false);
-          }),
-    if (routeName != DietListScreen.routeName)
-      IconButton(
-          icon: Icon(Icons.food_bank),
-          onPressed: () {
-            Navigator.of(context).pushReplacementNamed(DietListScreen.routeName,
-                arguments: false);
-          }),
-    if (routeName != WorkoutListScreen.routeName)
-      IconButton(
-          icon: Icon(Icons.fitness_center),
-          onPressed: () {
-            Navigator.of(context).pushReplacementNamed(
-                WorkoutListScreen.routeName,
-                arguments: false);
-          }),
-    if (routeName != PersonsListScreen.routeName)
-      IconButton(
-          icon: Icon(Icons.search),
-          onPressed: () {
-            Navigator.of(context).pushReplacementNamed(
-                PersonsListScreen.routeName,
-                arguments: false);
-          }),
-    if (routeName != CalendarPlansScreen.routeName)
-      IconButton(
-          icon: Icon(Icons.calendar_today),
-          onPressed: () {
-            Navigator.of(context).pushReplacementNamed(
-                CalendarPlansScreen.routeName,
-                arguments: false);
-          }),
-  ]);
+  return AppBar(
+      title: title.length == 0
+          ? null
+          : FittedBox(fit: BoxFit.contain, child: Text(title)),
+      actions: [
+        if (routeName != ProfileScreen.routeName)
+          IconButton(
+              icon: Icon(Icons.home),
+              onPressed: () {
+                Navigator.of(context).pushReplacementNamed(
+                    ProfileScreen.routeName,
+                    arguments: false);
+              }),
+        if (routeName != UserProfileScreen.routeName)
+          IconButton(
+              icon: Icon(Icons.person),
+              onPressed: () {
+                Navigator.of(context).pushReplacementNamed(
+                    UserProfileScreen.routeName,
+                    arguments: false);
+              }),
+        if (routeName != DietListScreen.routeName)
+          IconButton(
+              icon: Icon(Icons.food_bank),
+              onPressed: () {
+                Navigator.of(context).pushReplacementNamed(
+                    DietListScreen.routeName,
+                    arguments: false);
+              }),
+        if (routeName != WorkoutListScreen.routeName)
+          IconButton(
+              icon: Icon(Icons.fitness_center),
+              onPressed: () {
+                Navigator.of(context).pushReplacementNamed(
+                    WorkoutListScreen.routeName,
+                    arguments: false);
+              }),
+        if (routeName != PersonsListScreen.routeName)
+          IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () {
+                Navigator.of(context).pushReplacementNamed(
+                    PersonsListScreen.routeName,
+                    arguments: false);
+              }),
+        if (routeName != CalendarPlansScreen.routeName)
+          IconButton(
+              icon: Icon(Icons.calendar_today),
+              onPressed: () {
+                Navigator.of(context).pushReplacementNamed(
+                    CalendarPlansScreen.routeName,
+                    arguments: false);
+              }),
+      ]);
 }

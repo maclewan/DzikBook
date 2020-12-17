@@ -168,13 +168,26 @@ class _AddPostState extends State<AddPost> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(0),
                         ),
-                        onPressed: this._workoutNotNull ? null : getImage,
-                        child: Text(
-                          "zdjęcie",
-                          style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                              fontSize: 12),
+                        onPressed: this._workoutNotNull
+                            ? null
+                            : () {
+                                if (this._imageNotNull) {
+                                  setState(() {
+                                    _image = null;
+                                    _imageNotNull = false;
+                                  });
+                                } else
+                                  getImage();
+                              },
+                        child: FittedBox(
+                          fit: BoxFit.contain,
+                          child: Text(
+                            this._imageNotNull ? "usuń zdjęcie" : "zdjęcie",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                                fontSize: 12),
+                          ),
                         ),
                         color: Color.fromRGBO(126, 213, 111, 1.0),
                       ),
@@ -190,13 +203,27 @@ class _AddPostState extends State<AddPost> {
                           borderRadius: BorderRadius.only(
                               bottomRight: Radius.circular(10)),
                         ),
-                        onPressed: this._imageNotNull ? null : _addWorkoutPlan,
-                        child: Text(
-                          "trening",
-                          style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                              fontSize: 12),
+                        onPressed: this._imageNotNull
+                            ? null
+                            : () {
+                                if (this._workoutNotNull) {
+                                  setState(() {
+                                    _workout = null;
+                                    _workoutNotNull = false;
+                                  });
+                                } else {
+                                  _addWorkoutPlan();
+                                }
+                              },
+                        child: FittedBox(
+                          fit: BoxFit.contain,
+                          child: Text(
+                            this._workoutNotNull ? "usuń trening" : "trening",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                                fontSize: 12),
+                          ),
                         ),
                         color: Color.fromRGBO(126, 213, 111, 1.0),
                       ),
