@@ -12,15 +12,13 @@ import '../models/HttpException.dart';
 
 class Auth with ChangeNotifier {
   String _token;
+  String _refreshToken;
   DateTime _expiryDate;
   Dio dio = new Dio();
+  Timer _authTimer;
 
   bool get isAuth {
     return _token != null;
-  }
-
-  String get userId {
-    return _userId;
   }
 
   Future<void> _authentication(String password, String email, String urlSegment,
@@ -74,8 +72,8 @@ class Auth with ChangeNotifier {
     }
   }
 
-  Future<void> signup(String email, String password) async {
-    return _authentication(password, email, "signUp");
+  Future<void> signin(String email, String password) async {
+    return _authentication(password, email, "login", '', '');
   }
 
   Future<void> signup(
