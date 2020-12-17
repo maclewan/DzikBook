@@ -186,7 +186,7 @@ class MultipleUsersDataView(APIView):
         except:
             return Response("Wrong data set.", status=status.HTTP_406_NOT_ACCEPTABLE)
 
-        data_list = [UserData.objects.get(user=u) for u in user_id_list if UserData.objects.filter(user=u).exists() ]
+        data_list = [UserData.objects.get(user=u) for u in user_id_list if UserData.objects.filter(user=u).exists()]
         return_list = [{
                 'user_id': a.user,
                 'first_name': a.first_name,

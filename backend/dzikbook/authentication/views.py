@@ -31,9 +31,9 @@ class RegisterView(APIView):
             else:
                 raise Exception('Problem with data validation')
 
-            return Response("User Created Successfully. Now login to get your token")
+            return Response("User Created Successfully. Now login to get your token", status=status.HTTP_201_CREATED)
         except Exception as e:
-            return Response({str(e)})
+            return Response({str(e)}, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 
 class DeleteAccountView(APIView):
