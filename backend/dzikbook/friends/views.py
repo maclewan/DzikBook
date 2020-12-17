@@ -227,7 +227,6 @@ def get_friends_id(user_id):
 
 def check_if_user_exist(user_id):
     url = 'http://localhost:8000/auth/user/' + str(user_id) + '/'
-    print(requests.get(url).text)
     if requests.get(url).text == 'true':
         return True
     else:
