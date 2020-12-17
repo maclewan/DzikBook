@@ -15,7 +15,8 @@ class UserDataSerializer(serializers.Serializer):
 
     class Meta:
         model = UserData
-        fields = ('user', 'first_name', 'last_name', 'gym', 'birth_date', 'sex', 'job', 'additional_data',)
+        fields = ('user', 'first_name', 'last_name', 'gym', 'birth_date', 'sex', 'job', 'additional_data')
+        fields = ('user', 'first_name', 'last_name', 'gym', 'birth_date', 'sex', 'job', 'additional_data')
 
     def create(self, validated_data):
         """
