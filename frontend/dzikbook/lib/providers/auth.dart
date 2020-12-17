@@ -12,9 +12,6 @@ import '../models/HttpException.dart';
 
 class Auth with ChangeNotifier {
   String _token;
-  // String _userId;
-  String _refreshToken;
-  Timer _authTimer;
   DateTime _expiryDate;
   Dio dio = new Dio();
 
@@ -22,13 +19,8 @@ class Auth with ChangeNotifier {
     return _token != null;
   }
 
-  String get token {
-    if (_expiryDate != null &&
-        _expiryDate.isAfter(DateTime.now()) &&
-        _token != null) {
-      return _token;
-    }
-    return '';
+  String get userId {
+    return _userId;
   }
 
   Future<void> _authentication(String password, String email, String urlSegment,
@@ -82,8 +74,8 @@ class Auth with ChangeNotifier {
     }
   }
 
-  Future<void> signin(String email, String password) async {
-    return _authentication(password, email, "login", '', '');
+  Future<void> signup(String email, String password) async {
+    return _authentication(password, email, "signUp");
   }
 
   Future<void> signup(
