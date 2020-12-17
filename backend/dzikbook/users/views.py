@@ -13,11 +13,10 @@ from .models import UserData
 # create your views here
 from .serializers import UserDataSerializer
 
+from .utils import convert_bdate
+
 
 class SignedInUserDataView(APIView):
-    """
-    Get this user data
-    """
     authentication_classes = []
 
     @authenticate
@@ -29,15 +28,24 @@ class SignedInUserDataView(APIView):
 
             return Response(context)
         except models.ObjectDoesNotExist:
-            return Response("User data doesnt exist!", status=status.HTTP_404_NOT_FOUND)
+            return Response("User data doesn't exist!", status=status.HTTP_404_NOT_FOUND)
 
     @authenticate
     def post(self, request):
         try:
+
             user_id = request.user.id
 
             data = json.loads(json.dumps(request.POST))
             data['user'] = user_id
+
+            # convert birth date
+            b_date = data['birth_date']
+            b_date = convert_bdate(b_date)
+            if not b_date:
+                return Response("Invalid date format provided! Required: dd/MM/yyyy",
+                                status=status.HTTP_400_BAD_REQUEST)
+            data['birth_date'] = b_date
 
             data_serializer = UserDataSerializer(data=data)
 
@@ -49,7 +57,8 @@ class SignedInUserDataView(APIView):
             return Response(data_serializer.data)
 
         except Exception as e:
-            return Response("Error during posting a comment, record already exists!", status=status.HTTP_409_CONFLICT)
+
+            return Response("Error during posting a user data, record already exists!", status=status.HTTP_409_CONFLICT)
 
     @authenticate
     def put(self, request):
@@ -68,7 +77,7 @@ class SignedInUserDataView(APIView):
             user_data = data_serializer.update(instance=user_data, validated_data=data)
 
         except models.ObjectDoesNotExist:
-            return Response("User data doesnt exist!", status=status.HTTP_404_NOT_FOUND)
+            return Response("User data doesn't exist!", status=status.HTTP_404_NOT_FOUND)
 
         context = {'message': 'Data successfully updated', 'user_data': UserDataSerializer(user_data).data}
         return Response(context)
@@ -159,15 +168,18 @@ class SearchView(APIView):
             'user_id': u.user,
             'first_name': u.first_name,
             'last_name': u.last_name,
-            'gym': u.gym
+            'gym': u.gym,
+            'birth_date': u.birth_date,
+            'sex': u.sex,
+            'job': u.job
         }, user_data_list))
 
         # Apply offset and amount filters
         count = len(context)
         context = \
             [] if count <= offset else \
-            context[offset:count] if count <= offset + amount \
-            else context[offset:offset+amount]
+                context[offset:count] if count <= offset + amount \
+                    else context[offset:offset + amount]
 
         context = {'users_list': context}
         return Response(context)
@@ -178,9 +190,10 @@ class MultipleUsersDataView(APIView):
 
     @internal
     def post(self, request):
-
-        json_data = json.loads(request.body)
-        user_id_list = []
+        try:
+            json_data = json.loads(request.body)
+        except:
+            return Response("Wrong json provided.", status=status.HTTP_406_NOT_ACCEPTABLE)
         try:
             user_id_list = json_data['id_list']
         except:
@@ -188,9 +201,43 @@ class MultipleUsersDataView(APIView):
 
         data_list = [UserData.objects.get(user=u) for u in user_id_list if UserData.objects.filter(user=u).exists()]
         return_list = [{
-                'user_id': a.user,
-                'first_name': a.first_name,
-                'last_name': a.last_name
-            } for a in data_list]
+            # TODO: add another info if required
+            'user_id': a.user,
+            'first_name': a.first_name,
+            'last_name': a.last_name
+        } for a in data_list]
 
         return Response({"user_data_list": return_list})
+
+
+class CreateNewUserView(APIView):
+    authentication_classes = []
+
+    @internal
+    def post(self, request):
+        try:
+            user_id = request.user.id
+
+            data = {
+                'gym': "",
+                'additional_data': "",
+                'first_name': "",
+                'last_name': "",
+                'sex': "",
+                'job': "",
+                'birth_date': "1900-01-01",
+                'user': user_id
+            }
+
+            data_serializer = UserDataSerializer(data=data)
+
+            if not data_serializer.is_valid():
+                return Response("Invalid data provided!", status=status.HTTP_400_BAD_REQUEST)
+
+            user_data = data_serializer.create(validated_data=data)
+            user_data.save()
+
+            return Response(data_serializer.data)
+
+        except Exception as e:
+            return Response("Error during posting a user data, record already exists!", status=status.HTTP_409_CONFLICT)
