@@ -19,17 +19,12 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    final auth = Provider.of<Auth>(context, listen: false);
-    Timer(Duration(seconds: 3), () async {
-      if (auth.isAuth) {
+    final isAuth = Provider.of<Auth>(context, listen: false).isAuth;
+    Timer(Duration(seconds: 3), () {
+      if (isAuth) {
         Navigator.of(context).pushReplacementNamed(ProfileScreen.routeName);
       } else {
-        final autoLogin = await auth.tryAutoLogin();
-        if (autoLogin) {
-          Navigator.of(context).pushReplacementNamed(ProfileScreen.routeName);
-        } else {
-          Navigator.of(context).pushReplacementNamed(AuthScreen.routeName);
-        }
+        Navigator.of(context).pushReplacementNamed(AuthScreen.routeName);
       }
     });
   }
