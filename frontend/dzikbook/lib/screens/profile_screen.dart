@@ -17,6 +17,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   List<PostModel> _posts = [
     PostModel(
+        hasTraining: false,
         hasImage: true,
         comments: [],
         description: "Cześć i czołem, Oto zdjęcie w 4k!",
@@ -30,6 +31,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           "https://external-preview.redd.it/GOkP8onbuyjGmN9Rc8Que5mw21CdSw6OuXpAKUuE6-4.jpg?auto=webp&s=2bc0e522d1f2fa887333286d557466b2be00fa5e",
         )),
     PostModel(
+        hasTraining: false,
         hasImage: true,
         comments: [],
         description: "O M G  ale super fotka",
@@ -57,6 +59,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       timeTaken: "1d",
     ),
     PostModel(
+      hasTraining: true,
+      loadedTraining: Workout(name: "XD", workoutLength: 60, exercises: []),
       hasImage: false,
       likes: 15,
       comments: [],
@@ -68,6 +72,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       timeTaken: "36m",
     ),
     PostModel(
+      hasTraining: false,
       hasImage: false,
       likes: 10,
       comments: [],
@@ -176,6 +181,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               loadedImg: _posts[index - 1].hasImage
                   ? _posts[index - 1].loadedImg
                   : null,
+              hasTraining: _posts[index - 1].hasTraining,
+              traning: _posts[index - 1].loadedTraining,
             );
           },
         ));
