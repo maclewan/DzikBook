@@ -61,8 +61,6 @@ def internal(f):
         else:
             return Response("Not authorised!", status=status.HTTP_401_UNAUTHORIZED)
 
-        request.user = get_user(id)
-
         return f(*args, **kwargs)
 
     return validate
