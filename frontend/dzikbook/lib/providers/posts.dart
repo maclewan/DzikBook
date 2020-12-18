@@ -49,6 +49,7 @@ class Posts with ChangeNotifier {
 
   Future<List<CommentModel>> fetchPostComments(int postId) async {
     final url = "$apiUrl/socials/comments/post/$postId/";
+    Stopwatch stopwatch = Stopwatch()..start();
     List<CommentModel> comments = [];
     try {
       final response = await dio.get(url,
@@ -59,14 +60,16 @@ class Posts with ChangeNotifier {
         return [];
       }
       final List parsedList = response.data;
-      for (var c in parsedList) {
-        await getUserPhoto(c["author"].toString()).then((userPhoto) {
-          CommentModel comment =
-              new CommentModel(description: c["content"], imgSource: userPhoto);
-          comments.add(comment);
-        });
-      }
-
+      await Future.wait([
+        for (var c in parsedList)
+          getUserPhoto(c["author"].toString()).then((userPhoto) {
+            CommentModel comment = new CommentModel(
+                description: c["content"], imgSource: userPhoto);
+            comments.add(comment);
+          })
+      ]);
+      print(
+          "Fetchowanie ${comments.length} komentarzy dla posta $postId trwało ${stopwatch.elapsedMilliseconds}ms");
       return comments;
     } catch (error) {
       print(error);
@@ -133,29 +136,30 @@ class Posts with ChangeNotifier {
       }
       final List parsedList = response.data;
       Stopwatch stopwatch = new Stopwatch()..start();
+      await Future.wait([
+        for (final r in parsedList)
+          fetchPostComments(r["post_id"]).then((comments) async {
+            await getCredentials(r["author"]).then((creds) {
+              PostModel post = new PostModel(
+                  description: r["description"],
+                  id: r["post_id"].toString(),
+                  userImg: creds.userImg,
+                  userName: "${creds.userName} ${creds.lastName}",
+                  timeTaken: "15m",
+                  hasImage: r["photo"] != null ? true : false,
+                  hasTraining: false,
+                  comments: comments,
+                  loadedTraining: null,
+                  loadedImg: r["photo"] != null
+                      ? Image.network('$apiUrl${r["photo"]}')
+                      : null,
+                  likes: 0);
+              posts.add(post);
+              // print(posts.toString());
+            });
+          })
+      ]);
 
-      for (final r in parsedList) {
-        await fetchPostComments(r["post_id"]).then((comments) async {
-          await getCredentials(r["author"]).then((creds) {
-            PostModel post = new PostModel(
-                description: r["description"],
-                id: r["post_id"].toString(),
-                userImg: creds.userImg,
-                userName: "${creds.userName} ${creds.lastName}",
-                timeTaken: "15m",
-                hasImage: r["photo"] != null ? true : false,
-                hasTraining: false,
-                comments: comments,
-                loadedTraining: null,
-                loadedImg: r["photo"] != null
-                    ? Image.network('$apiUrl${r["photo"]}')
-                    : null,
-                likes: 0);
-            posts.add(post);
-            // print(posts.toString());
-          });
-        });
-      }
       print('10 postów fetchowano przez ${stopwatch.elapsedMilliseconds}ms');
       return posts;
       // final Map parsedImg = json.decode(imageResponse.data);
@@ -169,7 +173,8 @@ class Posts with ChangeNotifier {
   Future<Credentials> getCredentials(int userId) async {
     final url = "$apiUrl/users/data/$userId/";
     final imgUrl = "$apiUrl/media/profile/user/$userId/";
-
+    Map parsed;
+    String imageUrl;
     try {
       final response = await dio.get(url,
           options: Options(headers: {
@@ -178,15 +183,12 @@ class Posts with ChangeNotifier {
       if (response.statusCode >= 400) {
         throw HttpException("Operacja nie powiodła się!");
       }
-      print("Parsed User$userId info");
-
-      final Map parsed = response.data;
+      parsed = response.data;
       final imageResponse = await dio.get(imgUrl,
           options: Options(headers: {
             "Authorization": "Bearer " + token,
           }));
-      final imageUrl = apiUrl + imageResponse.data["photo"]["photo"];
-      print("Parsed User$userId Image");
+      imageUrl = apiUrl + imageResponse.data["photo"]["photo"];
       return Credentials(parsed["first_name"], parsed["last_name"], imageUrl);
     } catch (error) {
       throw HttpException("Nie ma fotki!");
