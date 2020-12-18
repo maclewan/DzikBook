@@ -9,6 +9,7 @@ import 'package:flutter/widgets.dart';
 import 'package:dzikbook/models/PostFetcher.dart';
 import 'package:dzikbook/providers/workouts.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 
 class Credentials {
   String userName;
@@ -19,6 +20,29 @@ class Credentials {
 
 class Posts with ChangeNotifier {
   List<PostModel> _posts = [];
+  static String formatDuration(Duration d) {
+    var seconds = d.inSeconds;
+    final days = seconds ~/ Duration.secondsPerDay;
+    seconds -= days * Duration.secondsPerDay;
+    final hours = seconds ~/ Duration.secondsPerHour;
+    seconds -= hours * Duration.secondsPerHour;
+    final minutes = seconds ~/ Duration.secondsPerMinute;
+    seconds -= minutes * Duration.secondsPerMinute;
+
+    final List<String> tokens = [];
+    if (days != 0) {
+      tokens.add('${days}d');
+    }
+    if (tokens.isNotEmpty || hours != 0) {
+      tokens.add('${hours}h');
+    }
+    if (tokens.isNotEmpty || minutes != 0) {
+      tokens.add('${minutes}m');
+    }
+    tokens.add('${seconds}s');
+
+    return tokens.join(':');
+  }
 
   String token;
   String refreshToken;
@@ -64,12 +88,19 @@ class Posts with ChangeNotifier {
         for (var c in parsedList)
           getUserPhoto(c["author"].toString()).then((userPhoto) {
             CommentModel comment = new CommentModel(
-                description: c["content"], imgSource: userPhoto);
+                description: c["content"],
+                imgSource: userPhoto,
+                commentId: c["comment_id"]);
             comments.add(comment);
           })
       ]);
       print(
           "Fetchowanie ${comments.length} komentarzy dla posta $postId trwało ${stopwatch.elapsedMilliseconds}ms");
+      comments.sort((a, b) {
+        int aId = a.commentId;
+        int bId = b.commentId;
+        return aId.compareTo(bId);
+      });
       return comments;
     } catch (error) {
       print(error);
@@ -93,7 +124,7 @@ class Posts with ChangeNotifier {
     }
   }
 
-  Future<bool> addComment(String postId, String comment) async {
+  Future<int> addComment(String postId, String comment) async {
     final url = "$apiUrl/socials/comments/post/$postId/";
     Map<String, dynamic> body = {
       'content': comment,
@@ -112,13 +143,13 @@ class Posts with ChangeNotifier {
         data: formData,
       );
       if (response.statusCode >= 400) {
-        return false;
+        return null;
       }
       print("comment added for post $postId");
       notifyListeners();
-      return true;
+      return response.data["comment_id"];
     } catch (error) {
-      return false;
+      return null;
     }
   }
 
@@ -140,12 +171,19 @@ class Posts with ChangeNotifier {
         for (final r in parsedList)
           fetchPostComments(r["post_id"]).then((comments) async {
             await getCredentials(r["author"]).then((creds) {
+              final format = DateFormat('yyyy-MM-DDTHH:mm:ss');
+              // print(r["timestamp"]);
+              Duration timeDuration =
+                  format.parse(r["timestamp"]).difference(DateTime.now());
+              String time = formatDuration(timeDuration);
+              int secondsTaken = timeDuration.inSeconds;
               PostModel post = new PostModel(
+                  secondsTaken: secondsTaken,
                   description: r["description"],
                   id: r["post_id"].toString(),
                   userImg: creds.userImg,
                   userName: "${creds.userName} ${creds.lastName}",
-                  timeTaken: "15m",
+                  timeTaken: time,
                   hasImage: r["photo"] != null ? true : false,
                   hasTraining: false,
                   comments: comments,
@@ -161,6 +199,11 @@ class Posts with ChangeNotifier {
       ]);
 
       print('10 postów fetchowano przez ${stopwatch.elapsedMilliseconds}ms');
+      posts.sort((a, b) {
+        var aSeconds = a.secondsTaken;
+        var bSeconds = b.secondsTaken;
+        return aSeconds.compareTo(bSeconds);
+      });
       return posts;
       // final Map parsedImg = json.decode(imageResponse.data);
       // print(parsedImg);
@@ -249,23 +292,4 @@ class Posts with ChangeNotifier {
       throw HttpException("Operacja nie powiodła się!");
     }
   }
-
-//   void addPost(postDescription, file, hasImg, hasTraining, training) {
-//     _posts.insert(
-//         0,
-//         new PostModel(
-//           hasImage: hasImg,
-//           hasTraining: hasTraining,
-//           loadedTraining: training,
-//           description: postDescription,
-//           id: "15",
-//           timeTaken: "0m",
-//           userName: mainUserName,
-//           userImg: mainUserImage,
-//           loadedImg: hasImg ? Image.file(file) : null,
-//           likes: 0,
-//           comments: [],
-//         ));
-//     notifyListeners();
-//   }
 }

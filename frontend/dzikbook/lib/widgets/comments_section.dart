@@ -27,13 +27,14 @@ class _CommentsSectionState extends State<CommentsSection> {
     Provider.of<Posts>(context, listen: false)
         .addComment(this.widget.postId, desc)
         .then((added) {
-      if (!added) return;
+      if (added == null) return;
       this.setState(() {
         this.widget.comments.add(
               new CommentModel(
                 description: desc,
                 imgSource:
                     Provider.of<UserData>(context, listen: false).imageUrl,
+                commentId: added,
               ),
             );
         if (this.widget.comments.length != 1) {

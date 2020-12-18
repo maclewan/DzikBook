@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'CommentModel.dart';
 
 class PostModel {
+  final int secondsTaken;
   final String description;
   final String id, userImg, userName, timeTaken;
   final Image loadedImg;
@@ -28,6 +29,7 @@ class PostModel {
       this.loadedImg,
       this.comments,
       this.loadedTraining,
+      @required this.secondsTaken,
       @required this.likes});
 }
 
