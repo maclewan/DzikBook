@@ -1,14 +1,17 @@
 import 'package:dzikbook/models/CommentModel.dart';
+import 'package:dzikbook/providers/user_data.dart';
 import 'package:dzikbook/providers/workouts.dart';
 import 'package:dzikbook/screens/user_profile_screen.dart';
 import 'package:dzikbook/widgets/comments_section.dart';
 import 'package:dzikbook/widgets/workout_post.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'reactions_section.dart';
 
 class Post extends StatelessWidget {
   final String id;
+  final String userId;
   final String userImg;
   final String userName;
   final String description;
@@ -22,6 +25,7 @@ class Post extends StatelessWidget {
   final int likes;
   final bool clickable;
   const Post({
+    @required this.userId,
     @required this.hasReacted,
     @required this.id,
     @required this.userName,
@@ -39,7 +43,6 @@ class Post extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('Post o ID ${this.id} ma ${this.likes} lajków');
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
       decoration: BoxDecoration(
@@ -60,15 +63,39 @@ class Post extends StatelessWidget {
                 GestureDetector(
                   onTap: () {
                     if (this.clickable) {
-                      Navigator.push(
+                      final userDataProvider =
+                          Provider.of<UserData>(context, listen: false);
+                      if (this.userId == userDataProvider.id) {
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => UserProfileScreen(
-                                    userImage: this.userImg,
-                                    userName: this.userName,
-                                    rootUser: false,
-                                    friend: true,
-                                  )));
+                            builder: (context) => UserProfileScreen(
+                              id: this.userId,
+                              friend: false,
+                              rootUser: true,
+                              userName: userDataProvider.name +
+                                  " " +
+                                  userDataProvider.lastName,
+                              userImage: userDataProvider.imageUrl,
+                            ),
+                          ),
+                        );
+                      } else {
+                        userDataProvider
+                            .getAnotherUserData(this.userId)
+                            .then((data) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => UserProfileScreen(
+                                        id: this.userId,
+                                        friend: data.isFriend,
+                                        rootUser: false,
+                                        userImage: data.image,
+                                        userName: data.name,
+                                      )));
+                        });
+                      }
                     }
                   },
                   child: Row(

@@ -1,9 +1,11 @@
 import 'package:dzikbook/models/PostFetcher.dart';
+import 'package:dzikbook/providers/posts.dart';
 import 'package:dzikbook/widgets/navbar.dart';
 import 'package:dzikbook/widgets/user_profile_info.dart';
 import 'package:flutter/material.dart';
 
 import 'package:dzikbook/widgets/post.dart';
+import 'package:provider/provider.dart';
 import '../models/dummyData.dart';
 
 class UserProfileScreen extends StatefulWidget {
@@ -12,68 +14,43 @@ class UserProfileScreen extends StatefulWidget {
   final String userImage;
   final bool rootUser;
   final bool friend;
+  final String id;
   const UserProfileScreen(
       {this.userImage = mainUserImage,
       this.userName = mainUserName,
       this.rootUser = true,
-      this.friend = false});
+      this.friend = false,
+      this.id});
   @override
   _UserProfileScreenState createState() => _UserProfileScreenState();
 }
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
-  List<PostModel> _posts = [];
-  PostFetcher _postFetcher;
-  bool _isLoading = true;
-  bool _hasMore = true;
-
   @override
   void initState() {
     super.initState();
-    _postFetcher = PostFetcher(
-        specificUser: true,
-        specificUserImageUrl: this.widget.userImage,
-        specificUserName: this.widget.userName);
-    _hasMore = true;
-    _loadMore();
-  }
-
-  void _loadMore() {
-    _isLoading = true;
-    _postFetcher.fetchPostsList(10).then((List<PostModel> fetchedPosts) {
-      if (fetchedPosts.isEmpty) {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-            _hasMore = false;
-          });
-        }
-      } else {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-            _posts.addAll(fetchedPosts);
-          });
-        }
-      }
-    });
+    Provider.of<Posts>(context, listen: false).restart();
+    Provider.of<Posts>(context, listen: false).loadMore(type: 1);
   }
 
   @override
   void dispose() {
     super.dispose();
-    _posts.clear();
   }
 
   @override
   Widget build(BuildContext context) {
+    var postsProvider = Provider.of<Posts>(context, listen: true);
+
     return Scaffold(
         appBar: buildNavBar(
             context: context,
             routeName: UserProfileScreen.routeName,
             title: 'Profil'),
         body: ListView.builder(
-          itemCount: _hasMore ? _posts.length + 1 : _posts.length,
+          itemCount: postsProvider.hasMore
+              ? postsProvider.wallPostsCount + 1
+              : postsProvider.wallPostsCount,
           itemBuilder: (BuildContext context, int index) {
             if (index == 0)
               return UserProfileInfo(
@@ -82,9 +59,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 rootUser: this.widget.rootUser,
                 isFriend: this.widget.friend,
               );
-            if (index >= _posts.length) {
-              if (!_isLoading) {
-                _loadMore();
+            if (index >= postsProvider.wallPostsCount) {
+              if (!postsProvider.isLoading) {
+                postsProvider.loadMore(type: 1);
               }
               return Center(
                 child: Padding(
@@ -100,19 +77,19 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
             return Post(
               clickable: false,
-              description: _posts[index - 1].description,
+              description: postsProvider.wallPosts[index - 1].description,
               id: index.toString(),
-              timeTaken: _posts[index - 1].timeTaken,
-              userName: _posts[index - 1].userName,
-              comments: _posts[index - 1].comments,
-              likes: _posts[index - 1].likes,
-              hasImage: _posts[index - 1].hasImage,
-              userImg: _posts[index - 1].userImg,
-              loadedImg: _posts[index - 1].hasImage
-                  ? _posts[index - 1].loadedImg
+              timeTaken: postsProvider.wallPosts[index - 1].timeTaken,
+              userName: postsProvider.wallPosts[index - 1].userName,
+              comments: postsProvider.wallPosts[index - 1].comments,
+              likes: postsProvider.wallPosts[index - 1].likes,
+              hasImage: postsProvider.wallPosts[index - 1].hasImage,
+              userImg: postsProvider.wallPosts[index - 1].userImg,
+              loadedImg: postsProvider.wallPosts[index - 1].hasImage
+                  ? postsProvider.wallPosts[index - 1].loadedImg
                   : null,
               hasTraining: false,
-              hasReacted: _posts[index - 1].hasReacted,
+              hasReacted: postsProvider.wallPosts[index - 1].hasReacted,
             );
           },
         ));

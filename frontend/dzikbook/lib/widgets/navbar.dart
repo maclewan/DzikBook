@@ -1,3 +1,4 @@
+import 'package:dzikbook/providers/user_data.dart';
 import 'package:dzikbook/screens/calendar_plans_screen.dart';
 import 'package:dzikbook/screens/diet_list_screen.dart';
 import 'package:dzikbook/screens/profile_screen.dart';
@@ -5,6 +6,7 @@ import 'package:dzikbook/screens/search_people_screen.dart';
 import 'package:dzikbook/screens/user_profile_screen.dart';
 import 'package:dzikbook/screens/workout_list_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 AppBar buildNavBar(
     {BuildContext context,
@@ -28,9 +30,23 @@ AppBar buildNavBar(
           IconButton(
               icon: Icon(Icons.person),
               onPressed: () {
-                Navigator.of(context).pushReplacementNamed(
-                    UserProfileScreen.routeName,
-                    arguments: false);
+                final userDataProvider =
+                    Provider.of<UserData>(context, listen: false);
+
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => UserProfileScreen(
+                      id: userDataProvider.id,
+                      friend: false,
+                      rootUser: true,
+                      userName: userDataProvider.name +
+                          " " +
+                          userDataProvider.lastName,
+                      userImage: userDataProvider.imageUrl,
+                    ),
+                  ),
+                );
               }),
         if (routeName != DietListScreen.routeName)
           IconButton(

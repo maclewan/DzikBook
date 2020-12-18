@@ -20,7 +20,7 @@ class Posts with ChangeNotifier {
   String userId;
   List<PostModel> _posts = [];
   static String formatDuration(Duration d) {
-    var seconds = -d.inSeconds;
+    var seconds = d.inSeconds.abs();
     final days = seconds ~/ Duration.secondsPerDay;
     seconds -= days * Duration.secondsPerDay;
     final hours = seconds ~/ Duration.secondsPerHour;
@@ -56,9 +56,10 @@ class Posts with ChangeNotifier {
 
   int get wallPostsCount => _posts.length;
 
-  void loadMore() {
+  void loadMore({int type, int userId = 0}) {
     _isLoading = true;
-    fetchMainPosts(10).then((List<PostModel> fetchedPosts) {
+    fetchMainPosts(counter: 10, type: type, userId: userId)
+        .then((List<PostModel> fetchedPosts) {
       if (fetchedPosts.isEmpty) {
         _isLoading = false;
         _hasMore = false;
@@ -68,6 +69,13 @@ class Posts with ChangeNotifier {
       }
       notifyListeners();
     });
+  }
+
+  void restart() {
+    this._posts.clear();
+    this._hasMore = true;
+    this._isLoading = true;
+    this.postsCount = 0;
   }
 
   Future<List> getPostReactions(int postId) async {
@@ -161,7 +169,6 @@ class Posts with ChangeNotifier {
         return null;
       }
       print("comment added for post $postId");
-      notifyListeners();
       return response.data["comment_id"];
     } catch (error) {
       return null;
@@ -177,6 +184,7 @@ class Posts with ChangeNotifier {
               "Authorization": "Bearer " + token,
             }));
         print(response);
+
         return true;
       } catch (error) {
         print(error);
@@ -197,8 +205,12 @@ class Posts with ChangeNotifier {
     }
   }
 
-  Future<List<PostModel>> fetchMainPosts(int counter) async {
-    final url = "$apiUrl/wall/main?amount=$counter&offset=$postsCount";
+  Future<List<PostModel>> fetchMainPosts(
+      {int counter, int type, int userId = 0}) async {
+    var url;
+    if (type == 0)
+      url = "$apiUrl/wall/main?amount=$counter&offset=$postsCount";
+    else if (type == 1) url = "$apiUrl/wall?amount=$counter&offset=$postsCount";
     postsCount += counter;
     List<PostModel> posts = [];
     try {
@@ -216,17 +228,19 @@ class Posts with ChangeNotifier {
           fetchPostComments(r["post_id"]).then((comments) async {
             await getPostReactions(r["post_id"]).then((reactions) async {
               await getCredentials(r["author"]).then((creds) {
-                final format = DateFormat('yyyy-MM-DDTHH:mm:ss');
+                DateTime now = (DateTime.now().add(Duration(hours: 6)));
+                DateTime old = (DateTime.parse(r["timestamp"]));
                 // print(r["timestamp"]);
-                Duration timeDuration =
-                    DateTime.now().difference(format.parse(r["timestamp"]));
+                Duration timeDuration = now.difference(old);
+                timeDuration -= Duration(hours: 5);
+                print(now);
+                print(old);
+                print("_" * 10);
                 String time = formatDuration(timeDuration);
+
                 int secondsTaken = timeDuration.inSeconds;
-                print(reactions);
-                print(this.userId);
-                print(reactions.contains(int.parse(this.userId)));
-                print("_" * 15);
                 PostModel post = new PostModel(
+                    userId: r["author"].toString(),
                     hasReacted: reactions.contains(int.parse(this.userId)),
                     secondsTaken: secondsTaken,
                     description: r["description"],
@@ -324,18 +338,21 @@ class Posts with ChangeNotifier {
       }
       final Map parsed = response.data;
       PostModel post = PostModel(
+          hasReacted: false,
+          secondsTaken: 0,
+          userId: this.userId,
           comments: [],
           description: parsed["description"],
           id: parsed["post_id"].toString(),
           userImg: userPhoto,
           userName: username,
-          timeTaken: "0",
+          timeTaken: "0s",
           hasImage: parsed["photo"] == null ? false : true,
           hasTraining: false,
           loadedImg: parsed["photo"] == null
               ? null
               : Image.network('$apiUrl${parsed["photo"]}'),
-          likes: 1);
+          likes: 0);
       _posts.insert(0, post);
       postsCount++;
       notifyListeners();

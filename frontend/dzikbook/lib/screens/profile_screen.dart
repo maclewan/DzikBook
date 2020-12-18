@@ -1,15 +1,11 @@
-import 'package:dzikbook/models/PostFetcher.dart';
 import 'package:dzikbook/providers/posts.dart';
 import 'package:dzikbook/providers/user_data.dart';
-import 'package:dzikbook/providers/workouts.dart';
 import 'package:dzikbook/widgets/navbar.dart';
 import 'package:flutter/material.dart';
 
 import 'package:dzikbook/widgets/add_post.dart';
 import 'package:dzikbook/widgets/post.dart';
-import 'package:http/http.dart';
 import 'package:provider/provider.dart';
-import '../models/dummyData.dart';
 
 class ProfileScreen extends StatefulWidget {
   static final routeName = '/profile';
@@ -22,7 +18,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    Provider.of<Posts>(context, listen: false).loadMore();
+    Provider.of<Posts>(context, listen: false).restart();
+    Provider.of<Posts>(context, listen: false).loadMore(type: 0);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -43,7 +45,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             if (index == 0) return AddPost();
             if (index >= postsProvider.wallPostsCount) {
               if (!postsProvider.isLoading) {
-                postsProvider.loadMore();
+                postsProvider.loadMore(type: 0);
               }
               return Center(
                 child: Padding(
@@ -58,6 +60,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             }
 
             return Post(
+              userId: postsProvider.wallPosts[index - 1].userId,
               description: postsProvider.wallPosts[index - 1].description,
               id: postsProvider.wallPosts[index - 1].id,
               timeTaken: postsProvider.wallPosts[index - 1].timeTaken,
