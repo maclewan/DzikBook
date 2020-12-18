@@ -1,4 +1,4 @@
-import 'dart:convert';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:dzikbook/models/config.dart';
@@ -94,6 +94,34 @@ class UserData with ChangeNotifier {
         }));
     {
       return response.data == "friends";
+    }
+  }
+
+  Future<bool> changeProfilePicture(File picture) async {
+    final url = "$apiUrl/media/profile/";
+
+    FormData formData = new FormData();
+    formData.files.add(MapEntry(
+      "photo",
+      await MultipartFile.fromFile(picture.path, filename: picture.path),
+    ));
+    try {
+      final response = await dio.post(
+        url,
+        options: Options(
+          headers: {
+            "Authorization": "Bearer " + token,
+          },
+        ),
+        data: formData,
+      );
+      print("IMAGE CHANGED");
+      _imageUrl = apiUrl + response.data[0]["photo"]["photo"];
+      notifyListeners();
+      return true;
+    } catch (error) {
+      print(error);
+      return false;
     }
   }
 

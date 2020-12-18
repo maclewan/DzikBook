@@ -1,5 +1,6 @@
 import 'package:dzikbook/models/PostFetcher.dart';
 import 'package:dzikbook/providers/posts.dart';
+import 'package:dzikbook/providers/user_data.dart';
 import 'package:dzikbook/widgets/navbar.dart';
 import 'package:dzikbook/widgets/user_profile_info.dart';
 import 'package:flutter/material.dart';
@@ -41,7 +42,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   @override
   Widget build(BuildContext context) {
     var postsProvider = Provider.of<Posts>(context, listen: true);
-
     return Scaffold(
         appBar: buildNavBar(
             context: context,
@@ -90,6 +90,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   : null,
               hasTraining: false,
               hasReacted: postsProvider.wallPosts[index - 1].hasReacted,
+              userId: this.widget.id,
             );
           },
         ));

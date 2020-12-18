@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:dzikbook/providers/user_data.dart';
 import 'package:dzikbook/screens/user_settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 class UserProfileInfo extends StatefulWidget {
   final String userName, userImg;
@@ -24,14 +26,17 @@ class _UserProfileInfoState extends State<UserProfileInfo> {
   final picker = ImagePicker();
   Future getImage() async {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
-
-    setState(() {
-      if (pickedFile != null) {
-        _image = File(pickedFile.path);
-      } else {
-        print('No image selected.');
-      }
-    });
+    if (pickedFile != null) {
+      Provider.of<UserData>(context, listen: false)
+          .changeProfilePicture(File(pickedFile.path))
+          .then((res) {
+        if (res) {
+          setState(() {
+            _image = File(pickedFile.path);
+          });
+        }
+      });
+    }
   }
 
   @override
@@ -47,7 +52,10 @@ class _UserProfileInfoState extends State<UserProfileInfo> {
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(5)),
                   image: DecorationImage(
-                      image: NetworkImage(this.widget.userImg),
+                      image: NetworkImage(this.widget.rootUser
+                          ? Provider.of<UserData>(context, listen: false)
+                              .imageUrl
+                          : this.widget.userImg),
                       fit: BoxFit.cover,
                       alignment: Alignment.center)),
               child: this.widget.rootUser

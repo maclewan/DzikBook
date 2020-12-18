@@ -7,7 +7,6 @@ import 'package:dzikbook/models/config.dart';
 import 'package:flutter/widgets.dart';
 import 'package:dzikbook/models/PostFetcher.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:intl/intl.dart';
 
 class Credentials {
   String userName;
