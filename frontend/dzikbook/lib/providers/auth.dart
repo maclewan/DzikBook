@@ -64,7 +64,7 @@ class Auth with ChangeNotifier {
         _refreshToken = responseData['refresh'];
         _expiryDate = DateTime.now().add(
           Duration(
-            seconds: 120,
+            seconds: 3600,
           ),
         );
         _autoTokenRefresh();
@@ -135,7 +135,7 @@ class Auth with ChangeNotifier {
       _refreshToken = responseData['refresh'];
       _expiryDate = DateTime.now().add(
         Duration(
-          seconds: 120,
+          seconds: 3600,
         ),
       );
       _autoTokenRefresh();

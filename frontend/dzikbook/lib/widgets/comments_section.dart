@@ -2,14 +2,17 @@ import 'dart:math';
 
 import 'package:dzikbook/models/CommentModel.dart';
 import 'package:dzikbook/models/dummyData.dart';
+import 'package:dzikbook/providers/posts.dart';
+import 'package:dzikbook/providers/user_data.dart';
 import 'package:dzikbook/widgets/add_comment.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class CommentsSection extends StatefulWidget {
   final List<CommentModel> comments;
-
-  CommentsSection(this.comments);
+  final String postId;
+  CommentsSection(this.comments, this.postId);
 
   @override
   _CommentsSectionState createState() => _CommentsSectionState();
@@ -20,19 +23,25 @@ class _CommentsSectionState extends State<CommentsSection> {
   final ItemPositionsListener itemPositionsListener =
       ItemPositionsListener.create();
 
-  void _addComment(String desc) {
-    this.setState(() {
-      this.widget.comments.add(
-            new CommentModel(
-              description: desc,
-              imgSource: mainUserImage,
-            ),
-          );
-      if (this.widget.comments.length != 1) {
-        itemScrollController.scrollTo(
-            index: this.widget.comments.length,
-            duration: Duration(milliseconds: 500));
-      }
+  Future<void> _addComment(String desc) async {
+    Provider.of<Posts>(context, listen: false)
+        .addComment(this.widget.postId, desc)
+        .then((added) {
+      if (!added) return;
+      this.setState(() {
+        this.widget.comments.add(
+              new CommentModel(
+                description: desc,
+                imgSource:
+                    Provider.of<UserData>(context, listen: false).imageUrl,
+              ),
+            );
+        if (this.widget.comments.length != 1) {
+          itemScrollController.scrollTo(
+              index: this.widget.comments.length,
+              duration: Duration(milliseconds: 500));
+        }
+      });
     });
   }
 

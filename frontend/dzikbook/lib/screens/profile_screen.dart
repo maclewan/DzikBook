@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 import 'package:dzikbook/widgets/add_post.dart';
 import 'package:dzikbook/widgets/post.dart';
+import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import '../models/dummyData.dart';
 
@@ -18,6 +19,12 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<Posts>(context, listen: false).loadMore();
+  }
+
   @override
   Widget build(BuildContext context) {
     var postsProvider = Provider.of<Posts>(context, listen: true);
@@ -52,7 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             return Post(
               description: postsProvider.wallPosts[index - 1].description,
-              id: index.toString(),
+              id: postsProvider.wallPosts[index - 1].id,
               timeTaken: postsProvider.wallPosts[index - 1].timeTaken,
               userName: postsProvider.wallPosts[index - 1].userName,
               comments: postsProvider.wallPosts[index - 1].comments,

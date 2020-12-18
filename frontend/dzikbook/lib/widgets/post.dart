@@ -139,7 +139,7 @@ class Post extends StatelessWidget {
                 ),
           if (this.hasTraining) WorkoutPost(workout: this.traning),
           ReactionsSections(likes: this.likes),
-          CommentsSection(this.comments),
+          CommentsSection(this.comments, this.id),
         ],
       ),
     );
