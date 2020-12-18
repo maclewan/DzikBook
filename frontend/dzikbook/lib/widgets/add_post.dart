@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:dzikbook/models/config.dart';
 import 'package:dzikbook/providers/posts.dart';
+import 'package:dzikbook/providers/user_data.dart';
 import 'package:dzikbook/providers/workouts.dart';
 import 'package:dzikbook/screens/workout_list_screen.dart';
 import 'package:flutter/material.dart';
@@ -8,9 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class AddPost extends StatefulWidget {
-  final String userImage;
-
-  const AddPost(this.userImage);
+  const AddPost();
 
   @override
   _AddPostState createState() => _AddPostState();
@@ -56,6 +56,7 @@ class _AddPostState extends State<AddPost> {
 
   @override
   Widget build(BuildContext context) {
+    var userImageProvider = Provider.of<UserData>(context, listen: true);
     return Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
@@ -79,7 +80,9 @@ class _AddPostState extends State<AddPost> {
                           topLeft: Radius.circular(10),
                         ),
                         child: Image.network(
-                          this.widget.userImage,
+                          userImageProvider.imageUrl != null
+                              ? userImageProvider.imageUrl
+                              : defaultPhotoUrl,
                           height: double.infinity,
                           fit: BoxFit.cover,
                         ),
@@ -141,17 +144,35 @@ class _AddPostState extends State<AddPost> {
                             {
                               this._imageNotNull
                                   ? Provider.of<Posts>(context, listen: false)
-                                      .addPost(myController.text, _image, true,
-                                          false, null)
+                                      .addPost(
+                                          myController.text,
+                                          _image,
+                                          true,
+                                          false,
+                                          null,
+                                          '${userImageProvider.name} ${userImageProvider.lastName}',
+                                          userImageProvider.imageUrl)
                                   : this._workoutNotNull
                                       ? Provider.of<Posts>(context,
                                               listen: false)
-                                          .addPost(myController.text, null,
-                                              false, true, _workout)
+                                          .addPost(
+                                              myController.text,
+                                              null,
+                                              false,
+                                              true,
+                                              _workout,
+                                              '${userImageProvider.name} ${userImageProvider.lastName}',
+                                              userImageProvider.imageUrl)
                                       : Provider.of<Posts>(context,
                                               listen: false)
-                                          .addPost(myController.text, null,
-                                              false, false, null),
+                                          .addPost(
+                                              myController.text,
+                                              null,
+                                              false,
+                                              false,
+                                              null,
+                                              '${userImageProvider.name} ${userImageProvider.lastName}',
+                                              userImageProvider.imageUrl),
                             },
                           this._image = null,
                           this._workout = null,

@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:async';
 // import 'package:universal_html/html.dart';
 import 'package:dio/dio.dart';
+import 'package:dzikbook/models/config.dart';
 
 import 'package:flutter/widgets.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:universal_html/prefer_universal/html.dart';
 
@@ -34,7 +34,7 @@ class Auth with ChangeNotifier {
 
   Future<void> _authentication(String password, String email, String urlSegment,
       String firstName, String lastName) async {
-    final url = "http://10.0.3.2:8000/auth/$urlSegment/";
+    final url = "$apiUrl/auth/$urlSegment/";
 
     Map<String, dynamic> body = {
       'email': email,
@@ -64,7 +64,7 @@ class Auth with ChangeNotifier {
         _refreshToken = responseData['refresh'];
         _expiryDate = DateTime.now().add(
           Duration(
-            seconds: 3600,
+            seconds: 120,
           ),
         );
         _autoTokenRefresh();
@@ -114,7 +114,7 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> refreshToken() async {
-    final url = 'http://10.0.3.2:8000/auth/login/refresh/';
+    final url = '$apiUrl/auth/login/refresh/';
     Map<String, dynamic> body = {
       'refresh': _refreshToken,
     };
@@ -135,7 +135,7 @@ class Auth with ChangeNotifier {
       _refreshToken = responseData['refresh'];
       _expiryDate = DateTime.now().add(
         Duration(
-          seconds: 3600,
+          seconds: 120,
         ),
       );
       _autoTokenRefresh();

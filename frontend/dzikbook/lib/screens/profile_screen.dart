@@ -21,7 +21,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     var postsProvider = Provider.of<Posts>(context, listen: true);
-    Provider.of<UserData>(context).getUserData();
+    Provider.of<UserData>(context, listen: false).getUserData();
+
     return Scaffold(
         appBar: buildNavBar(
             context: context,
@@ -32,7 +33,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ? postsProvider.wallPostsCount + 1
               : postsProvider.wallPostsCount,
           itemBuilder: (BuildContext context, int index) {
-            if (index == 0) return AddPost(mainUserImage);
+            if (index == 0) return AddPost();
             if (index >= postsProvider.wallPostsCount) {
               if (!postsProvider.isLoading) {
                 postsProvider.loadMore();

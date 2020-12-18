@@ -1,7 +1,19 @@
+import 'dart:convert';
+import 'package:dio/dio.dart';
+import 'package:dzikbook/models/HttpException.dart';
+import 'dart:async';
+import 'package:dzikbook/models/config.dart';
+import 'package:dzikbook/widgets/post.dart';
+import 'package:flutter/widgets.dart';
 import 'package:dzikbook/models/PostFetcher.dart';
-import 'package:dzikbook/models/dummyData.dart';
 import 'package:dzikbook/providers/workouts.dart';
 import 'package:flutter/cupertino.dart';
+
+class Credentials {
+  String userName;
+  String lastName;
+  Credentials(this.userName, this.lastName);
+}
 
 class Posts with ChangeNotifier {
   List<PostModel> _posts = [
@@ -104,7 +116,7 @@ class Posts with ChangeNotifier {
   String refreshToken;
   bool _isLoading = false;
   bool _hasMore = true;
-
+  Dio dio = new Dio();
   bool get isLoading => _isLoading;
   bool get hasMore => _hasMore;
 
@@ -126,22 +138,95 @@ class Posts with ChangeNotifier {
     });
   }
 
-  void addPost(postDescription, _file, hasImg, hasTraining, training) {
-    _posts.insert(
-        0,
-        new PostModel(
-          hasImage: hasImg,
-          hasTraining: hasTraining,
-          loadedTraining: training,
-          description: postDescription,
-          id: "15",
-          timeTaken: "0m",
-          userName: mainUserName,
-          userImg: mainUserImage,
-          loadedImg: hasImg ? Image.file(_file) : null,
-          likes: 0,
-          comments: [],
-        ));
-    notifyListeners();
+  Future<Credentials> getCredentials(int userId) async {
+    final url = "$apiUrl/users/data/$userId/";
+    try {
+      final response = await dio.get(url,
+          options: Options(headers: {
+            "Authorization": "Bearer " + token,
+          }));
+      if (response.statusCode >= 400) {
+        throw HttpException("Operacja nie powiodła się!");
+      }
+
+      final Map parsed = response.data;
+      return Credentials(parsed["first_name"], parsed["last_name"]);
+    } catch (error) {
+      throw HttpException("Nie ma fotki!");
+    }
   }
+
+  Future<void> addPost(postDescription, file, hasImg, hasTraining, training,
+      username, userPhoto) async {
+    final url = "$apiUrl/wall/post/";
+    Map<String, dynamic> body = {
+      'description': postDescription,
+      'additional_data': json.encode(training),
+      'type': hasImg
+          ? 'media'
+          : hasTraining
+              ? 'training'
+              : 'text',
+    };
+    FormData formData = new FormData.fromMap(body);
+    if (hasImg)
+      formData.files.add(MapEntry(
+        "photo",
+        await MultipartFile.fromFile(file.path, filename: file.path),
+      ));
+    try {
+      final response = await dio.post(
+        url,
+        options: Options(
+          headers: {
+            "Accept": "application/json",
+            "Authorization": "Bearer " + token,
+          },
+        ),
+        data: formData,
+      );
+
+      if (response.statusCode >= 400) {
+        throw HttpException("Operacja nie powiodła się!");
+      }
+      final Map parsed = response.data;
+      PostModel post = PostModel(
+          comments: [],
+          description: parsed["description"],
+          id: parsed["post_id"].toString(),
+          userImg: userPhoto,
+          userName: username,
+          timeTaken: "0",
+          hasImage: parsed["photo"] == null ? false : true,
+          hasTraining: false,
+          loadedImg: parsed["photo"] == null
+              ? null
+              : Image.network('$apiUrl${parsed["photo"]}'),
+          likes: 1);
+      print(post.toString());
+      _posts.insert(0, post);
+      notifyListeners();
+    } catch (error) {
+      throw HttpException("Operacja nie powiodła się!");
+    }
+  }
+
+//   void addPost(postDescription, file, hasImg, hasTraining, training) {
+//     _posts.insert(
+//         0,
+//         new PostModel(
+//           hasImage: hasImg,
+//           hasTraining: hasTraining,
+//           loadedTraining: training,
+//           description: postDescription,
+//           id: "15",
+//           timeTaken: "0m",
+//           userName: mainUserName,
+//           userImg: mainUserImage,
+//           loadedImg: hasImg ? Image.file(file) : null,
+//           likes: 0,
+//           comments: [],
+//         ));
+//     notifyListeners();
+//   }
 }
