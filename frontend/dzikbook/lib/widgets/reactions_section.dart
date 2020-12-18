@@ -28,14 +28,18 @@ class _ReactionsSectionsState extends State<ReactionsSections> {
             child: GestureDetector(
               onTap: () {
                 Provider.of<Posts>(context, listen: false)
-                    .handleReaction(this.widget.postId, this.widget.hasReacted);
-                this.setState(() {
-                  if (this.widget.hasReacted) {
-                    this.widget.likes--;
-                    this.widget.hasReacted = false;
-                  } else {
-                    this.widget.likes++;
-                    this.widget.hasReacted = true;
+                    .handleReaction(this.widget.postId, this.widget.hasReacted)
+                    .then((value) {
+                  if (value) {
+                    this.setState(() {
+                      if (this.widget.hasReacted) {
+                        this.widget.likes--;
+                        this.widget.hasReacted = false;
+                      } else {
+                        this.widget.likes++;
+                        this.widget.hasReacted = true;
+                      }
+                    });
                   }
                 });
               },
