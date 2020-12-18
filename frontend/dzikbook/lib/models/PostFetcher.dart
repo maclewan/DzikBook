@@ -16,6 +16,7 @@ class PostModel {
   final int likes;
   final bool hasImage;
   final bool hasTraining;
+  final bool hasReacted;
   final Workout loadedTraining;
 
   PostModel(
@@ -26,6 +27,7 @@ class PostModel {
       @required this.timeTaken,
       @required this.hasImage,
       @required this.hasTraining,
+      @required this.hasReacted,
       this.loadedImg,
       this.comments,
       this.loadedTraining,

@@ -1,17 +1,20 @@
+import 'package:dzikbook/providers/posts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 class ReactionsSections extends StatefulWidget {
   int likes;
-  ReactionsSections({this.likes});
+  String postId;
+  bool hasReacted;
+  ReactionsSections(
+      {@required this.postId, @required this.likes, @required this.hasReacted});
 
   @override
   _ReactionsSectionsState createState() => _ReactionsSectionsState();
 }
 
 class _ReactionsSectionsState extends State<ReactionsSections> {
-  bool hasReacted = false;
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -24,18 +27,20 @@ class _ReactionsSectionsState extends State<ReactionsSections> {
             padding: const EdgeInsets.all(10.0),
             child: GestureDetector(
               onTap: () {
+                Provider.of<Posts>(context, listen: false)
+                    .handleReaction(this.widget.postId, this.widget.hasReacted);
                 this.setState(() {
-                  if (this.hasReacted) {
+                  if (this.widget.hasReacted) {
                     this.widget.likes--;
-                    this.hasReacted = false;
+                    this.widget.hasReacted = false;
                   } else {
                     this.widget.likes++;
-                    this.hasReacted = true;
+                    this.widget.hasReacted = true;
                   }
                 });
               },
               child: SvgPicture.asset(
-                'assets/images/${this.hasReacted ? 'dzik_reaction.svg' : 'dzik_reaction_outlined.svg'}',
+                'assets/images/${this.widget.hasReacted ? 'dzik_reaction.svg' : 'dzik_reaction_outlined.svg'}',
                 width: 20,
                 height: 20,
               ),

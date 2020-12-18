@@ -16,11 +16,13 @@ class Post extends StatelessWidget {
   final Image loadedImg;
   final bool hasImage;
   final bool hasTraining;
+  final bool hasReacted;
   final Workout traning;
   final List<CommentModel> comments;
   final int likes;
   final bool clickable;
   const Post({
+    @required this.hasReacted,
     @required this.id,
     @required this.userName,
     @required this.description,
@@ -37,6 +39,7 @@ class Post extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('Post o ID ${this.id} ma ${this.likes} lajków');
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
       decoration: BoxDecoration(
@@ -138,7 +141,11 @@ class Post extends StatelessWidget {
                   },
                 ),
           if (this.hasTraining) WorkoutPost(workout: this.traning),
-          ReactionsSections(likes: this.likes),
+          ReactionsSections(
+            likes: this.likes,
+            postId: this.id,
+            hasReacted: this.hasReacted,
+          ),
           CommentsSection(this.comments, this.id),
         ],
       ),

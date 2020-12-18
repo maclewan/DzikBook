@@ -51,16 +51,16 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider(
             create: (context) => DayPlans(),
           ),
-          ChangeNotifierProxyProvider<Auth, Posts>(
-            create: (_) => Posts(),
-            update: (_, auth, posts) => posts
-              ..token = auth.token
-              ..refreshToken = auth.getRefreshToken,
-          ),
           ChangeNotifierProxyProvider<Auth, UserData>(
             create: (_) => UserData(),
             update: (_, auth, userData) => userData..update(auth),
           ),
+          ChangeNotifierProxyProvider<UserData, Posts>(
+              create: (_) => Posts(),
+              update: (_, userData, posts) => posts
+                ..token = userData.token
+                ..refreshToken = userData.refreshToken
+                ..userId = userData.id),
         ],
         child: Consumer<Auth>(
           builder: (ctx, auth, _) => MaterialApp(

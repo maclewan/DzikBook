@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 
 class UserData with ChangeNotifier {
   String _name;
+  String _id;
   String _lastName;
   String _imageUrl;
   String _gym;
@@ -27,6 +28,7 @@ class UserData with ChangeNotifier {
   String get birthDate => _birthDate;
   String get sex => _sex;
   String get job => _job;
+  String get id => _id;
 
   void update(Auth auth) {
     token = auth.token;
@@ -53,7 +55,7 @@ class UserData with ChangeNotifier {
       this._gym = parsed["gym"];
       this._sex = parsed["sex"];
       this._job = parsed["job"];
-
+      this._id = parsed["user"].toString();
       final imageResponse = await dio.get(imgUrl,
           options: Options(headers: {
             "Authorization": "Bearer " + token,

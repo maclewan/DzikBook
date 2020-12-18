@@ -4,10 +4,8 @@ import 'package:dzikbook/models/CommentModel.dart';
 import 'package:dzikbook/models/HttpException.dart';
 import 'dart:async';
 import 'package:dzikbook/models/config.dart';
-import 'package:dzikbook/widgets/post.dart';
 import 'package:flutter/widgets.dart';
 import 'package:dzikbook/models/PostFetcher.dart';
-import 'package:dzikbook/providers/workouts.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 
@@ -19,9 +17,10 @@ class Credentials {
 }
 
 class Posts with ChangeNotifier {
+  String userId;
   List<PostModel> _posts = [];
   static String formatDuration(Duration d) {
-    var seconds = d.inSeconds;
+    var seconds = -d.inSeconds;
     final days = seconds ~/ Duration.secondsPerDay;
     seconds -= days * Duration.secondsPerDay;
     final hours = seconds ~/ Duration.secondsPerHour;
@@ -69,6 +68,22 @@ class Posts with ChangeNotifier {
       }
       notifyListeners();
     });
+  }
+
+  Future<List> getPostReactions(int postId) async {
+    final url = "$apiUrl/socials/reactions/$postId";
+    try {
+      final response = await dio.get(url,
+          options: Options(headers: {
+            "Authorization": "Bearer " + token,
+          }));
+      final List r = response.data;
+      List<int> reactions = [for (final i in r) i["user_id"]];
+      return reactions;
+    } catch (error) {
+      print(error);
+      return [];
+    }
   }
 
   Future<List<CommentModel>> fetchPostComments(int postId) async {
@@ -153,6 +168,35 @@ class Posts with ChangeNotifier {
     }
   }
 
+  Future<bool> handleReaction(String postId, bool hasReacted) async {
+    final url = "$apiUrl/socials/reactions/$postId/";
+    if (hasReacted) {
+      try {
+        final response = await dio.delete(url,
+            options: Options(headers: {
+              "Authorization": "Bearer " + token,
+            }));
+        print(response);
+        return true;
+      } catch (error) {
+        print(error);
+        return false;
+      }
+    } else {
+      try {
+        final response = await dio.post(url,
+            options: Options(headers: {
+              "Authorization": "Bearer " + token,
+            }));
+        print(response);
+        return true;
+      } catch (error) {
+        print(error);
+        return false;
+      }
+    }
+  }
+
   Future<List<PostModel>> fetchMainPosts(int counter) async {
     final url = "$apiUrl/wall/main?amount=$counter&offset=$postsCount";
     postsCount += counter;
@@ -170,30 +214,37 @@ class Posts with ChangeNotifier {
       await Future.wait([
         for (final r in parsedList)
           fetchPostComments(r["post_id"]).then((comments) async {
-            await getCredentials(r["author"]).then((creds) {
-              final format = DateFormat('yyyy-MM-DDTHH:mm:ss');
-              // print(r["timestamp"]);
-              Duration timeDuration =
-                  format.parse(r["timestamp"]).difference(DateTime.now());
-              String time = formatDuration(timeDuration);
-              int secondsTaken = timeDuration.inSeconds;
-              PostModel post = new PostModel(
-                  secondsTaken: secondsTaken,
-                  description: r["description"],
-                  id: r["post_id"].toString(),
-                  userImg: creds.userImg,
-                  userName: "${creds.userName} ${creds.lastName}",
-                  timeTaken: time,
-                  hasImage: r["photo"] != null ? true : false,
-                  hasTraining: false,
-                  comments: comments,
-                  loadedTraining: null,
-                  loadedImg: r["photo"] != null
-                      ? Image.network('$apiUrl${r["photo"]}')
-                      : null,
-                  likes: 0);
-              posts.add(post);
-              // print(posts.toString());
+            await getPostReactions(r["post_id"]).then((reactions) async {
+              await getCredentials(r["author"]).then((creds) {
+                final format = DateFormat('yyyy-MM-DDTHH:mm:ss');
+                // print(r["timestamp"]);
+                Duration timeDuration =
+                    DateTime.now().difference(format.parse(r["timestamp"]));
+                String time = formatDuration(timeDuration);
+                int secondsTaken = timeDuration.inSeconds;
+                print(reactions);
+                print(this.userId);
+                print(reactions.contains(int.parse(this.userId)));
+                print("_" * 15);
+                PostModel post = new PostModel(
+                    hasReacted: reactions.contains(int.parse(this.userId)),
+                    secondsTaken: secondsTaken,
+                    description: r["description"],
+                    id: r["post_id"].toString(),
+                    userImg: creds.userImg,
+                    userName: "${creds.userName} ${creds.lastName}",
+                    timeTaken: time,
+                    hasImage: r["photo"] != null ? true : false,
+                    hasTraining: false,
+                    comments: comments,
+                    loadedTraining: null,
+                    loadedImg: r["photo"] != null
+                        ? Image.network('$apiUrl${r["photo"]}')
+                        : null,
+                    likes: reactions.length);
+                posts.add(post);
+                // print(posts.toString());
+              });
             });
           })
       ]);

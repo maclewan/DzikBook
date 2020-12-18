@@ -71,6 +71,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   : null,
               hasTraining: postsProvider.wallPosts[index - 1].hasTraining,
               traning: postsProvider.wallPosts[index - 1].loadedTraining,
+              hasReacted: postsProvider.wallPosts[index - 1].hasReacted,
             );
           },
         ));

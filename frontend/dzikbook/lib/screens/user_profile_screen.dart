@@ -112,6 +112,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   ? _posts[index - 1].loadedImg
                   : null,
               hasTraining: false,
+              hasReacted: _posts[index - 1].hasReacted,
             );
           },
         ));
