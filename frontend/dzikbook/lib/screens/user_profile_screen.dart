@@ -74,7 +74,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               );
             if (index >= postsProvider.wallPostsCount + 1) {
               if (!postsProvider.isLoading) {
-                postsProvider.loadMore(type: 1);
+                postsProvider.loadMore(
+                    type: this.widget.rootUser ? 1 : 2, userId: this.widget.id);
               }
               return Center(
                 child: Padding(
