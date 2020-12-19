@@ -15,7 +15,8 @@ class _FriendsListScreenState extends State<FriendsListScreen> {
   @override
   void initState() {
     final friendsProvider = Provider.of<Friends>(context, listen: false);
-    if (!friendsProvider.hasFetched) friendsProvider.fetchFriendsList();
+    friendsProvider.clearFriendList();
+    friendsProvider.fetchFriendsList();
     super.initState();
   }
 

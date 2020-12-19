@@ -86,7 +86,6 @@ class Friend extends StatelessWidget {
                                         userDataProvider
                                             .getAnotherUserData(this.userId)
                                             .then((data) {
-                                          print(data);
                                           Navigator.push(
                                               context,
                                               MaterialPageRoute(

@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:dzikbook/providers/friends.dart';
+import 'package:dzikbook/providers/search_people.dart';
 import 'package:dzikbook/providers/user_data.dart';
 import 'package:dzikbook/screens/user_settings_screen.dart';
 import 'package:flutter/material.dart';
@@ -7,11 +9,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class UserProfileInfo extends StatefulWidget {
-  final String userName, userImg;
+  final String userName, userImg, userId;
   final bool rootUser, isFriend;
   final int postsCount, trainingsCount, dietsCount;
   const UserProfileInfo({
     Key key,
+    @required this.userId,
     @required this.userImg,
     @required this.userName,
     @required this.rootUser,
@@ -218,10 +221,47 @@ class _UserProfileInfoState extends State<UserProfileInfo> {
                         ),
                         child: MaterialButton(
                           onPressed: () {
-                            this.widget.rootUser
-                                ? Navigator.of(context)
-                                    .pushNamed(UserSettingsScreeen.routeName)
-                                : print("test");
+                            if (this.widget.rootUser) {
+                              Navigator.of(context)
+                                  .pushNamed(UserSettingsScreeen.routeName);
+                            }
+                            if (this.widget.isFriend) {
+                              final friendsProvider =
+                                  Provider.of<Friends>(context, listen: false);
+                              friendsProvider
+                                  .deleteUserFromFriends(this.widget.userId)
+                                  .then((response) {
+                                print(response);
+                                Navigator.of(context).pop();
+                              });
+                            }
+                            if (!this.widget.isFriend) {
+                              final searchPeopleProvider =
+                                  Provider.of<SearchPeople>(context,
+                                      listen: false);
+                              searchPeopleProvider
+                                  .sendFriendRequest(this.widget.userId)
+                                  .then((response) {
+                                print(response);
+                                showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text('Zaproszenie'),
+                                        content: Text(
+                                            '${!response ? "BŁĄD! Nie zaproszono " : "Zaproszono "} do znajomych!'),
+                                        actions: [
+                                          TextButton(
+                                            child: Text('Zrozumiano'),
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                          ),
+                                        ],
+                                      );
+                                    }).then((_) => Navigator.of(context).pop());
+                              });
+                            }
                           },
                           height: double.infinity,
                           minWidth: double.infinity,

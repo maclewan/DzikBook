@@ -1,9 +1,8 @@
-import 'package:dzikbook/providers/friends.dart';
 import 'package:dzikbook/providers/search_people.dart';
+import 'package:dzikbook/providers/user_data.dart';
 import 'package:dzikbook/screens/user_profile_screen.dart';
 import 'package:dzikbook/widgets/navbar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_search_bar/flutter_search_bar.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
@@ -111,21 +110,71 @@ class _PersonsListScreenState extends State<PersonsListScreen> {
                                       Expanded(
                                         child: FlatButton(
                                             minWidth: double.infinity,
-                                            onPressed: () {},
+                                            onPressed: () {
+                                              searchPeopleProvider
+                                                  .sendFriendRequest(
+                                                      person.userId)
+                                                  .then((response) {
+                                                print(response);
+                                                showDialog(
+                                                    context: context,
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return AlertDialog(
+                                                        title:
+                                                            Text('Zaproszenie'),
+                                                        content: Text(
+                                                            '${!response ? "BŁĄD! Nie zaproszono " : "Zaproszono "} do znajomych!'),
+                                                        actions: [
+                                                          TextButton(
+                                                            child: Text(
+                                                                'Zrozumiano'),
+                                                            onPressed: () {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                            },
+                                                          ),
+                                                        ],
+                                                      );
+                                                    }).then((_) => Navigator.of(
+                                                        context)
+                                                    .pop());
+                                              });
+                                            },
                                             child: Text("Dodaj do znajomych")),
                                       ),
                                       Expanded(
                                         child: FlatButton(
                                             minWidth: double.infinity,
                                             onPressed: () {
-                                              final friendsProvider =
-                                                  Provider.of<Friends>(context,
+                                              final userDataProvider =
+                                                  Provider.of<UserData>(context,
                                                       listen: false);
-                                              friendsProvider
-                                                  .deleteUserFromFriends(
+                                              userDataProvider
+                                                  .getAnotherUserData(
                                                       person.userId)
-                                                  .then((response) {
-                                                Navigator.of(context).pop();
+                                                  .then((data) {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            UserProfileScreen(
+                                                              postsCount:
+                                                                  data.posts[0],
+                                                              trainingsCount:
+                                                                  data.posts[1],
+                                                              dietsCount:
+                                                                  data.posts[2],
+                                                              id: person.userId,
+                                                              friend:
+                                                                  data.isFriend,
+                                                              rootUser: false,
+                                                              userImage:
+                                                                  data.image,
+                                                              userName:
+                                                                  data.name,
+                                                            )));
                                               });
                                             },
                                             child: Text("Pokaż profil")),

@@ -30,8 +30,33 @@ class SearchPeople with ChangeNotifier {
     }
   }
 
+  Future<bool> sendFriendRequest(String userId) async {
+    final url = "$apiUrl/friends/request/$userId/";
+    final data = {
+      'user_id': userId,
+    };
+    final FormData formData = FormData.fromMap(data);
+    try {
+      final response = await dio.post(url,
+          options: Options(headers: {
+            "Authorization": "Bearer " + token,
+          }),
+          data: formData);
+
+      print(response);
+      _users.removeWhere((user) => user.userId == userId);
+      notifyListeners();
+      return true;
+    } catch (error) {
+      print(error);
+      print("Nie zaproszono znajomego");
+      return false;
+    }
+  }
+
   Future<void> searchPeopleList(String key) async {
-    final url = "$apiUrl/users/search?name=$key&amount=100&offset=0";
+    _users.clear();
+    final url = "$apiUrl/users/search?key=name&value=$key&amount=100&offset=0";
     print("zaczynam szukać przyjaciół!");
     try {
       final response = await dio.get(url,
@@ -43,7 +68,7 @@ class SearchPeople with ChangeNotifier {
         return;
       }
       print(response);
-      final List parsed = response.data["user_data_list"];
+      final List parsed = response.data["users_list"];
       await Future.wait([
         for (final id in parsed)
           getOtherUserImage(id["user_id"].toString()).then((response) {

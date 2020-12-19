@@ -75,26 +75,6 @@ class Friends with ChangeNotifier {
     }
   }
 
-  Future<bool> sendFriendRequest(String userId) async {
-    final url = "$apiUrl/friends/request/$userId/";
-    final data = {
-      'user_id': userId,
-    };
-    final FormData formData = FormData.fromMap(data);
-    try {
-      final response = await dio.post(url,
-          options: Options(headers: {
-            "Authorization": "Bearer " + token,
-          }),
-          data: formData);
-      return true;
-    } catch (error) {
-      print(error);
-      print("Nie zaproszono znajomego");
-      return false;
-    }
-  }
-
   Future<bool> denyFriendRequest(String invitationId) async {
     final imgUrl = "$apiUrl/friends/request/manage/$invitationId/";
     try {
