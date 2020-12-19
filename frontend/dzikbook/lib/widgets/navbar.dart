@@ -2,6 +2,7 @@ import 'package:dzikbook/providers/user_data.dart';
 import 'package:dzikbook/screens/calendar_plans_screen.dart';
 import 'package:dzikbook/screens/diet_list_screen.dart';
 import 'package:dzikbook/screens/friends_list_screen.dart';
+import 'package:dzikbook/screens/invitations_screen.dart';
 import 'package:dzikbook/screens/profile_screen.dart';
 import 'package:dzikbook/screens/search_people_screen.dart';
 import 'package:dzikbook/screens/user_profile_screen.dart';
@@ -93,6 +94,14 @@ AppBar buildNavBar(
               onPressed: () {
                 Navigator.of(context).pushReplacementNamed(
                     FriendsListScreen.routeName,
+                    arguments: false);
+              }),
+        if (routeName != InvitationsScreen.routeName)
+          IconButton(
+              icon: Icon(Icons.group_add),
+              onPressed: () {
+                Navigator.of(context).pushReplacementNamed(
+                    InvitationsScreen.routeName,
                     arguments: false);
               }),
       ]);
