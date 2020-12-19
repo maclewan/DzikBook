@@ -137,6 +137,22 @@ class UserDataView(APIView):
             return Response("User data doesnt exist!", status=status.HTTP_404_NOT_FOUND)
 
 
+class BasicUserDataView(APIView):
+    authentication_classes = []
+
+    @authenticate
+    def get(self, request, id):
+        try:
+            user_data = UserData.objects.get(user=id)
+            context = {
+                'first_name': user_data.first_name,
+                'last_name': user_data.last_name
+            }
+            return Response(context)
+        except models.ObjectDoesNotExist:
+            return Response("User data doesnt exist!", status=status.HTTP_404_NOT_FOUND)
+
+
 class SearchView(APIView):
     authentication_classes = []
 
