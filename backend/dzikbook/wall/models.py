@@ -17,6 +17,6 @@ class Post(models.Model):
     visibility = models.BooleanField(default=True)
     timestamp = models.DateTimeField(auto_now_add=True, null=True)
 
-    type = models.CharField(max_length=10, choices=[(tag, tag.value) for tag in PostTypes])
+    type = models.CharField(max_length=10, choices=[(tag.name.lower(), tag.value) for tag in PostTypes])
     photo = models.CharField(max_length=200, null=True, blank=True)
     additional_data = models.TextField(null=True)
