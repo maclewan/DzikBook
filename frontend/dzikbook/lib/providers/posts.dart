@@ -280,7 +280,7 @@ class Posts with ChangeNotifier {
   }
 
   Future<Credentials> getCredentials(int userId) async {
-    final url = "$apiUrl/users/data/$userId/";
+    final url = "$apiUrl/users/basic/$userId/";
     final imgUrl = "$apiUrl/media/profile/user/$userId/";
     Map parsed;
     String imageUrl;
@@ -301,7 +301,7 @@ class Posts with ChangeNotifier {
           throw HttpException("Operacja nie powiodła się!");
         }
         parsed = response.data;
-        imageUrl = apiUrl + imageResponse.data["photo"]["photo"];
+        imageUrl = apiUrl + imageResponse.data["downsized_photo"]["photo"];
       });
       return Credentials(parsed["first_name"], parsed["last_name"], imageUrl);
     } catch (error) {

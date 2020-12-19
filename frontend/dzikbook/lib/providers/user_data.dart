@@ -143,7 +143,7 @@ class UserData with ChangeNotifier {
   }
 
   Future<String> getOtherUserName(String userId) async {
-    final url = "$apiUrl/users/data/$userId/";
+    final url = "$apiUrl/users/basic/$userId/";
     try {
       final response = await dio.get(url,
           options: Options(headers: {
