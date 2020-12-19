@@ -91,7 +91,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             return Post(
               clickable: false,
               description: postsProvider.wallPosts[index - 1].description,
-              id: index.toString(),
+              id: postsProvider.wallPosts[index - 1].id,
               timeTaken: postsProvider.wallPosts[index - 1].timeTaken,
               userName: postsProvider.wallPosts[index - 1].userName,
               comments: postsProvider.wallPosts[index - 1].comments,
