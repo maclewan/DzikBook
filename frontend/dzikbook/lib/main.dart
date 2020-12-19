@@ -1,5 +1,7 @@
+import 'package:dzikbook/providers/friends.dart';
 import 'package:dzikbook/providers/posts.dart';
 import 'package:dzikbook/providers/user_data.dart';
+import 'package:dzikbook/screens/friends_list_screen.dart';
 import 'package:dzikbook/screens/user_settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -60,6 +62,10 @@ class MyApp extends StatelessWidget {
                 ..token = userData.token
                 ..refreshToken = userData.refreshToken
                 ..userId = userData.id),
+          ChangeNotifierProxyProvider<Auth, Friends>(
+            create: (_) => Friends(),
+            update: (_, auth, friends) => friends..token = auth.token,
+          )
         ],
         child: Consumer<Auth>(
           builder: (ctx, auth, _) => MaterialApp(
@@ -83,6 +89,7 @@ class MyApp extends StatelessWidget {
               CalendarPlansScreen.routeName: (ctx) => CalendarPlansScreen(),
               PersonsListScreen.routeName: (ctx) => PersonsListScreen(),
               UserSettingsScreeen.routeName: (ctx) => UserSettingsScreeen(),
+              FriendsListScreen.routeName: (ctx) => FriendsListScreen(),
             },
           ),
         ));

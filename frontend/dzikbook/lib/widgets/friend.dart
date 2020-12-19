@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class Friend extends StatelessWidget {
-  final String userImg, userName;
-  const Friend({this.userImg, this.userName});
+  final String userImg, userName, userId;
+  const Friend({this.userImg, this.userName, this.userId});
 
   @override
   Widget build(BuildContext context) {

@@ -18,6 +18,7 @@ class Credentials {
 class Posts with ChangeNotifier {
   String userId;
   List<PostModel> _posts = [];
+
   static String formatDuration(Duration d) {
     var seconds = d.inSeconds.abs();
     final days = seconds ~/ Duration.secondsPerDay;
@@ -95,7 +96,6 @@ class Posts with ChangeNotifier {
 
   Future<List<CommentModel>> fetchPostComments(int postId) async {
     final url = "$apiUrl/socials/comments/post/$postId/";
-    Stopwatch stopwatch = Stopwatch()..start();
     List<CommentModel> comments = [];
     try {
       final response = await dio.get(url,
