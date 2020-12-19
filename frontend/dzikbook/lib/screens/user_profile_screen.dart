@@ -64,6 +64,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           itemBuilder: (BuildContext context, int index) {
             if (index == 0)
               return UserProfileInfo(
+                postsCount: this.widget.postsCount,
+                trainingsCount: this.widget.trainingsCount,
+                dietsCount: this.widget.dietsCount,
                 userImg: this.widget.userImage,
                 userName: this.widget.userName,
                 rootUser: this.widget.rootUser,

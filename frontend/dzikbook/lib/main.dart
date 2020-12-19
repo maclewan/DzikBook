@@ -1,6 +1,5 @@
 import 'package:dzikbook/providers/posts.dart';
 import 'package:dzikbook/providers/user_data.dart';
-import 'package:dzikbook/screens/user_profile_screen.dart';
 import 'package:dzikbook/screens/user_settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -83,7 +82,6 @@ class MyApp extends StatelessWidget {
               AddDietScreen.routeName: (ctx) => AddDietScreen(),
               CalendarPlansScreen.routeName: (ctx) => CalendarPlansScreen(),
               PersonsListScreen.routeName: (ctx) => PersonsListScreen(),
-              UserProfileScreen.routeName: (ctx) => UserProfileScreen(),
               UserSettingsScreeen.routeName: (ctx) => UserSettingsScreeen(),
             },
           ),

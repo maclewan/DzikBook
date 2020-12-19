@@ -9,13 +9,17 @@ import 'package:provider/provider.dart';
 class UserProfileInfo extends StatefulWidget {
   final String userName, userImg;
   final bool rootUser, isFriend;
-  const UserProfileInfo(
-      {Key key,
-      @required this.userImg,
-      @required this.userName,
-      @required this.rootUser,
-      @required this.isFriend})
-      : super(key: key);
+  final int postsCount, trainingsCount, dietsCount;
+  const UserProfileInfo({
+    Key key,
+    @required this.userImg,
+    @required this.userName,
+    @required this.rootUser,
+    @required this.isFriend,
+    @required this.postsCount,
+    @required this.trainingsCount,
+    @required this.dietsCount,
+  }) : super(key: key);
 
   @override
   _UserProfileInfoState createState() => _UserProfileInfoState();
@@ -138,7 +142,7 @@ class _UserProfileInfoState extends State<UserProfileInfo> {
                                   color: Colors.white,
                                 ),
                               ),
-                              Text("15",
+                              Text(this.widget.postsCount.toString(),
                                   style: TextStyle(
                                     color: Colors.white,
                                   )),
@@ -167,7 +171,7 @@ class _UserProfileInfoState extends State<UserProfileInfo> {
                                 color: Colors.white,
                               ),
                             ),
-                            Text("15",
+                            Text(this.widget.trainingsCount.toString(),
                                 style: TextStyle(
                                   color: Colors.white,
                                 )),
@@ -195,7 +199,7 @@ class _UserProfileInfoState extends State<UserProfileInfo> {
                                 color: Colors.white,
                               ),
                             ),
-                            Text("15",
+                            Text(this.widget.dietsCount.toString(),
                                 style: TextStyle(
                                   color: Colors.white,
                                 )),

@@ -89,8 +89,6 @@ class UserData with ChangeNotifier {
         postsCounts.add(pTraining.length);
         postsCounts.add(pDiets.length);
       });
-      print(postsCounts);
-      print("XDDD");
       return postsCounts;
     } catch (error) {
       print(error);
@@ -183,7 +181,6 @@ class UserData with ChangeNotifier {
         getOtherUserFriendStatus(userId),
         getUserPostsCount(userId),
       ]).then((values) {
-        print(values);
         _userPostData =
             _UserPostData(values[0], values[1], values[2], values[3]);
       });
