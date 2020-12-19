@@ -224,8 +224,7 @@ class _UserProfileInfoState extends State<UserProfileInfo> {
                             if (this.widget.rootUser) {
                               Navigator.of(context)
                                   .pushNamed(UserSettingsScreeen.routeName);
-                            }
-                            if (this.widget.isFriend) {
+                            } else if (this.widget.isFriend) {
                               final friendsProvider =
                                   Provider.of<Friends>(context, listen: false);
                               friendsProvider
@@ -234,8 +233,7 @@ class _UserProfileInfoState extends State<UserProfileInfo> {
                                 print(response);
                                 Navigator.of(context).pop();
                               });
-                            }
-                            if (!this.widget.isFriend) {
+                            } else if (!this.widget.isFriend) {
                               final searchPeopleProvider =
                                   Provider.of<SearchPeople>(context,
                                       listen: false);
