@@ -17,6 +17,9 @@ from .utils import convert_bdate
 
 
 class SignedInUserDataView(APIView):
+    """
+    Get this user data
+    """
     authentication_classes = []
 
     @authenticate
@@ -69,6 +72,14 @@ class SignedInUserDataView(APIView):
             data = json.loads(json.dumps(request.POST))
             data['user'] = user_id
 
+            # convert birth date
+            b_date = data['birth_date']
+            b_date = convert_bdate(b_date)
+            if not b_date:
+                return Response("Invalid date format provided! Required: dd/MM/yyyy",
+                                status=status.HTTP_400_BAD_REQUEST)
+            data['birth_date'] = b_date
+
             data_serializer = UserDataSerializer(data=data)
 
             if not data_serializer.is_valid():
@@ -79,7 +90,7 @@ class SignedInUserDataView(APIView):
         except models.ObjectDoesNotExist:
             return Response("User data doesn't exist!", status=status.HTTP_404_NOT_FOUND)
 
-        context = {'message': 'Data successfully updated', 'user_data': UserDataSerializer(user_data).data}
+        context = {'message': 'Data successfully updated', 'user_data': data_serializer.data}
         return Response(context)
 
     @authenticate
