@@ -96,6 +96,52 @@ class UserData with ChangeNotifier {
     }
   }
 
+  Future<void> changeUserData(
+      {String newGym,
+      String newSex,
+      String newBirthDate,
+      String newJob}) async {
+    final url = "$apiUrl/users/data/";
+    final data = {
+      'gym': newGym,
+      'additional_data': this._additionalData,
+      'first_name': this._name,
+      'last_name': this._lastName,
+      'sex': newSex,
+      'job': newJob,
+      'birth_date': newBirthDate,
+    };
+    FormData formData = FormData.fromMap(data);
+    try {
+      await dio
+          .put(url,
+              data: formData,
+              options: Options(headers: {
+                "Authorization": "Bearer " + token,
+              }))
+          .then((response) {
+        if (response.statusCode >= 400) {
+          print("BŁĄD ${response.statusCode} - ${response.statusMessage}");
+        }
+        final Map parsed = response.data["user_data"];
+
+        this._name = parsed["first_name"];
+        this._lastName = parsed["last_name"];
+        this._additionalData = parsed["additional_data"];
+        this._birthDate = parsed["birth_date"];
+        this._gym = parsed["gym"];
+        this._sex = parsed["sex"];
+        this._job = parsed["job"];
+        notifyListeners();
+      });
+
+      // final Map parsedImg = json.decode(imageResponse.data);
+      // print(parsedImg);
+    } catch (error) {
+      throw HttpException("Nie ma fotki!");
+    }
+  }
+
   Future<String> getOtherUserName(String userId) async {
     final url = "$apiUrl/users/data/$userId/";
     try {
@@ -213,7 +259,7 @@ class UserData with ChangeNotifier {
         final Map parsed = response.data;
         this._name = parsed["first_name"];
         this._lastName = parsed["last_name"];
-        this._additionalData = parsed["additionalData"];
+        this._additionalData = parsed["additional_data"];
         this._birthDate = parsed["birth_date"];
         this._gym = parsed["gym"];
         this._sex = parsed["sex"];

@@ -15,18 +15,16 @@ class UserSettingsInfo extends StatelessWidget {
   final String propTitle, propDescription;
   final bool notEmpty;
   final DialogInfo dialogInfo;
-  final void Function(void Function(int, String), BuildContext, String, String,
-      String, String, String) editSetting;
-  final void Function(int, String) updateState;
-  const UserSettingsInfo(
-      {Key key,
-      this.propTitle,
-      this.propDescription,
-      this.notEmpty,
-      this.editSetting,
-      this.dialogInfo,
-      this.updateState})
-      : super(key: key);
+  final void Function(BuildContext, String, String, String, String, String)
+      editSetting;
+  const UserSettingsInfo({
+    Key key,
+    this.propTitle,
+    this.propDescription,
+    this.notEmpty,
+    this.editSetting,
+    this.dialogInfo,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +38,6 @@ class UserSettingsInfo extends StatelessWidget {
         ),
         onPressed: () {
           editSetting(
-              this.updateState,
               context,
               this.dialogInfo.title,
               this.dialogInfo.currLabel,
@@ -50,29 +47,5 @@ class UserSettingsInfo extends StatelessWidget {
         },
       ),
     );
-    // return !this.notEmpty
-    //     ? Column(
-    //         mainAxisAlignment: MainAxisAlignment.start,
-    //         crossAxisAlignment: CrossAxisAlignment.start,
-    //         children: [
-    //           Text(this.propTitle,
-    //               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
-    //           FlatButton(
-    //               onPressed: () {},
-    //               child: Row(
-    //                   mainAxisAlignment: MainAxisAlignment.start,
-    //                   crossAxisAlignment: CrossAxisAlignment.center,
-    //                   children: [
-    //                     Icon(
-    //                       Icons.add,
-    //                       color: Colors.green,
-    //                     ),
-    //                     Text(this.propDescription,
-    //                         style: TextStyle(
-    //                             fontSize: 14, color: Colors.grey[600]))
-    //                   ]))
-    //         ],
-    //       )
-    //     : Container();
   }
 }

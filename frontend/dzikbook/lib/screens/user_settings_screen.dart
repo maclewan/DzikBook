@@ -1,6 +1,8 @@
+import 'package:dzikbook/providers/user_data.dart';
 import 'package:dzikbook/widgets/navbar.dart';
 import 'package:dzikbook/widgets/user_settings_info.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class _SingleSettingInfo {
   String title;
@@ -33,24 +35,13 @@ class _UserSettingsScreeenState extends State<UserSettingsScreeen> {
     super.initState();
   }
 
-  void updateState(int id, String text) {
-    setState(() {
-      settings[id].description = text;
-      settings[id].notEmpty = text.length > 0;
-    });
-  }
-
-  void infoDialog(
-      void Function(int, String) updateState,
-      BuildContext context,
-      String title,
-      String currLabel,
-      String futureLabel,
-      String hintText,
-      String currState) {
+  void infoDialog(BuildContext context, String title, String currLabel,
+      String futureLabel, String hintText, String currState) {
     showDialog(
         context: context,
         builder: (_) {
+          final userDataProvider =
+              Provider.of<UserData>(context, listen: false);
           TextEditingController controller = new TextEditingController();
           return AlertDialog(
             title: Text(title),
@@ -86,25 +77,53 @@ class _UserSettingsScreeenState extends State<UserSettingsScreeen> {
                   int id;
                   switch (title) {
                     case "Siłownia":
-                      id = 0;
+                      userDataProvider
+                          .changeUserData(
+                              newGym: controller.text,
+                              newBirthDate: userDataProvider.birthDate,
+                              newJob: userDataProvider.job,
+                              newSex: userDataProvider.sex)
+                          .then((response) {
+                        Navigator.of(context).pop();
+                      });
                       break;
                     case "Data urodzenia":
-                      id = 1;
-                      break;
-                    case "Data pierwszego treningu":
-                      id = 2;
+                      userDataProvider
+                          .changeUserData(
+                              newGym: userDataProvider.gym,
+                              newBirthDate: controller.text,
+                              newJob: userDataProvider.job,
+                              newSex: userDataProvider.sex)
+                          .then((response) {
+                        Navigator.of(context).pop();
+                      });
                       break;
                     case "Płeć":
-                      id = 3;
+                      userDataProvider
+                          .changeUserData(
+                              newGym: userDataProvider.gym,
+                              newBirthDate: userDataProvider.birthDate,
+                              newJob: userDataProvider.job,
+                              newSex: controller.text)
+                          .then((response) {
+                        Navigator.of(context).pop();
+                      });
                       break;
                     case "Praca":
-                      id = 4;
+                      userDataProvider
+                          .changeUserData(
+                              newGym: userDataProvider.gym,
+                              newBirthDate: userDataProvider.birthDate,
+                              newJob: controller.text,
+                              newSex: userDataProvider.sex)
+                          .then((response) {
+                        Navigator.of(context).pop();
+                      });
                       break;
                     default:
-                      id = 0;
+                      Navigator.of(context).pop();
                   }
-                  updateState(id, controller.text);
-                  Navigator.of(context).pop();
+                  // updateState(id, controller.text);
                 },
               )
             ],
@@ -114,17 +133,26 @@ class _UserSettingsScreeenState extends State<UserSettingsScreeen> {
 
   @override
   Widget build(BuildContext context) {
+    final userDataProvider = Provider.of<UserData>(context, listen: true);
+    settings = [
+      _SingleSettingInfo("Nazwa siłowni", userDataProvider.gym,
+          userDataProvider.gym.length > 0),
+      _SingleSettingInfo("Data urodzenia", userDataProvider.birthDate,
+          userDataProvider.birthDate.length > 0),
+      _SingleSettingInfo(
+          "Płeć", userDataProvider.sex, userDataProvider.sex.length > 0),
+      _SingleSettingInfo(
+          "Nazwa firmy", userDataProvider.job, userDataProvider.job.length > 0),
+    ];
     dialogs = [
       DialogInfo("Siłownia", "Aktualna siłownia", "Nowa siłownia",
           "Podaj nazwę siłowni", settings[0].description),
       DialogInfo("Data urodzenia", "Aktualna data", "Nowa data",
           "Wprowadź datę DD/MM/RRRR", settings[1].description),
-      DialogInfo("Data pierwszego treningu", "Aktualna data", "Nowa data",
-          "Wprowadź datę DD/MM/RRRR", settings[2].description),
       DialogInfo("Płeć", "Aktualna płeć", "Nowa płeć", "Podaj płeć",
-          settings[3].description),
+          settings[2].description),
       DialogInfo("Praca", "Aktualna nazwa firmy", "Nowa nazwa firmy",
-          "Podaj nazwę firmy", settings[4].description),
+          "Podaj nazwę firmy", settings[3].description),
     ];
     return Scaffold(
       appBar: buildNavBar(context: context, routeName: '', title: ""),
@@ -149,7 +177,6 @@ class _UserSettingsScreeenState extends State<UserSettingsScreeen> {
             propTitle: settings[0].title,
             editSetting: infoDialog,
             dialogInfo: dialogs[0],
-            updateState: this.updateState,
           ),
           Divider(color: Colors.grey[600]),
           SizedBox(
@@ -166,7 +193,6 @@ class _UserSettingsScreeenState extends State<UserSettingsScreeen> {
             propTitle: settings[1].title,
             editSetting: infoDialog,
             dialogInfo: dialogs[1],
-            updateState: this.updateState,
           ),
           UserSettingsInfo(
             notEmpty: settings[2].notEmpty,
@@ -174,15 +200,6 @@ class _UserSettingsScreeenState extends State<UserSettingsScreeen> {
             propTitle: settings[2].title,
             editSetting: infoDialog,
             dialogInfo: dialogs[2],
-            updateState: this.updateState,
-          ),
-          UserSettingsInfo(
-            notEmpty: settings[3].notEmpty,
-            propDescription: settings[3].description,
-            propTitle: settings[3].title,
-            editSetting: infoDialog,
-            dialogInfo: dialogs[3],
-            updateState: this.updateState,
           ),
           Divider(color: Colors.grey[600]),
           SizedBox(
@@ -194,12 +211,11 @@ class _UserSettingsScreeenState extends State<UserSettingsScreeen> {
                 style: TextStyle(fontSize: 25, fontWeight: FontWeight.w500)),
           ),
           UserSettingsInfo(
-            notEmpty: settings[4].notEmpty,
-            propDescription: settings[4].description,
-            propTitle: settings[4].title,
+            notEmpty: settings[3].notEmpty,
+            propDescription: settings[3].description,
+            propTitle: settings[3].title,
             editSetting: infoDialog,
-            dialogInfo: dialogs[4],
-            updateState: this.updateState,
+            dialogInfo: dialogs[3],
           ),
           Divider(color: Colors.grey[600]),
           SizedBox(
