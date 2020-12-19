@@ -32,21 +32,27 @@ AppBar buildNavBar(
               onPressed: () {
                 final userDataProvider =
                     Provider.of<UserData>(context, listen: false);
-
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => UserProfileScreen(
-                      id: userDataProvider.id,
-                      friend: false,
-                      rootUser: true,
-                      userName: userDataProvider.name +
-                          " " +
-                          userDataProvider.lastName,
-                      userImage: userDataProvider.imageUrl,
+                userDataProvider
+                    .getUserPostsCount(userDataProvider.id)
+                    .then((List<int> posts) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => UserProfileScreen(
+                        postsCount: posts[0],
+                        trainingsCount: posts[1],
+                        dietsCount: posts[2],
+                        id: userDataProvider.id,
+                        friend: false,
+                        rootUser: true,
+                        userName: userDataProvider.name +
+                            " " +
+                            userDataProvider.lastName,
+                        userImage: userDataProvider.imageUrl,
+                      ),
                     ),
-                  ),
-                );
+                  );
+                });
               }),
         if (routeName != DietListScreen.routeName)
           IconButton(

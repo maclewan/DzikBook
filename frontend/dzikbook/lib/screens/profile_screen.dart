@@ -39,11 +39,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             routeName: ProfileScreen.routeName),
         body: ListView.builder(
           itemCount: postsProvider.hasMore
-              ? postsProvider.wallPostsCount + 1
-              : postsProvider.wallPostsCount,
+              ? postsProvider.wallPostsCount + 2
+              : postsProvider.wallPostsCount + 1,
           itemBuilder: (BuildContext context, int index) {
             if (index == 0) return AddPost();
-            if (index >= postsProvider.wallPostsCount) {
+            if (index >= postsProvider.wallPostsCount + 1) {
               if (!postsProvider.isLoading) {
                 postsProvider.loadMore(type: 0);
               }

@@ -16,12 +16,18 @@ class UserProfileScreen extends StatefulWidget {
   final bool rootUser;
   final bool friend;
   final String id;
+  final int postsCount;
+  final int dietsCount;
+  final int trainingsCount;
   const UserProfileScreen(
       {this.userImage = mainUserImage,
       this.userName = mainUserName,
       this.rootUser = true,
       this.friend = false,
-      this.id});
+      @required this.postsCount,
+      @required this.dietsCount,
+      @required this.trainingsCount,
+      @required this.id});
   @override
   _UserProfileScreenState createState() => _UserProfileScreenState();
 }
@@ -31,7 +37,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   void initState() {
     super.initState();
     Provider.of<Posts>(context, listen: false).restart();
-    Provider.of<Posts>(context, listen: false).loadMore(type: 1);
+    if (this.widget.rootUser) {
+      Provider.of<Posts>(context, listen: false).loadMore(type: 1);
+    } else
+      Provider.of<Posts>(context, listen: false)
+          .loadMore(type: 2, userId: this.widget.id);
   }
 
   @override
@@ -49,8 +59,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             title: 'Profil'),
         body: ListView.builder(
           itemCount: postsProvider.hasMore
-              ? postsProvider.wallPostsCount + 1
-              : postsProvider.wallPostsCount,
+              ? postsProvider.wallPostsCount + 2
+              : postsProvider.wallPostsCount + 1,
           itemBuilder: (BuildContext context, int index) {
             if (index == 0)
               return UserProfileInfo(
@@ -59,7 +69,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 rootUser: this.widget.rootUser,
                 isFriend: this.widget.friend,
               );
-            if (index >= postsProvider.wallPostsCount) {
+            if (index >= postsProvider.wallPostsCount + 1) {
               if (!postsProvider.isLoading) {
                 postsProvider.loadMore(type: 1);
               }

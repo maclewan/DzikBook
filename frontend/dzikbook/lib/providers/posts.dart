@@ -55,7 +55,7 @@ class Posts with ChangeNotifier {
 
   int get wallPostsCount => _posts.length;
 
-  void loadMore({int type, int userId = 0}) {
+  void loadMore({int type, String userId = ""}) {
     _isLoading = true;
     fetchMainPosts(counter: 10, type: type, userId: userId)
         .then((List<PostModel> fetchedPosts) {
@@ -116,8 +116,7 @@ class Posts with ChangeNotifier {
             comments.add(comment);
           })
       ]);
-      print(
-          "Fetchowanie ${comments.length} komentarzy dla posta $postId trwało ${stopwatch.elapsedMilliseconds}ms");
+
       comments.sort((a, b) {
         int aId = a.commentId;
         int bId = b.commentId;
@@ -205,11 +204,14 @@ class Posts with ChangeNotifier {
   }
 
   Future<List<PostModel>> fetchMainPosts(
-      {int counter, int type, int userId = 0}) async {
+      {int counter, int type, String userId}) async {
     var url;
     if (type == 0)
       url = "$apiUrl/wall/main?amount=$counter&offset=$postsCount";
-    else if (type == 1) url = "$apiUrl/wall?amount=$counter&offset=$postsCount";
+    else if (type == 1)
+      url = "$apiUrl/wall?amount=$counter&offset=$postsCount";
+    else if (type == 2)
+      url = "$apiUrl/wall/$userId?amount=$counter&offset=$postsCount";
     postsCount += counter;
     List<PostModel> posts = [];
     try {
@@ -236,10 +238,8 @@ class Posts with ChangeNotifier {
             DateTime old = (DateTime.parse(r["timestamp"]));
             // print(r["timestamp"]);
             Duration timeDuration = now.difference(old);
-            timeDuration -= Duration(hours: 5);
-            print(now);
-            print(old);
-            print("_" * 10);
+            timeDuration -= Duration(hours: 6);
+
             String time = formatDuration(timeDuration);
 
             int secondsTaken = timeDuration.inSeconds;

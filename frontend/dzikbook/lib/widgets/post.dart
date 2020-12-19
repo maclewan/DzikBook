@@ -66,28 +66,38 @@ class Post extends StatelessWidget {
                       final userDataProvider =
                           Provider.of<UserData>(context, listen: false);
                       if (this.userId == userDataProvider.id) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => UserProfileScreen(
-                              id: this.userId,
-                              friend: false,
-                              rootUser: true,
-                              userName: userDataProvider.name +
-                                  " " +
-                                  userDataProvider.lastName,
-                              userImage: userDataProvider.imageUrl,
-                            ),
-                          ),
-                        );
+                        userDataProvider
+                            .getUserPostsCount(this.userId)
+                            .then((List<int> posts) {
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => UserProfileScreen(
+                                  postsCount: posts[0],
+                                  trainingsCount: posts[1],
+                                  dietsCount: posts[2],
+                                  id: userDataProvider.id,
+                                  friend: false,
+                                  rootUser: true,
+                                  userName: userDataProvider.name +
+                                      " " +
+                                      userDataProvider.lastName,
+                                  userImage: userDataProvider.imageUrl,
+                                ),
+                              ));
+                        });
                       } else {
                         userDataProvider
                             .getAnotherUserData(this.userId)
                             .then((data) {
+                          print(data);
                           Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) => UserProfileScreen(
+                                        postsCount: data.posts[0],
+                                        trainingsCount: data.posts[1],
+                                        dietsCount: data.posts[2],
                                         id: this.userId,
                                         friend: data.isFriend,
                                         rootUser: false,
