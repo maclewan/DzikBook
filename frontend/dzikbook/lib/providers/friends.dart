@@ -35,6 +35,24 @@ class Friends with ChangeNotifier {
     }
   }
 
+  Future<bool> deleteUserFromFriends(String userId) async {
+    final url = "$apiUrl/friends/$userId/";
+    try {
+      final response = await dio.delete(url,
+          options: Options(headers: {
+            "Authorization": "Bearer " + token,
+          }));
+      print(response);
+      _friends.removeWhere((friend) => friend.userId == userId);
+      notifyListeners();
+      return true;
+    } catch (error) {
+      print(error);
+      print("Nie wywalono ze znajomych");
+      return false;
+    }
+  }
+
   Future<void> fetchFriendsList() async {
     final url = "$apiUrl/friends/list";
     print("zaczynam fetchować friends");
