@@ -224,41 +224,43 @@ class Posts with ChangeNotifier {
       Stopwatch stopwatch = new Stopwatch()..start();
       await Future.wait([
         for (final r in parsedList)
-          fetchPostComments(r["post_id"]).then((comments) async {
-            await getPostReactions(r["post_id"]).then((reactions) async {
-              await getCredentials(r["author"]).then((creds) {
-                DateTime now = (DateTime.now().add(Duration(hours: 6)));
-                DateTime old = (DateTime.parse(r["timestamp"]));
-                // print(r["timestamp"]);
-                Duration timeDuration = now.difference(old);
-                timeDuration -= Duration(hours: 5);
-                print(now);
-                print(old);
-                print("_" * 10);
-                String time = formatDuration(timeDuration);
+          Future.wait([
+            fetchPostComments(r["post_id"]),
+            getPostReactions(r["post_id"]),
+            getCredentials(r["author"])
+          ]).then((res) {
+            List<CommentModel> comments = res[0];
+            List<dynamic> reactions = res[1];
+            Credentials creds = res[2];
+            DateTime now = (DateTime.now().add(Duration(hours: 6)));
+            DateTime old = (DateTime.parse(r["timestamp"]));
+            // print(r["timestamp"]);
+            Duration timeDuration = now.difference(old);
+            timeDuration -= Duration(hours: 5);
+            print(now);
+            print(old);
+            print("_" * 10);
+            String time = formatDuration(timeDuration);
 
-                int secondsTaken = timeDuration.inSeconds;
-                PostModel post = new PostModel(
-                    userId: r["author"].toString(),
-                    hasReacted: reactions.contains(int.parse(this.userId)),
-                    secondsTaken: secondsTaken,
-                    description: r["description"],
-                    id: r["post_id"].toString(),
-                    userImg: creds.userImg,
-                    userName: "${creds.userName} ${creds.lastName}",
-                    timeTaken: time,
-                    hasImage: r["photo"] != null ? true : false,
-                    hasTraining: false,
-                    comments: comments,
-                    loadedTraining: null,
-                    loadedImg: r["photo"] != null
-                        ? Image.network('$apiUrl${r["photo"]}')
-                        : null,
-                    likes: reactions.length);
-                posts.add(post);
-                // print(posts.toString());
-              });
-            });
+            int secondsTaken = timeDuration.inSeconds;
+            PostModel post = new PostModel(
+                userId: r["author"].toString(),
+                hasReacted: reactions.contains(int.parse(this.userId)),
+                secondsTaken: secondsTaken,
+                description: r["description"],
+                id: r["post_id"].toString(),
+                userImg: creds.userImg,
+                userName: "${creds.userName} ${creds.lastName}",
+                timeTaken: time,
+                hasImage: r["photo"] != null ? true : false,
+                hasTraining: false,
+                comments: comments,
+                loadedTraining: null,
+                loadedImg: r["photo"] != null
+                    ? Image.network('$apiUrl${r["photo"]}')
+                    : null,
+                likes: reactions.length);
+            posts.add(post);
           })
       ]);
 
@@ -283,22 +285,27 @@ class Posts with ChangeNotifier {
     Map parsed;
     String imageUrl;
     try {
-      final response = await dio.get(url,
-          options: Options(headers: {
-            "Authorization": "Bearer " + token,
-          }));
-      if (response.statusCode >= 400) {
-        throw HttpException("Operacja nie powiodła się!");
-      }
-      parsed = response.data;
-      final imageResponse = await dio.get(imgUrl,
-          options: Options(headers: {
-            "Authorization": "Bearer " + token,
-          }));
-      imageUrl = apiUrl + imageResponse.data["photo"]["photo"];
+      await Future.wait([
+        dio.get(url,
+            options: Options(headers: {
+              "Authorization": "Bearer " + token,
+            })),
+        dio.get(imgUrl,
+            options: Options(headers: {
+              "Authorization": "Bearer " + token,
+            }))
+      ]).then((responses) {
+        final response = responses[0];
+        final imageResponse = responses[1];
+        if (response.statusCode >= 400) {
+          throw HttpException("Operacja nie powiodła się!");
+        }
+        parsed = response.data;
+        imageUrl = apiUrl + imageResponse.data["photo"]["photo"];
+      });
       return Credentials(parsed["first_name"], parsed["last_name"], imageUrl);
     } catch (error) {
-      throw HttpException("Nie ma fotki!");
+      return null;
     }
   }
 

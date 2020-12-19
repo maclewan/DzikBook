@@ -147,29 +147,34 @@ class UserData with ChangeNotifier {
     final url = "$apiUrl/users/data/";
     final imgUrl = "$apiUrl/media/profile/";
     try {
-      final response = await dio.get(url,
-          options: Options(headers: {
-            "Authorization": "Bearer " + token,
-          }));
-      if (response.statusCode >= 400) {
-        throw HttpException("Operacja nie powiodła się!");
-      }
+      Future.wait([
+        dio.get(url,
+            options: Options(headers: {
+              "Authorization": "Bearer " + token,
+            })),
+        dio.get(imgUrl,
+            options: Options(headers: {
+              "Authorization": "Bearer " + token,
+            }))
+      ]).then((responses) {
+        final response = responses[0];
+        final imageResponse = responses[1];
+        if (response.statusCode >= 400) {
+          throw HttpException("Operacja nie powiodła się!");
+        }
+        final Map parsed = response.data;
+        this._name = parsed["first_name"];
+        this._lastName = parsed["last_name"];
+        this._additionalData = parsed["additionalData"];
+        this._birthDate = parsed["birth_date"];
+        this._gym = parsed["gym"];
+        this._sex = parsed["sex"];
+        this._job = parsed["job"];
+        this._id = parsed["user"].toString();
+        _imageUrl = apiUrl + imageResponse.data["photo"]["photo"];
+        notifyListeners();
+      });
 
-      final Map parsed = response.data;
-      this._name = parsed["first_name"];
-      this._lastName = parsed["last_name"];
-      this._additionalData = parsed["additionalData"];
-      this._birthDate = parsed["birth_date"];
-      this._gym = parsed["gym"];
-      this._sex = parsed["sex"];
-      this._job = parsed["job"];
-      this._id = parsed["user"].toString();
-      final imageResponse = await dio.get(imgUrl,
-          options: Options(headers: {
-            "Authorization": "Bearer " + token,
-          }));
-      _imageUrl = apiUrl + imageResponse.data["photo"]["photo"];
-      notifyListeners();
       // final Map parsedImg = json.decode(imageResponse.data);
       // print(parsedImg);
     } catch (error) {
