@@ -1,4 +1,5 @@
 import json
+from .constants import SERVER_HOST
 
 import requests
 from django.shortcuts import render
@@ -210,7 +211,7 @@ def get_user_list(friends_list, id):
     payload = {'id_list': friends_list}
 
     # Send request to users service
-    url = 'http://127.0.0.1:8000/users/multi/'
+    url = 'http://'+SERVER_HOST+'/users/multi/'
     headers = {"Uid": str(id), "Flag": hash_user(id)}
     r = requests.post(url, data=json.dumps(payload), headers=headers)
 
@@ -226,7 +227,7 @@ def get_friends_id(user_id):
 
 
 def check_if_user_exist(user_id):
-    url = 'http://localhost:8000/auth/user/' + str(user_id) + '/'
+    url = 'http://'+SERVER_HOST+'/auth/user/' + str(user_id) + '/'
     print(requests.get(url).text)
     if requests.get(url).text == 'true':
         return True

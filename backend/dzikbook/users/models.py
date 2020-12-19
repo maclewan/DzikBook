@@ -11,3 +11,10 @@ class UserData(models.Model):
     sex = models.CharField(null=True, blank=False, max_length=25)
     job = models.CharField(null=True, blank=False, max_length=40)
     additional_data = models.TextField(null=True, blank=False)
+
+
+class DetailsData(models.Model):
+    user = models.IntegerField(unique=True, null=False, blank=False)
+    workout_plans = models.TextField(null=True, blank=False)
+    diet_plans = models.TextField(null=True, blank=False)
+

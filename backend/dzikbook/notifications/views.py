@@ -1,5 +1,8 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
+from .constants import SERVER_HOST
+
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Notification
@@ -63,7 +66,7 @@ class SigInUserNotificationsView(APIView):
             return Response("Could not create Response", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 def check_if_user_exist(user_id):
-    url = 'http://localhost:8000/auth/user/' + str(user_id) + '/'
+    url = 'http://'+SERVER_HOST+'/auth/user/' + str(user_id) + '/'
     if requests.get(url).text == 'true':
         return True
     else:

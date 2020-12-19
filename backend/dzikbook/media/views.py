@@ -1,4 +1,7 @@
 from django.contrib.auth.models import User
+from .constants import SERVER_HOST
+
+
 from django.core.files.base import ContentFile
 from django.shortcuts import render
 from rest_framework.views import APIView

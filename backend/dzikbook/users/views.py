@@ -1,5 +1,8 @@
 import json
 
+from .constants import SERVER_HOST
+
+
 import requests
 from django.db import models
 from rest_framework import status
@@ -8,10 +11,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from .decorators import authenticate, internal, hash_user
-from .models import UserData
+from .models import UserData, DetailsData
 
 # create your views here
-from .serializers import UserDataSerializer
+from .serializers import UserDataSerializer, DetailsDataSerializer
 
 from .utils import convert_bdate
 
@@ -106,12 +109,87 @@ class SignedInUserDataView(APIView):
         return Response(context)
 
 
+class SignedInUserDetailsView(APIView):
+    """
+    Get this user data
+    """
+    authentication_classes = []
+
+    @authenticate
+    def get(self, request):
+        try:
+            user_id = request.user.id
+            user_data = DetailsData.objects.get(user=user_id)
+            context = DetailsDataSerializer(user_data, many=False).data
+
+            return Response(context)
+        except models.ObjectDoesNotExist:
+            return Response("User details data doesn't exist!", status=status.HTTP_404_NOT_FOUND)
+
+    @authenticate
+    def post(self, request):
+        try:
+
+            user_id = request.user.id
+
+            data = json.loads(json.dumps(request.POST))
+            data['user'] = user_id
+
+            data_serializer = DetailsDataSerializer(data=data)
+
+            if not data_serializer.is_valid():
+                return Response("Invalid data provided!", status=status.HTTP_400_BAD_REQUEST)
+
+            user_data = data_serializer.create(validated_data=data)
+            user_data.save()
+            return Response(data_serializer.data)
+
+        except Exception as e:
+
+            return Response("Error during posting a user details data, record already exists!",
+                            status=status.HTTP_409_CONFLICT)
+
+    @authenticate
+    def put(self, request):
+        try:
+            user_id = request.user.id
+            user_data = DetailsData.objects.get(user=user_id)
+
+            data = json.loads(json.dumps(request.POST))
+            data['user'] = user_id
+
+            data_serializer = DetailsDataSerializer(data=data)
+
+            if not data_serializer.is_valid():
+                return Response("Invalid data provided!", status=status.HTTP_400_BAD_REQUEST)
+
+            user_data = data_serializer.update(instance=user_data, validated_data=data)
+
+        except models.ObjectDoesNotExist:
+            return Response("Details data details data doesn't exist!", status=status.HTTP_404_NOT_FOUND)
+
+        context = {'message': 'Details user data successfully updated', 'user_data': data_serializer.data}
+        return Response(context)
+
+    @authenticate
+    def delete(self, request):
+        try:
+            user_id = request.user.id
+            DetailsData.objects.get(user=user_id).delete()
+
+        except models.ObjectDoesNotExist:
+            return Response("User details data doesnt exist!", status=status.HTTP_404_NOT_FOUND)
+
+        context = {'message': 'Details data successfully deleted'}
+        return Response(context)
+
+
 class UserDataView(APIView):
     authentication_classes = []
 
     @authenticate
     def get(self, request, id):
-        url = 'http://localhost:8000/friends/' + str(id) + '/'
+        url = 'http://'+SERVER_HOST+'/friends/' + str(id) + '/'
         headers = {"Uid": str(request.user.id), "Flag": hash_user(request.user.id)}
         r = requests.get(url, headers=headers)
         r = r.json()
@@ -135,6 +213,24 @@ class UserDataView(APIView):
 
         except models.ObjectDoesNotExist:
             return Response("User data doesnt exist!", status=status.HTTP_404_NOT_FOUND)
+
+
+class DetailsDataView(APIView):
+    authentication_classes = []
+
+    @authenticate
+    def get(self, request, id):
+        try:
+            user_details = DetailsData.objects.get(user=id)
+            context = {
+                'workout_plans': user_details.workout_plans,
+                'diet_plans': user_details.diet_plans
+            }
+
+            return Response(context)
+
+        except models.ObjectDoesNotExist:
+            return Response("User details doesnt exist!", status=status.HTTP_404_NOT_FOUND)
 
 
 class BasicUserDataView(APIView):
@@ -245,6 +341,7 @@ class CreateNewUserView(APIView):
         try:
             user_id = request.user.id
 
+            # User data
             data = {
                 'gym': "",
                 'additional_data': "",
@@ -264,7 +361,23 @@ class CreateNewUserView(APIView):
             user_data = data_serializer.create(validated_data=data)
             user_data.save()
 
+            # Details data
+            data = {
+                'diet_plans': "{}",
+                'workout_plans': "{}",
+                'user': user_id
+            }
+
+            data_serializer = DetailsDataSerializer(data=data)
+
+            if not data_serializer.is_valid():
+                return Response("Invalid data provided!", status=status.HTTP_400_BAD_REQUEST)
+
+            user_data = data_serializer.create(validated_data=data)
+            user_data.save()
+
             return Response(data_serializer.data)
 
         except Exception as e:
-            return Response("Error during posting a user data, record already exists!", status=status.HTTP_409_CONFLICT)
+            return Response("Error during posting a user data or user details data, record already exists!",
+                            status=status.HTTP_409_CONFLICT)

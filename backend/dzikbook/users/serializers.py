@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import UserData
+from .models import UserData, DetailsData
 
 
 class UserDataSerializer(serializers.Serializer):
@@ -15,7 +15,6 @@ class UserDataSerializer(serializers.Serializer):
 
     class Meta:
         model = UserData
-        fields = ('user', 'first_name', 'last_name', 'gym', 'birth_date', 'sex', 'job', 'additional_data')
         fields = ('user', 'first_name', 'last_name', 'gym', 'birth_date', 'sex', 'job', 'additional_data')
 
     def create(self, validated_data):
@@ -35,6 +34,32 @@ class UserDataSerializer(serializers.Serializer):
         instance.sex = validated_data.get('sex', instance.sex)
         instance.job = validated_data.get('job', instance.job)
         instance.additional_data = validated_data.get('additional_data', instance.additional_data)
+
+        instance.save()
+        return instance
+
+
+class DetailsDataSerializer(serializers.Serializer):
+    user = serializers.IntegerField(required=True, allow_null=False)
+    workout_plans = serializers.CharField(required=True, allow_blank=True)
+    diet_plans = serializers.CharField(required=True, allow_blank=True)
+
+    class Meta:
+        model = UserData
+        fields = ('user', 'workout_plans', 'diet_plans')
+
+    def create(self, validated_data):
+        """
+        Create and return a new `DetailsData` instance, given the validated data.
+        """
+        return DetailsData.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        """
+        Update and return an existing `DetailsData` instance, given the validated data.
+        """
+        instance.workout_plans = validated_data.get('workout_plans', instance.workout_plans)
+        instance.diet_plans = validated_data.get('diet_plans', instance.diet_plans)
 
         instance.save()
         return instance
