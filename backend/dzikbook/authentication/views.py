@@ -1,6 +1,10 @@
 import json
 import time
 
+from .constants import SERVER_HOST
+
+
+
 import requests
 from django.contrib.auth.models import User
 from rest_framework import status
@@ -9,6 +13,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework_simplejwt.views import TokenObtainPairView
+
 
 from .decorators import hash_user
 from .serializers import RegisterSerializer, LogoutPossibleTokenObtainPairSerializer
@@ -83,7 +88,7 @@ class ExistsUserView(APIView):
 def createUserData(user: User):
     id = user.pk
     # Send request to users service
-    url = 'http://localhost:8000/users/data/new/'
+    url = 'http://'+SERVER_HOST+'/users/data/new/'
     headers = {
         "Uid": str(id),
         "Flag": hash_user(id),

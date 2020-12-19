@@ -1,6 +1,9 @@
 import requests
 from django.contrib.auth.models import User
 from django.shortcuts import render
+from .constants import SERVER_HOST
+
+
 from django.db import models
 from rest_framework import status
 from rest_framework.views import APIView
@@ -43,7 +46,7 @@ class SigInUserPostsView(APIView):
                 files = {'photo': list(request.FILES.values())[0]}
 
                 try:
-                    response = requests.post('http://127.0.0.1:8000/media/photo/', headers=headers, files=files)
+                    response = requests.post('http://'+SERVER_HOST+'/media/photo/', headers=headers, files=files)
                     response_json = response.json()
                 except Exception:
                     return Response("Internal server error!", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -82,7 +85,7 @@ class SigInUserPostsView(APIView):
                 files = {'photo': list(request.FILES.values())[0]}
 
                 try:
-                    response = requests.post('http://127.0.0.1:8000/media/photo/', headers=headers, files=files)
+                    response = requests.post('http://'+SERVER_HOST+'/media/photo/', headers=headers, files=files)
                     response_json = response.json()
                 except Exception:
                     return Response("Internal server error!", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -166,7 +169,7 @@ class MainWallListView(APIView):
 
             headers = {"Uid": user_id, "Flag": hash_user(user_id)}
             try:
-                response = requests.get(f'http://127.0.0.1:8000/friends/id_list/', headers=headers)
+                response = requests.get(f'http://'+SERVER_HOST+'/friends/id_list/', headers=headers)
                 response_json = response.json()
             except Exception as e:
                 return Response("Internal server error!", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
