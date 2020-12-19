@@ -25,7 +25,7 @@ def authenticate(f):
         else:
             # Is user will communicate with service
             auth = request.headers["Authorization"] if 'Authorization' in request.headers else ''
-            url = 'http://localhost:8000/auth/validate/'
+            url = 'http://127.0.0.1:8000/auth/validate/'
             headers = {"Authorization": auth}
             r = requests.get(url, headers=headers)
 
