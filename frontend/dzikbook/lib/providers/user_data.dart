@@ -253,6 +253,7 @@ class UserData with ChangeNotifier {
         'workouts': data['workouts']
             .map<Workout>(
               (workout) => Workout(
+                id: workout['id'],
                 name: workout['name'],
                 workoutLength: workout['length'],
                 exercises: workout['exercises']
@@ -276,6 +277,7 @@ class UserData with ChangeNotifier {
         'diets': data['diets']
             .map<Diet>(
               (diet) => Diet(
+                id: diet['id'],
                 name: diet['name'],
                 dietCalories: diet['calories'],
                 foodList: diet['food']
@@ -347,6 +349,7 @@ class UserData with ChangeNotifier {
     Map<String, dynamic> newAddData = {
       'workouts': _additionalData['workouts']
           .map((Workout workout) => {
+                'id': workout.id,
                 'name': workout.name,
                 'length': workout.workoutLength,
                 'exercises': workout.exercises
@@ -362,6 +365,7 @@ class UserData with ChangeNotifier {
           .toList(),
       'diets': _additionalData['diets']
           .map((Diet diet) => {
+                'id': diet.id,
                 'name': diet.name,
                 'calories': diet.dietCalories,
                 'food': diet.foodList

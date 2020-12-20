@@ -8,7 +8,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/dayPlans.dart';
+import '../providers/day_plans.dart';
 import '../providers/workouts.dart';
 import '../providers/diets.dart';
 
@@ -282,7 +282,7 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
       if (workout == null) return;
       DateTime newDate =
           DateTime(_selectedDay.year, _selectedDay.month, _selectedDay.day);
-      plansData.addWorkoutPlan(workout, newDate);
+      await plansData.addWorkoutPlan(workout, newDate);
       _toActive("all");
       _setEvents(plansData.allPlans);
     }
@@ -293,7 +293,7 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
       if (diet == null) return;
       DateTime newDate =
           DateTime(_selectedDay.year, _selectedDay.month, _selectedDay.day);
-      plansData.addDietPlan(diet, newDate);
+      await plansData.addDietPlan(diet, newDate);
       _toActive("all");
       _setEvents(plansData.allPlans);
     }
