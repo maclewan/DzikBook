@@ -1,9 +1,12 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:dzikbook/models/config.dart';
 import 'package:dzikbook/models/HttpException.dart';
 import 'package:dzikbook/providers/auth.dart';
+import 'package:dzikbook/providers/diets.dart';
+import 'package:dzikbook/providers/workouts.dart';
 import 'package:flutter/material.dart';
 
 class _UserPostData {
@@ -15,24 +18,27 @@ class _UserPostData {
 }
 
 class UserData with ChangeNotifier {
-  String _name;
-  String _id;
-  String _lastName;
-  String _imageUrl;
-  String _gym;
-  String _birthDate;
-  String _sex;
-  String _job;
-  String _additionalData;
-  String token;
-  String refreshToken;
+  String _name = 'none';
+  String _id = 'none';
+  String _lastName = 'none';
+  String _imageUrl = 'none';
+  String _gym = 'none';
+  String _birthDate = '10/10/2020';
+  String _sex = 'none';
+  String _job = 'none';
+  Map<String, dynamic> _additionalData = {
+    'diets': <Diet>[],
+    'workouts': <Workout>[],
+  };
+  String token = 'none';
+  String refreshToken = 'none';
   Dio dio = new Dio();
 
   String get name => _name;
   String get lastName => _lastName;
   String get imageUrl => _imageUrl;
   String get gym => _gym;
-  String get additionalData => _additionalData;
+  Map<String, dynamic> get additionalData => _additionalData;
   String get birthDate => _birthDate;
   String get sex => _sex;
   String get job => _job;
@@ -104,7 +110,9 @@ class UserData with ChangeNotifier {
     final url = "$apiUrl/users/data/";
     final data = {
       'gym': newGym,
-      'additional_data': this._additionalData,
+      'additional_data': json.encode(
+        mapAdditionalData(),
+      ),
       'first_name': this._name,
       'last_name': this._lastName,
       'sex': newSex,
@@ -127,7 +135,8 @@ class UserData with ChangeNotifier {
 
         this._name = parsed["first_name"];
         this._lastName = parsed["last_name"];
-        this._additionalData = parsed["additional_data"];
+        this._additionalData =
+            json.decode(parsed["additional_data"]) as Map<String, dynamic>;
         this._birthDate = parsed["birth_date"];
         this._gym = parsed["gym"];
         this._sex = parsed["sex"];
@@ -237,6 +246,64 @@ class UserData with ChangeNotifier {
     }
   }
 
+  Map<String, List> mapFetchedAddData(data) {
+    data = json.decode(data);
+    try {
+      Map<String, List> newData = {
+        'workouts': data['workouts']
+            .map<Workout>(
+              (workout) => Workout(
+                name: workout['name'],
+                workoutLength: workout['length'],
+                exercises: workout['exercises']
+                    .map<Exercise>(
+                      (e) => Exercise(
+                        id: e['id'],
+                        name: e['name'],
+                        series: int.parse(e['series']),
+                        reps: int.parse(
+                          e['reps'],
+                        ),
+                        breakTime: int.parse(
+                          e['breakTime'],
+                        ),
+                      ),
+                    )
+                    .toList(),
+              ),
+            )
+            .toList(),
+        'diets': data['diets']
+            .map<Diet>(
+              (diet) => Diet(
+                name: diet['name'],
+                dietCalories: diet['calories'],
+                foodList: diet['food']
+                    .map<Food>(
+                      (food) => Food(
+                        id: food['id'],
+                        name: food['name'],
+                        weight: food['weight'],
+                        protein: food['protein'],
+                        calories: food['calories'],
+                        carbs: food['carbs'],
+                        fat: food['food'],
+                      ),
+                    )
+                    .toList(),
+              ),
+            )
+            .toList(),
+      };
+      return newData;
+    } catch (error, stackTrace) {
+      return {
+        'diets': <Diet>[],
+        'workouts': <Workout>[],
+      };
+    }
+  }
+
   Future<void> getUserData() async {
     final url = "$apiUrl/users/data/";
     final imgUrl = "$apiUrl/media/profile/";
@@ -246,26 +313,26 @@ class UserData with ChangeNotifier {
             options: Options(headers: {
               "Authorization": "Bearer " + token,
             })),
-        dio.get(imgUrl,
-            options: Options(headers: {
-              "Authorization": "Bearer " + token,
-            }))
+        // dio.get(imgUrl,
+        //     options: Options(headers: {
+        //       "Authorization": "Bearer " + token,
+        //     }))
       ]).then((responses) {
         final response = responses[0];
-        final imageResponse = responses[1];
+        //final imageResponse = responses[1];
         if (response.statusCode >= 400) {
           throw HttpException("Operacja nie powiodła się!");
         }
         final Map parsed = response.data;
         this._name = parsed["first_name"];
         this._lastName = parsed["last_name"];
-        this._additionalData = parsed["additional_data"];
+        this._additionalData = mapFetchedAddData(parsed["additional_data"]);
         this._birthDate = parsed["birth_date"];
         this._gym = parsed["gym"];
         this._sex = parsed["sex"];
         this._job = parsed["job"];
         this._id = parsed["user"].toString();
-        _imageUrl = apiUrl + imageResponse.data["photo"]["photo"];
+        //_imageUrl = apiUrl + imageResponse.data["photo"]["photo"];
         notifyListeners();
       });
 
@@ -274,5 +341,88 @@ class UserData with ChangeNotifier {
     } catch (error) {
       throw HttpException("Nie ma fotki!");
     }
+  }
+
+  Map<String, dynamic> mapAdditionalData() {
+    Map<String, dynamic> newAddData = {
+      'workouts': _additionalData['workouts']
+          .map((Workout workout) => {
+                'name': workout.name,
+                'length': workout.workoutLength,
+                'exercises': workout.exercises
+                    .map((Exercise e) => {
+                          'id': e.id,
+                          'name': e.name,
+                          'series': e.series.toString(),
+                          'reps': e.reps.toString(),
+                          'breakTime': e.breakTime.toString(),
+                        })
+                    .toList(),
+              })
+          .toList(),
+      'diets': _additionalData['diets']
+          .map((Diet diet) => {
+                'name': diet.name,
+                'calories': diet.dietCalories,
+                'food': diet.foodList
+                    .map((Food food) => {
+                          'id': food.id,
+                          'name': food.name,
+                          'weight': food.weight,
+                          'protein': food.protein,
+                          'calories': food.calories,
+                          'carbs': food.carbs,
+                          'fat': food.fat,
+                        })
+                    .toList(),
+              })
+          .toList(),
+    };
+    return newAddData;
+  }
+
+  Future<void> updateAdditionalData() async {
+    final url = "$apiUrl/users/data/";
+    final data = {
+      'gym': this._gym,
+      'additional_data': json.encode(
+        mapAdditionalData(),
+      ),
+      'first_name': this._name,
+      'last_name': this._lastName,
+      'sex': this._sex,
+      'job': this._job,
+      'birth_date': this._birthDate,
+    };
+    FormData formData = FormData.fromMap(data);
+    try {
+      await dio.put(url,
+          data: formData,
+          options: Options(headers: {
+            "Authorization": "Bearer " + token,
+          }));
+    } catch (error) {
+      throw HttpException(error);
+    }
+  }
+
+  Future<void> updateWorkouts(List<Workout> workouts) async {
+    Map<String, dynamic> oldAdditionalData = _additionalData;
+    _additionalData['workouts'] = workouts;
+    await updateAdditionalData().catchError((error) => {
+          _additionalData = oldAdditionalData,
+          throw HttpException(error),
+        });
+    notifyListeners();
+  }
+
+  Future<void> updateDiets(List<Diet> diets) async {
+    Map<String, dynamic> oldAdditionalData = _additionalData;
+    _additionalData['diets'] = diets;
+    await updateAdditionalData().catchError((error) => {
+          _additionalData = oldAdditionalData,
+          throw HttpException(error),
+        });
+    notifyListeners();
   }
 }

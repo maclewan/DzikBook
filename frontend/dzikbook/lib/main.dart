@@ -43,12 +43,6 @@ class MyApp extends StatelessWidget {
             create: (context) => Auth(),
           ),
           ChangeNotifierProvider(
-            create: (context) => Workouts(),
-          ),
-          ChangeNotifierProvider(
-            create: (context) => Diets(),
-          ),
-          ChangeNotifierProvider(
             create: (context) => Static(),
           ),
           ChangeNotifierProvider(
@@ -71,6 +65,18 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProxyProvider<Auth, SearchPeople>(
             create: (_) => SearchPeople(),
             update: (_, auth, people) => people..token = auth.token,
+          ),
+          ChangeNotifierProxyProvider<UserData, Workouts>(
+            create: (_) => Workouts(),
+            update: (_, userData, workouts) => workouts
+              ..update = userData.updateWorkouts
+              ..workouts = userData.additionalData['workouts'],
+          ),
+          ChangeNotifierProxyProvider<UserData, Diets>(
+            create: (_) => Diets(),
+            update: (_, userData, workouts) => workouts
+              ..update = userData.updateDiets
+              ..diets = userData.additionalData['diets'],
           ),
         ],
         child: Consumer<Auth>(
