@@ -17,11 +17,13 @@ class Exercise {
 }
 
 class Workout {
+  final String id;
   final String name;
   final int workoutLength;
   final List<Exercise> exercises;
 
   Workout({
+    @required this.id,
     @required this.name,
     @required this.workoutLength,
     @required this.exercises,

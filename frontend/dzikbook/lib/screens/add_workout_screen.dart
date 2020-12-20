@@ -78,6 +78,7 @@ class _AddWorkoutScreenState extends State<AddWorkoutScreen> {
     final _workoutProvider = Provider.of<Workouts>(context, listen: false);
     final workoutTime = await _workoutProvider.countWorkoutLength(_exercises);
     Workout newWorkout = Workout(
+        id: DateTime.now().toIso8601String(),
         name: _nameController.text,
         workoutLength: (workoutTime / 60).ceil(),
         exercises: _exercises);

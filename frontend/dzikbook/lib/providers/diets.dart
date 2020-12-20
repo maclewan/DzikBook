@@ -21,11 +21,13 @@ class Food {
 }
 
 class Diet {
+  final String id;
   final String name;
   final int dietCalories;
   final List<Food> foodList;
 
   Diet({
+    @required this.id,
     @required this.name,
     @required this.dietCalories,
     @required this.foodList,

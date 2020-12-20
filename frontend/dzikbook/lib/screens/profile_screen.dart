@@ -1,3 +1,4 @@
+import 'package:dzikbook/providers/day_plans.dart';
 import 'package:dzikbook/providers/posts.dart';
 import 'package:dzikbook/providers/user_data.dart';
 import 'package:dzikbook/widgets/navbar.dart';
@@ -31,6 +32,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     var postsProvider = Provider.of<Posts>(context, listen: true);
     Provider.of<UserData>(context, listen: false).getUserData();
+    Provider.of<DayPlans>(context, listen: false).fetchPlans();
 
     return Scaffold(
         appBar: buildNavBar(

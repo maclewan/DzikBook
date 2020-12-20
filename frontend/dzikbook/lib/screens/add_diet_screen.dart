@@ -101,6 +101,7 @@ class _AddDietScreenState extends State<AddDietScreen> {
     final _dietProvider = Provider.of<Diets>(context, listen: false);
     final totalCalories = await _dietProvider.sumCalories(_food);
     Diet newDiet = Diet(
+      id: DateTime.now().toIso8601String(),
       name: _nameController.text,
       dietCalories: totalCalories.round(),
       foodList: _food,
