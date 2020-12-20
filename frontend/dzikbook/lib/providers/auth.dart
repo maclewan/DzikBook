@@ -35,7 +35,6 @@ class Auth with ChangeNotifier {
   Future<void> _authentication(String password, String email, String urlSegment,
       String firstName, String lastName) async {
     final url = "$apiUrl/auth/$urlSegment/";
-
     Map<String, dynamic> body = {
       'email': email,
       'username': email,
@@ -80,6 +79,7 @@ class Auth with ChangeNotifier {
         prefs.setString('userData', userData);
       }
     } catch (error) {
+      print(error);
       throw HttpException("Operacja nie powiodła się!");
     }
   }
