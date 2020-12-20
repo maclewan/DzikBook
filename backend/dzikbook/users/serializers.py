@@ -45,7 +45,7 @@ class DetailsDataSerializer(serializers.Serializer):
     diet_plans = serializers.CharField(required=True, allow_blank=True)
 
     class Meta:
-        model = UserData
+        model = DetailsData
         fields = ('user', 'workout_plans', 'diet_plans')
 
     def create(self, validated_data):
