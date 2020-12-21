@@ -91,24 +91,28 @@ class DayPlans with ChangeNotifier {
   }
 
   Future<void> mapPlanIds() async {
-    _idWorkoutPlans.forEach((key, value) {
-      _workoutPlans[key] = value
-          .map<Object>((e) => workouts
-              .where(
-                (element) => element.id == e,
-              )
-              .first)
-          .toList();
-    });
-    _idDietPlans.forEach((key, value) {
-      _dietPlans[key] = value
-          .map<Object>((e) => diets
-              .where(
-                (element) => element.id == e,
-              )
-              .first)
-          .toList();
-    });
+    if (workouts.isNotEmpty) {
+      _idWorkoutPlans.forEach((key, value) {
+        _workoutPlans[key] = value
+            .map<Object>((e) => workouts
+                .where(
+                  (element) => element.id == e,
+                )
+                .first)
+            .toList();
+      });
+    }
+    if (diets.isNotEmpty) {
+      _idDietPlans.forEach((key, value) {
+        _dietPlans[key] = value
+            .map<Object>((e) => diets
+                .where(
+                  (element) => element.id == e,
+                )
+                .first)
+            .toList();
+      });
+    }
   }
 
   Future<void> addWorkoutPlan(Workout plan, DateTime date) async {

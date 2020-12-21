@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:dzikbook/models/config.dart';
 import 'package:dzikbook/models/HttpException.dart';
-import 'package:dzikbook/models/dummyData.dart';
 import 'package:dzikbook/providers/auth.dart';
 import 'package:dzikbook/providers/diets.dart';
 import 'package:dzikbook/providers/workouts.dart';
@@ -244,8 +243,8 @@ class UserData with ChangeNotifier {
   }
 
   Map<String, List> mapFetchedAddData(data) {
-    data = json.decode(data);
     try {
+      data = json.decode(data);
       Map<String, List> newData = {
         'workouts': data['workouts']
             .map<Workout>(

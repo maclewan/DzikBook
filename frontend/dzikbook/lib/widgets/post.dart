@@ -118,7 +118,7 @@ class Post extends StatelessWidget {
                             shape: BoxShape.circle,
                             image: DecorationImage(
                                 image: NetworkImage(this.userImg),
-                                fit: BoxFit.contain,
+                                fit: BoxFit.cover,
                                 alignment: Alignment.topCenter)),
                       ),
                       Text(
