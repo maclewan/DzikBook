@@ -92,6 +92,8 @@ def createUserData(user: User):
     headers = {
         "Uid": str(id),
         "Flag": hash_user(id),
+        "Firstname": user.first_name,
+        "Lastname": user.last_name,
     }
     r = requests.post(url, headers=headers)
     return r

@@ -178,7 +178,7 @@ class MainWallListView(APIView):
                 return Response(response.content, status=response.status_code)
 
             friends_id_list = list(response_json['friends_list'])
-            friends_id_list.extend(user_id)
+            friends_id_list.append(user_id)
             users_list = [User(int(id)) for id in friends_id_list]
             all_posts = Post.objects.filter(author__in=users_list).order_by('-timestamp')
 
@@ -190,7 +190,6 @@ class MainWallListView(APIView):
                 all_posts = all_posts.filter(type=type)
 
             all_posts = all_posts[offset:offset + amount]
-
             context = PostSerializer(all_posts, many=True).data
         except Exception as e:
             return Response("Post with given id doesn't exist!", status=status.HTTP_404_NOT_FOUND)
