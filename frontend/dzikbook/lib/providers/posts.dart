@@ -223,6 +223,9 @@ class Posts with ChangeNotifier {
         throw HttpException("Operacja nie powiodła się!");
       }
       final List parsedList = response.data;
+      for (final r in parsedList) {
+        print(r);
+      }
       Stopwatch stopwatch = new Stopwatch()..start();
       await Future.wait([
         for (final r in parsedList)
