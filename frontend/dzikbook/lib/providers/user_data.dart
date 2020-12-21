@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:dzikbook/models/config.dart';
 import 'package:dzikbook/models/HttpException.dart';
+import 'package:dzikbook/models/dummyData.dart';
 import 'package:dzikbook/providers/auth.dart';
 import 'package:dzikbook/providers/diets.dart';
 import 'package:dzikbook/providers/workouts.dart';
@@ -18,20 +19,20 @@ class _UserPostData {
 }
 
 class UserData with ChangeNotifier {
-  String _name = 'none';
-  String _id = 'none';
-  String _lastName = 'none';
-  String _imageUrl = 'none';
-  String _gym = 'none';
-  String _birthDate = '10/10/2020';
-  String _sex = 'none';
-  String _job = 'none';
+  String _name = '';
+  String _id = '';
+  String _lastName = '';
+  String _imageUrl = defaultPhotoUrl;
+  String _gym = '';
+  String _birthDate = '01/01/1990';
+  String _sex = '';
+  String _job = '';
   Map<String, dynamic> _additionalData = {
     'diets': <Diet>[],
     'workouts': <Workout>[],
   };
-  String token = 'none';
-  String refreshToken = 'none';
+  String token = '';
+  String refreshToken = '';
   Dio dio = new Dio();
 
   String get name => _name;
@@ -133,10 +134,6 @@ class UserData with ChangeNotifier {
         }
         final Map parsed = response.data["user_data"];
 
-        this._name = parsed["first_name"];
-        this._lastName = parsed["last_name"];
-        this._additionalData =
-            json.decode(parsed["additional_data"]) as Map<String, dynamic>;
         this._birthDate = parsed["birth_date"];
         this._gym = parsed["gym"];
         this._sex = parsed["sex"];
@@ -315,13 +312,13 @@ class UserData with ChangeNotifier {
             options: Options(headers: {
               "Authorization": "Bearer " + token,
             })),
-        // dio.get(imgUrl,
-        //     options: Options(headers: {
-        //       "Authorization": "Bearer " + token,
-        //     }))
+        dio.get(imgUrl,
+            options: Options(headers: {
+              "Authorization": "Bearer " + token,
+            }))
       ]).then((responses) {
         final response = responses[0];
-        //final imageResponse = responses[1];
+        final imageResponse = responses[1];
         if (response.statusCode >= 400) {
           throw HttpException("Operacja nie powiodła się!");
         }
@@ -334,7 +331,8 @@ class UserData with ChangeNotifier {
         this._sex = parsed["sex"];
         this._job = parsed["job"];
         this._id = parsed["user"].toString();
-        //_imageUrl = apiUrl + imageResponse.data["photo"]["photo"];
+        _imageUrl = apiUrl + imageResponse.data["photo"]["photo"];
+        print(_imageUrl);
         notifyListeners();
       });
 
