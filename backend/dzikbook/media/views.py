@@ -29,7 +29,6 @@ class PhotoManagementView(APIView):
 
     @internal
     def post(self, request):
-        print('jestesmy w srodku media')
         response = save_inmemory_image(request)
         return response
 
@@ -90,8 +89,16 @@ class SigInUserProfilePhotoView(APIView):
     def get(self, request):
         try:
             current_user = request.user
-            profile_photos = ProfilePhoto.objects.get(user=current_user.pk)
-            context = ProfilePhotoSerializer(profile_photos).data
+
+            profile_photo = ProfilePhoto.objects.filter(user=current_user.pk).first()  # None if not found
+            if profile_photo is None:
+                photo = Photo()
+                downsized_photo = Photo()
+                photo.photo = "photos/default_profile.png"
+                downsized_photo.photo = "photos/default_profile_downscaled.png"
+                profile_photo = ProfilePhoto(photo=photo, downsized_photo=downsized_photo, user=current_user.pk)
+
+            context = ProfilePhotoSerializer(profile_photo).data
 
         except Exception as e:
             return Response("Error, could not retrive logged in user profile photos!",
@@ -115,8 +122,15 @@ class ProfilePhotoView(APIView):
     @authenticate
     def get(self, request, user_id):
         try:
-            photo = ProfilePhotoSerializer(ProfilePhoto.objects.get(user=user_id)).data
-            context = photo
+            profile_photo = ProfilePhoto.objects.filter(user=user_id).first()  # None if not found
+            if profile_photo is None:
+                photo = Photo()
+                downsized_photo = Photo()
+                photo.photo = "photos/default_profile.png"
+                downsized_photo.photo = "photos/default_profile_downscaled.png"
+                profile_photo = ProfilePhoto(photo=photo, downsized_photo=downsized_photo, user=user_id)
+
+            context = ProfilePhotoSerializer(profile_photo).data
         except:
             return Response("Error, could not retrive profile photo with id " + str(user_id) + "!",
                             status=status.HTTP_404_NOT_FOUND)

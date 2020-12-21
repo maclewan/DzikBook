@@ -2,7 +2,6 @@ import json
 
 from .constants import SERVER_HOST
 
-
 import requests
 from django.db import models
 from rest_framework import status
@@ -189,7 +188,7 @@ class UserDataView(APIView):
 
     @authenticate
     def get(self, request, id):
-        url = 'http://'+SERVER_HOST+'/friends/' + str(id) + '/'
+        url = 'http://' + SERVER_HOST + '/friends/' + str(id) + '/'
         headers = {"Uid": str(request.user.id), "Flag": hash_user(request.user.id)}
         r = requests.get(url, headers=headers)
         r = r.json()
@@ -255,10 +254,11 @@ class SearchView(APIView):
     @authenticate
     def get(self, request):
 
+        current_user = request.user
         key = request.GET.get('key', '')
         value = request.GET.get('value', '')
-        amount = int(request.GET.get('amount', ''))
-        offset = int(request.GET.get('offset', ''))
+        amount = int(request.GET.get('amount', 10))
+        offset = int(request.GET.get('offset', 0))
 
         if '' in (key, amount, offset, value):
             return Response("Wrong argument set (key, amount, offset).",
@@ -287,6 +287,7 @@ class SearchView(APIView):
             user_data_list.extend(list(UserData.objects.filter(last_name__icontains=last_name)))
 
         user_data_list = list(set(user_data_list))
+        user_data_list = filter(lambda u: u.user != current_user.pk, user_data_list)
         context = list(map(lambda u: {
             'user_id': u.user,
             'first_name': u.first_name,
@@ -340,13 +341,15 @@ class CreateNewUserView(APIView):
     def post(self, request):
         try:
             user_id = request.user.id
+            first_name = request.headers.get("Firstname", "")
+            last_name = request.headers.get("Lastname", "")
 
             # User data
             data = {
                 'gym': "",
                 'additional_data': "",
-                'first_name': "",
-                'last_name': "",
+                'first_name': first_name,
+                'last_name': last_name,
                 'sex': "",
                 'job': "",
                 'birth_date': "1900-01-01",
@@ -363,8 +366,8 @@ class CreateNewUserView(APIView):
 
             # Details data
             data = {
-                'diet_plans': "{}",
-                'workout_plans': "{}",
+                'diet_plans': "[]",
+                'workout_plans': "[]",
                 'user': user_id
             }
 
