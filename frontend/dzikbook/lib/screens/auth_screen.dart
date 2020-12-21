@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dzikbook/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -94,22 +96,22 @@ class _AuthCardState extends State<AuthCard>
     _controller = AnimationController(
       vsync: this,
       duration: Duration(
-        milliseconds: 300,
+        milliseconds: 700,
       ),
     );
     _slideAnimation = Tween<Offset>(
-      begin: Offset(0, -1.5),
+      begin: Offset(0, -0.5),
       end: Offset(0, 0),
     ).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: Curves.fastOutSlowIn,
+        curve: Curves.easeInOutCubic,
       ),
     );
     _opacityAnimation = Tween(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: Curves.easeIn,
+        curve: Curves.easeInOutCubic,
       ),
     );
   }
@@ -133,11 +135,13 @@ class _AuthCardState extends State<AuthCard>
         _changeAuthDesc = "Należysz do stada?";
         _btnText = "Zarejestruj";
         _changeAuthText = "Zaloguj się";
+        _controller.forward();
       } else {
         _authMode = AuthMode.SignIn;
         _changeAuthDesc = "Nie należysz jeszcze do stada?";
         _btnText = "Zaloguj";
         _changeAuthText = "Zarejestruj się";
+        _controller.reverse();
       }
     });
   }
@@ -295,154 +299,63 @@ class _AuthCardState extends State<AuthCard>
                             ),
                           ),
                         ),
-
                       AnimatedContainer(
-                        duration: Duration(milliseconds: 300),
+                        duration: Duration(milliseconds: 700),
                         constraints: BoxConstraints(
                           minHeight: _authMode == AuthMode.SignUp ? 60 : 0,
-                          maxHeight: _authMode == AuthMode.SignUp ? 150 : 0,
+                          maxHeight: _authMode == AuthMode.SignUp ? 120 : 0,
                         ),
-                        curve: Curves.easeIn,
-                        child: Column(
-                          children: [
-                            if (_authMode == AuthMode.SignUp)
-                              TextFormField(
-                                enabled: _authMode == AuthMode.SignUp,
-                                decoration: InputDecoration(
-                                  labelText: 'Imię',
-                                  contentPadding: const EdgeInsets.only(
-                                      bottom: -2, top: -5),
-                                  icon: Icon(Icons.person),
-                                ),
-                                validator: (value) {
-                                  if (value.isEmpty) {
-                                    return 'Podaj imię!';
-                                  }
-                                  return null;
-                                },
-                                onSaved: (value) {
-                                  _authData['first-name'] = value;
-                                },
+                        curve: Curves.easeInOutCubic,
+                        child: FadeTransition(
+                          opacity: _opacityAnimation,
+                          child: SlideTransition(
+                            position: _slideAnimation,
+                            child: Flexible(
+                              child: ListView(
+                                padding: EdgeInsets.all(0),
+                                children: [
+                                  TextFormField(
+                                    enabled: _authMode == AuthMode.SignUp,
+                                    decoration: InputDecoration(
+                                      labelText: 'Imię',
+                                      contentPadding: const EdgeInsets.only(
+                                          bottom: -2, top: -5),
+                                      icon: Icon(Icons.person),
+                                    ),
+                                    validator: (value) {
+                                      if (value.isEmpty) {
+                                        return 'Podaj imię!';
+                                      }
+                                      return null;
+                                    },
+                                    onSaved: (value) {
+                                      _authData['first-name'] = value;
+                                    },
+                                  ),
+                                  TextFormField(
+                                    enabled: _authMode == AuthMode.SignUp,
+                                    decoration: InputDecoration(
+                                      labelText: 'Nazwisko',
+                                      contentPadding: const EdgeInsets.only(
+                                          bottom: -2, top: -5),
+                                      icon: Icon(Icons.person),
+                                    ),
+                                    validator: (value) {
+                                      if (value.isEmpty || value.length < 5) {
+                                        return 'Podaj nazwisko';
+                                      }
+                                      return null;
+                                    },
+                                    onSaved: (value) {
+                                      _authData['last-name'] = value;
+                                    },
+                                  ),
+                                ],
                               ),
-                            if (_authMode == AuthMode.SignUp)
-                              TextFormField(
-                                enabled: _authMode == AuthMode.SignUp,
-                                decoration: InputDecoration(
-                                  labelText: 'Nazwisko',
-                                  contentPadding: const EdgeInsets.only(
-                                      bottom: -2, top: -5),
-                                  icon: Icon(Icons.person),
-                                ),
-                                validator: (value) {
-                                  if (value.isEmpty || value.length < 5) {
-                                    return 'Podaj nazwisko';
-                                  }
-                                  return null;
-                                },
-                                onSaved: (value) {
-                                  _authData['last-name'] = value;
-                                },
-                              ),
-                          ],
+                            ),
+                          ),
                         ),
                       ),
-                      // AnimatedContainer(
-                      //   duration: Duration(milliseconds: 300),
-                      //   constraints: BoxConstraints(
-                      //     minHeight: _authMode == AuthMode.SignUp ? 60 : 0,
-                      //     maxHeight: _authMode == AuthMode.SignUp ? 150 : 0,
-                      //   ),
-                      //   curve: Curves.easeIn,
-                      //   child: FadeTransition(
-                      //     opacity: _opacityAnimation,
-                      //     child: SlideTransition(
-                      //       position: _slideAnimation,
-                      //       child: Column(
-                      //         children: [
-                      //           if (_authMode == AuthMode.SignUp)
-                      //             TextFormField(
-                      //               enabled: _authMode == AuthMode.SignUp,
-                      //               decoration: InputDecoration(
-                      //                 labelText: 'Imię',
-                      //                 contentPadding: const EdgeInsets.only(
-                      //                     bottom: -2, top: -5),
-                      //                 icon: Icon(Icons.person),
-                      //               ),
-                      //               validator: (value) {
-                      //                 if (value.isEmpty) {
-                      //                   return 'Podaj imię!';
-                      //                 }
-                      //                 return null;
-                      //               },
-                      //               onSaved: (value) {
-                      //                 _authData['first-name'] = value;
-                      //               },
-                      //             ),
-                      //           if (_authMode == AuthMode.SignUp)
-                      //             TextFormField(
-                      //               enabled: _authMode == AuthMode.SignUp,
-                      //               decoration: InputDecoration(
-                      //                 labelText: 'Nazwisko',
-                      //                 contentPadding: const EdgeInsets.only(
-                      //                     bottom: -2, top: -5),
-                      //                 icon: Icon(Icons.person),
-                      //               ),
-                      //               validator: (value) {
-                      //                 if (value.isEmpty || value.length < 5) {
-                      //                   return 'Podaj nazwisko';
-                      //                 }
-                      //                 return null;
-                      //               },
-                      //               onSaved: (value) {
-                      //                 _authData['last-name'] = value;
-                      //               },
-                      //             ),
-                      //         ],
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ),
-                      // if (_authMode == AuthMode.SignUp)
-                      //   TextFormField(
-                      //     enabled: _authMode == AuthMode.SignUp,
-                      //     decoration: InputDecoration(
-                      //       labelText: 'Imię',
-                      //       contentPadding:
-                      //           const EdgeInsets.only(bottom: -2, top: -5),
-                      //       icon: Icon(Icons.person),
-                      //     ),
-                      //     validator: (value) {
-                      //       if (value.isEmpty) {
-                      //         return 'Podaj imię!';
-                      //       }
-                      //       return null;
-                      //     },
-                      //     onSaved: (value) {
-                      //       _authData['first-name'] = value;
-                      //     },
-                      //   ),
-                      // SizedBox(
-                      //   height: deviceSize.height * 0.01,
-                      // ),
-                      // if (_authMode == AuthMode.SignUp)
-                      //   TextFormField(
-                      //     enabled: _authMode == AuthMode.SignUp,
-                      //     decoration: InputDecoration(
-                      //       labelText: 'Nazwisko',
-                      //       contentPadding:
-                      //           const EdgeInsets.only(bottom: -2, top: -5),
-                      //       icon: Icon(Icons.person),
-                      //     ),
-                      //     validator: (value) {
-                      //       if (value.isEmpty || value.length < 5) {
-                      //         return 'Podaj nazwisko';
-                      //       }
-                      //       return null;
-                      //     },
-                      //     onSaved: (value) {
-                      //       _authData['second-name'] = value;
-                      //     },
-                      //   ),
                       SizedBox(
                         height: deviceSize.height * 0.02,
                       ),
