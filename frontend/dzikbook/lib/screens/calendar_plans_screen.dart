@@ -41,6 +41,8 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
   bool _allButton = true;
   bool _dietButton = false;
   bool owner;
+  AnimationController _slideAnimController;
+  Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
@@ -59,6 +61,26 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
       duration: const Duration(milliseconds: 400),
     );
 
+    _slideAnimController = AnimationController(
+      vsync: this,
+      duration: Duration(
+        milliseconds: 700,
+      ),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: Offset(0, 2),
+      end: Offset(0, 0),
+    ).animate(
+      CurvedAnimation(
+        parent: _slideAnimController,
+        curve: Curves.easeInOutCubic,
+      ),
+    );
+
+    if (_selectedEvents.isNotEmpty) {
+      _slideAnimController.forward();
+    }
+
     _animationController.forward();
   }
 
@@ -69,7 +91,12 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
     super.dispose();
   }
 
-  void _onDaySelected(DateTime day, List events, List holidays) {
+  void _onDaySelected(DateTime day, List events, List holidays) async {
+    if (_slideAnimController.isCompleted && events.isEmpty) {
+      await _slideAnimController.reverse();
+    } else if (_slideAnimController.isDismissed && events.isNotEmpty) {
+      _slideAnimController.forward();
+    }
     setState(() {
       _selectedDay = day;
       _selectedEvents = events;
@@ -370,8 +397,8 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
   }
 
   Widget _buildEventList() {
-    return Visibility(
-      visible: _selectedEvents.isNotEmpty,
+    return SlideTransition(
+      position: _slideAnimation,
       child: Container(
         padding: const EdgeInsets.only(top: 10, left: 8, right: 8),
         margin: const EdgeInsets.symmetric(horizontal: 10),
@@ -428,9 +455,6 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
                     ),
                     child: ListTile(
                       dense: true,
-                      // shape: RoundedRectangleBorder(
-                      //     borderRadius: BorderRadius.circular(10)),
-                      // tileColor: Colors.white,
                       onTap: nav,
                       leading: SvgPicture.asset(
                         picture,

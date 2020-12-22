@@ -157,11 +157,11 @@ class _AuthCardState extends State<AuthCard>
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('An Error Occurred!'),
+        title: Text('Wystąpił błąd'),
         content: Text(message),
         actions: <Widget>[
           FlatButton(
-            child: Text('Okay'),
+            child: Text('Okej'),
             onPressed: () {
               Navigator.of(ctx).pop();
             },
@@ -173,7 +173,6 @@ class _AuthCardState extends State<AuthCard>
 
   Future<void> _submit() async {
     if (!_formKey.currentState.validate()) {
-      // Invalid!
       return;
     }
     _formKey.currentState.save();
@@ -200,18 +199,7 @@ class _AuthCardState extends State<AuthCard>
         _toggleAuthType();
       }
     } on HttpException catch (error) {
-      var errorMessage = 'Authentication failed';
-      if (error.toString().contains('EMAIL_EXISTS')) {
-        errorMessage = 'This email address is already in use.';
-      } else if (error.toString().contains('INVALID_EMAIL')) {
-        errorMessage = 'This is not a valid email address';
-      } else if (error.toString().contains('WEAK_PASSWORD')) {
-        errorMessage = 'This password is too weak.';
-      } else if (error.toString().contains('EMAIL_NOT_FOUND')) {
-        errorMessage = 'Could not find a user with that email.';
-      } else if (error.toString().contains('INVALID_PASSWORD')) {
-        errorMessage = 'Invalid password.';
-      }
+      var errorMessage = error.toString();
       _showErrorDialog(errorMessage);
     } catch (error) {
       const errorMessage =
@@ -310,48 +298,51 @@ class _AuthCardState extends State<AuthCard>
                           opacity: _opacityAnimation,
                           child: SlideTransition(
                             position: _slideAnimation,
-                            child: Flexible(
-                              child: ListView(
-                                padding: EdgeInsets.all(0),
-                                children: [
-                                  TextFormField(
-                                    enabled: _authMode == AuthMode.SignUp,
-                                    decoration: InputDecoration(
-                                      labelText: 'Imię',
-                                      contentPadding: const EdgeInsets.only(
-                                          bottom: -2, top: -5),
-                                      icon: Icon(Icons.person),
-                                    ),
-                                    validator: (value) {
-                                      if (value.isEmpty) {
-                                        return 'Podaj imię!';
-                                      }
-                                      return null;
-                                    },
-                                    onSaved: (value) {
-                                      _authData['first-name'] = value;
-                                    },
+                            child: ListView(
+                              padding: EdgeInsets.all(0),
+                              children: [
+                                TextFormField(
+                                  enabled: _authMode == AuthMode.SignUp,
+                                  decoration: InputDecoration(
+                                    labelText: 'Imię',
+                                    contentPadding: const EdgeInsets.only(
+                                        bottom: -2, top: -5),
+                                    icon: Icon(Icons.person),
                                   ),
-                                  TextFormField(
-                                    enabled: _authMode == AuthMode.SignUp,
-                                    decoration: InputDecoration(
-                                      labelText: 'Nazwisko',
-                                      contentPadding: const EdgeInsets.only(
-                                          bottom: -2, top: -5),
-                                      icon: Icon(Icons.person),
-                                    ),
-                                    validator: (value) {
-                                      if (value.isEmpty || value.length < 5) {
-                                        return 'Podaj nazwisko';
-                                      }
-                                      return null;
-                                    },
-                                    onSaved: (value) {
-                                      _authData['last-name'] = value;
-                                    },
+                                  validator: _authMode == AuthMode.SignUp
+                                      ? (value) {
+                                          if (value.isEmpty) {
+                                            return 'Podaj imię!';
+                                          }
+                                          return null;
+                                        }
+                                      : null,
+                                  onSaved: (value) {
+                                    _authData['first-name'] = value;
+                                  },
+                                ),
+                                TextFormField(
+                                  enabled: _authMode == AuthMode.SignUp,
+                                  decoration: InputDecoration(
+                                    labelText: 'Nazwisko',
+                                    contentPadding: const EdgeInsets.only(
+                                        bottom: -2, top: -5),
+                                    icon: Icon(Icons.person),
                                   ),
-                                ],
-                              ),
+                                  validator: _authMode == AuthMode.SignUp
+                                      ? (value) {
+                                          if (value.isEmpty ||
+                                              value.length < 5) {
+                                            return 'Podaj nazwisko';
+                                          }
+                                          return null;
+                                        }
+                                      : null,
+                                  onSaved: (value) {
+                                    _authData['last-name'] = value;
+                                  },
+                                ),
+                              ],
                             ),
                           ),
                         ),

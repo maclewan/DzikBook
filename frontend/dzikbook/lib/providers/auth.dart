@@ -55,6 +55,9 @@ class Auth with ChangeNotifier {
       );
 
       if (response.statusCode >= 400) {
+        if (response.statusCode == 401) {
+          throw HttpException("Błędne dane!");
+        }
         throw HttpException("Operacja nie powiodła się!");
       }
       if (urlSegment == 'login') {
@@ -79,7 +82,6 @@ class Auth with ChangeNotifier {
         prefs.setString('userData', userData);
       }
     } catch (error) {
-      print(error);
       throw HttpException("Operacja nie powiodła się!");
     }
   }
