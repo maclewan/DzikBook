@@ -299,14 +299,32 @@ class ViewsTestCase(APITestCase):
         self.client.post('http://testserver/users/data/new/', )
         response = self.client.get('http://testserver/users/data/')
         self.assertEqual(response.json(), {
-                'gym': "",
-                'additional_data': "",
-                'first_name': "",
-                'last_name': "",
-                'sex': "",
-                'job': "",
-                'birth_date': "01/01/1900",
-                'user': 1
-            })
+            'gym': "",
+            'additional_data': "",
+            'first_name': "",
+            'last_name': "",
+            'sex': "",
+            'job': "",
+            'birth_date': "01/01/1900",
+            'user': 1
+        })
 
     def test_search_users(self):
+        data2 = copy(self.data2)
+        data2['first_name'] = 'john'
+        data2['last_name'] = 'doe'
+
+        self.client.post('http://testserver/users/data/', self.data)
+        self.client2.post('http://testserver/users/data/', data2)
+        response = self.client.get('http://testserver/users/search?key=gym&value=test&amount=10&offset=0')
+
+        self.assertEqual(response.json(), {'users_list': [
+            {'user_id': 1, 'first_name': 'test_name', 'last_name': 'test_last_name', 'gym': 'test_gym',
+             'birth_date': '1900-01-01', 'sex': 'test_sex', 'job': 'test_job'},
+            {'user_id': 2, 'first_name': 'john', 'last_name': 'doe', 'gym': 'test_gym', 'birth_date': '1900-01-01',
+             'sex': 'test_sex', 'job': 'test_job'}]})
+
+        response = self.client.get('http://testserver/users/search?key=name&value=test&amount=10&offset=0')
+        self.assertEqual(response.json(), {'users_list': [
+            {'user_id': 1, 'first_name': 'test_name', 'last_name': 'test_last_name', 'gym': 'test_gym',
+             'birth_date': '1900-01-01', 'sex': 'test_sex', 'job': 'test_job'}]})
