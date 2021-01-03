@@ -2,15 +2,11 @@ import datetime
 import json
 from copy import copy
 
-import requests
 from django.test import TestCase
-from django.test.client import Client
-from rest_framework.test import APIRequestFactory, RequestsClient, APIClient, APITestCase
+from rest_framework.test import  RequestsClient, APITestCase
 
-from .constants import SERVER_HOST
 from .decorators import hash_user
 from .models import UserData, DetailsData
-from django.contrib.auth.models import User
 from .serializers import DetailsDataSerializer, UserDataSerializer
 from .utils import convert_bdate
 
