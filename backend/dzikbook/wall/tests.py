@@ -3,6 +3,7 @@ from .models import Post
 from django.contrib.auth.models import User
 from .serializers import PostSerializer
 
+
 # Create your tests here.
 
 ##################
@@ -10,12 +11,12 @@ from .serializers import PostSerializer
 ##################
 
 class PostTestCase(TestCase):
-    
+
     def setUp(self):
         author = User.objects.create(username="test_user", password="test_password")
         data = {
-            "author":author,
-            "description":"description"
+            "author": author,
+            "description": "description"
         }
         Post.objects.create(**data)
 
@@ -34,23 +35,25 @@ class PostSerializerTestCase(TestCase):
     def setUp(self):
         author = User.objects.create(username="test_user", password="test_password")
         data = {
-            "author":author,
-            "description":"description"
+            "author": author,
+            "description": "description"
         }
         Post.objects.create(**data)
-    
+
     def test_translation(self):
         post = Post.objects.get(pk=1)
         serializer = PostSerializer
-        self.assertEqual(serializer(post).data, {'post_id':1, 'author':1, 'description':"description", 'visibility':True, 'image': None })
-    
+        self.assertEqual(serializer(post).data,
+                         {'post_id': 1, 'author': 1, 'description': "description", 'visibility': True, 'image': None})
+
     def test_update(self):
         serializer = PostSerializer()
         post = Post.objects.get(pk=1)
         data = {
-            "description":"test_description",
-            "image":"new_image",
-            "visibility":False,
+            "description": "test_description",
+            "image": "new_image",
+            "visibility": False,
         }
         post = serializer.update(post, validated_data=data)
-        self.assertTrue(isinstance(post.author, User) and post.description == "test_description" and post.visibility and post.image == "new_image")
+        self.assertTrue(isinstance(post.author,
+                                   User) and post.description == "test_description" and post.visibility and post.image == "new_image")
