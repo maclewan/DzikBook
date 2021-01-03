@@ -325,7 +325,6 @@ class MultipleUsersDataView(APIView):
 
         data_list = [UserData.objects.get(user=u) for u in user_id_list if UserData.objects.filter(user=u).exists()]
         return_list = [{
-            # TODO: add another info if required
             'user_id': a.user,
             'first_name': a.first_name,
             'last_name': a.last_name

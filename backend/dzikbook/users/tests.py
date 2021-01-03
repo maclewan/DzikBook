@@ -193,8 +193,34 @@ class ViewsTestCase(APITestCase):
             'birth_date': '01/01/1900'
         }
 
+        self.details = {
+            'user': 1,
+            'workout_plans': "test_workouts",
+            'diet_plans': "test_diet_plans",
+        }
+
         self.client = RequestsClient()
         self.client.headers = {"Uid": str(1), "Flag": hash_user(1)}
+
+        self.data2 = {
+            'user': 2,
+            'gym': "test_gym",
+            'additional_data': "test_add_data",
+            'first_name': 'test_name',
+            'last_name': 'test_last_name',
+            'sex': 'test_sex',
+            'job': 'test_job',
+            'birth_date': '01/01/1900'
+        }
+
+        self.details2 = {
+            'user': 2,
+            'workout_plans': "test_workouts",
+            'diet_plans': "test_diet_plans",
+        }
+
+        self.client2 = RequestsClient()
+        self.client2.headers = {"Uid": str(2), "Flag": hash_user(2)}
 
     def test_signed_in_user_data(self):
         response = self.client.post('http://testserver/users/data/', self.data)
@@ -214,3 +240,73 @@ class ViewsTestCase(APITestCase):
         response = self.client.get('http://testserver/users/data/')
         self.assertNotEqual(response.json(), updated_data)
         self.assertEqual(response.json(), "User data doesn't exist!")
+
+    def test_signed_in_details_data(self):
+        response = self.client.post('http://testserver/users/details/', self.details)
+        self.assertEqual(response.json(), self.details)
+
+        response = self.client.get('http://testserver/users/details/')
+        self.assertEqual(response.json(), self.details)
+
+        updated_data = copy(self.details)
+        updated_data['workout_plans'] = 'updated_plans'
+
+        response = self.client.put('http://testserver/users/details/', updated_data)
+        self.assertNotEqual(response.json()['user_data'], self.details)
+        self.assertEqual(response.json()['user_data'], updated_data)
+
+        self.client.delete('http://testserver/users/details/')
+        response = self.client.get('http://testserver/users/details/')
+        self.assertNotEqual(response.json(), updated_data)
+        self.assertEqual(response.json(), "User details data doesn't exist!")
+
+    # todo: test for UserDataView
+
+    def test_details_data(self):
+        response = self.client2.get('http://testserver/users/details/1')
+        self.assertEqual(response.json(), 'User details doesnt exist!')
+
+        self.client.post('http://testserver/users/details/', self.details)
+        response = self.client2.get('http://testserver/users/details/1')
+        formated_details = copy(self.details)
+        formated_details.pop('user')
+        self.assertEqual(response.json(), formated_details)
+
+    def test_basic_data(self):
+        response = self.client2.get('http://testserver/users/basic/1')
+        self.assertEqual(response.json(), 'User data doesnt exist!')
+
+        self.client.post('http://testserver/users/data/', self.data)
+        response = self.client2.get('http://testserver/users/basic/1')
+
+        self.assertEqual(response.json(), {'first_name': 'test_name', 'last_name': 'test_last_name'})
+
+    def test_multiple_data(self):
+        self.client.post('http://testserver/users/data/', self.data)
+        self.client2.post('http://testserver/users/data/', self.data2)
+
+        data = json.dumps({'id_list': [1, 2]})
+        response = self.client.post('http://testserver/users/multi/', data)
+        self.assertEqual(response.json(),
+                         {'user_data_list':
+                             [
+                                 {'user_id': 1, 'first_name': 'test_name', 'last_name': 'test_last_name'},
+                                 {'user_id': 2, 'first_name': 'test_name', 'last_name': 'test_last_name'}
+                             ]
+                         })
+
+    def test_create_empty_user_data(self):
+        self.client.post('http://testserver/users/data/new/', )
+        response = self.client.get('http://testserver/users/data/')
+        self.assertEqual(response.json(), {
+                'gym': "",
+                'additional_data': "",
+                'first_name': "",
+                'last_name': "",
+                'sex': "",
+                'job': "",
+                'birth_date': "01/01/1900",
+                'user': 1
+            })
+
+    def test_search_users(self):
