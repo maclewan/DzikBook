@@ -4,12 +4,16 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.response import Response
 
-from .constants import SERVER_HOST
+import wall.constants as constants
 
 
 def authenticate(f):
     def validate(*args, **kwargs):
         request = args[1]
+        # if hasattr(request, 'user'):
+        #     if request.user.is_authenticated:
+        #         return f(*args, **kwargs)
+
 
         if 'Flag' in request.headers:
             # If service will communicate just with another service
@@ -27,7 +31,7 @@ def authenticate(f):
         else:
             # Is user will communicate with service
             auth = request.headers["Authorization"] if 'Authorization' in request.headers else ''
-            url = 'http://'+SERVER_HOST+'/auth/validate/'
+            url = 'http://'+constants.SERVER_HOST+'/auth/validate/'
             headers = {"Authorization": auth}
             r = requests.get(url, headers=headers)
 
