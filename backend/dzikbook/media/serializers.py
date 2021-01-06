@@ -5,7 +5,7 @@ from .models import Photo, ProfilePhoto
 class PhotoSerializer(serializers.ModelSerializer):
 
     def get_photo_id(self, obj):
-        return obj.pk
+        return obj.id
 
 
     class Meta:
@@ -20,11 +20,17 @@ class PhotoSerializer(serializers.ModelSerializer):
 
 
 class ProfilePhotoSerializer(serializers.ModelSerializer):
-    photo = PhotoSerializer()
-    downsized_photo = PhotoSerializer()
+    photo = serializers.SerializerMethodField('get_photo')
+    downsized_photo = serializers.SerializerMethodField('get_downsized_photo')
 
     def get_profile_photo_id(self, obj):
         return obj.id
+
+    def get_photo(self, obj):
+        return PhotoSerializer(Photo.objects.filter(id=obj.photo).first()).data
+
+    def get_downsized_photo(self, obj):
+        return PhotoSerializer(Photo.objects.filter(id=obj.downsized_photo).first()).data
 
     class Meta:
         model = ProfilePhoto
@@ -35,4 +41,3 @@ class ProfilePhotoSerializer(serializers.ModelSerializer):
         Create and return a new `ProfilePhoto` instance, given the validated data. 
         """
         return ProfilePhoto.objects.create(**validated_data)
-    

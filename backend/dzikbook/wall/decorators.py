@@ -10,10 +10,6 @@ import wall.constants as constants
 def authenticate(f):
     def validate(*args, **kwargs):
         request = args[1]
-        # if hasattr(request, 'user'):
-        #     if request.user.is_authenticated:
-        #         return f(*args, **kwargs)
-
 
         if 'Flag' in request.headers:
             # If service will communicate just with another service
