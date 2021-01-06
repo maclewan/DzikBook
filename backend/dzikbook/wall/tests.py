@@ -1,14 +1,19 @@
 from collections import OrderedDict
 
+from PIL import Image
+from django.core.files.base import ContentFile
 from django.test import TestCase, Client, LiveServerTestCase
 from rest_framework_simplejwt.tokens import Token
 
+from .decorators import hash_user
 from .models import Post
 from django.contrib.auth.models import User
 from .serializers import PostSerializer
 from django.urls import reverse
 import unittest.mock as mock
 from rest_framework.test import APIRequestFactory, APITestCase, APIClient
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.utils.six import BytesIO
 
 
 # Create your tests here.
@@ -16,6 +21,7 @@ from rest_framework.test import APIRequestFactory, APITestCase, APIClient
 ##################
 ## models tests ##
 ##################
+
 
 class PostTestCase(TestCase):
 
@@ -142,22 +148,23 @@ class PostSerializerTestCase(TestCase):
         self.assertEqual(self.post.timestamp, starting_timestamp)  # timestamp shouldnt update
 
 
-#######################
+#################
 ## views tests ##
-#######################
-def mocked_requests_friendslist(*args):
-    return {'friends_list': [2]}
+#################
 
 
 class PostViewTestCase(LiveServerTestCase):
     port = 8081
+    server_host = "localhost:" + str(port)
 
     def setUp(self):
+        self.server_host = PostViewTestCase.server_host
         self.client = APIClient()
         self.user1 = User.objects.create(username="user1", password="user1")
         self.user2 = User.objects.create(username="user2", password="user2")
         self.user3 = User.objects.create(username="user3", password="user3")
-        self.client.force_authenticate(user=self.user1)
+        logged_user_id = self.user1.pk
+        self.client.credentials(HTTP_Uid=str(logged_user_id), HTTP_Flag=hash_user(logged_user_id))
 
         data = {
             "author": self.user1,
@@ -165,6 +172,7 @@ class PostViewTestCase(LiveServerTestCase):
             "type": "text",
         }
         self.post1 = Post.objects.create(**data)
+        self.post4 = Post.objects.create(**data)
         data["author"] = self.user2
         self.post2 = Post.objects.create(**data)
         data["author"] = self.user3
@@ -174,30 +182,136 @@ class PostViewTestCase(LiveServerTestCase):
         Post.objects.all().delete()
         User.objects.all().delete()
 
-    @mock.patch('wall.constants.SERVER_HOST', "localhost:" + str(port))
-    def test_sig_in_user_posts_list(self):
+    def test_sig_in_user_posts_get_existing(self):
+        tested_post = self.post3
+        url = reverse('sig_in_user_posts', args=[tested_post.id])
+        response = self.client.get(url, format='json')
+        serializer = PostSerializer(tested_post)
+        self.assertEqual(response.data, serializer.data)
+
+    def test_sig_in_user_posts_get_nonexisting(self):
+        url = reverse('sig_in_user_posts', args=[999])
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.data, "Post with given id doesn't exist!")
+
+    @mock.patch('wall.constants.SERVER_HOST', server_host)
+    def test_sig_in_user_posts_post_image(self):
+        url = reverse('sig_in_user_add_post')
+
+        photo = create_image(None)
+        photo_file = SimpleUploadedFile('photo.png', photo.getvalue())
+        data = {
+            "description": "description",
+            "additional_data": "additional_data",
+            "type": "media",
+            "photo": photo_file,
+        }
+        response = self.client.post(url, data)
+
+        self.assertEqual(int(response.data['author']), self.user1.id)
+        self.assertEqual(response.data['description'], 'description')
+        self.assertEqual(response.data['type'], 'media')
+        self.assertEqual(response.data['additional_data'], 'additional_data')
+        self.assertIsNotNone(response.data['photo'])
+
+    def test_sig_in_user_posts_post_nonimage(self):
+        url = reverse('sig_in_user_add_post')
+
+        data = {
+            "description": "description",
+            "additional_data": "additional_data",
+            "type": "media",
+        }
+        response = self.client.post(url, data)
+
+        self.assertEqual(int(response.data['author']), self.user1.id)
+        self.assertEqual(response.data['description'], 'description')
+        self.assertEqual(response.data['type'], 'media')
+        self.assertEqual(response.data['additional_data'], 'additional_data')
+        self.assertIsNone(response.data['photo'])
+
+    def test_sig_in_user_posts_put_not_yours(self):
+        url = reverse('sig_in_user_posts', args=[self.post3.id])
+        data = {
+            "description": "description_updated",
+            "additional_data": "additional_data_updated",
+            "type": "text",
+        }
+        response = self.client.put(url, data)
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.data, "Post doesn't exist!")
+
+    @mock.patch('wall.constants.SERVER_HOST', server_host)
+    def test_sig_in_user_posts_put(self):
+        url = reverse('sig_in_user_posts', args=[self.post1.id])
+
+        photo = create_image(None)
+        photo_file = SimpleUploadedFile('photo.png', photo.getvalue())
+        data = {
+            "description": "description_updated",
+            "additional_data": "additional_data_updated",
+            "type": "media",
+            "photo": photo_file,
+        }
+        response = self.client.put(url, data)
+        self.assertEqual(int(response.data['author']), self.user1.id)
+        self.assertEqual(response.data['description'], 'description_updated')
+        self.assertEqual(response.data['type'], 'text')  # type cannot be modified
+        self.assertEqual(response.data['additional_data'], 'additional_data_updated')
+        self.assertIsNotNone(response.data['photo'])
+
+    def test_sig_in_user_posts_list_get(self):
         url = reverse('sig_in_user_posts_list')
         response = self.client.get(url, format='json')
-        self.assertDictEqual(dict(response.data[0]), {'post_id': self.post1.id,
-                                                      'author': self.user1.id,
-                                                      'description': 'description',
-                                                      'additional_data': None,
-                                                      'visibility': True,
-                                                      'photo': None,
-                                                      'type': 'text',
-                                                      'timestamp': mock.ANY})
 
-    # @mock.patch('wall.views.requests.get')
-    # def test_main_wall(self, mocked_get):
-    #     mocked_get.return_value = mock.Mock(status_code=201, json= lambda: {'friends_list': [3]})
-    #     url = reverse('main_wall')
-    #     response = self.client.get(url, format='json')
-    #     print(response.data)
+        self.assertEqual(len(response.data), 2)
+        self.assertIn(response.data[0]['post_id'], [self.post1.id, self.post4.id])
+        self.assertIn(response.data[1]['post_id'], [self.post1.id, self.post4.id])
 
-    @mock.patch('wall.constants.SERVER_HOST', "localhost:" + str(port))
-    @mock.patch('friends.constants.SERVER_HOST', "localhost:" + str(port))
-    def test_main_wall(self):
-        url = reverse('main_wall')
+    def test_post_list_get(self):
+        url = reverse('posts_list', args=[self.user3.id])
         response = self.client.get(url, format='json')
-        # print(response.data)
-        # self.assertDictEqual(response.data, {})
+
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['post_id'], self.post3.id)
+
+    @mock.patch('wall.constants.SERVER_HOST', server_host)
+    @mock.patch('friends.constants.SERVER_HOST', server_host)
+    @mock.patch('authentication.constants.SERVER_HOST', server_host)
+    def test_main_wall_list_view_get(self):
+        url = reverse('main_wall')
+        client2 = APIClient()
+        client2.credentials(HTTP_Uid=str(self.user2.id), HTTP_Flag=hash_user(self.user2.id))
+
+        client3 = APIClient()
+        client3.credentials(HTTP_Uid=str(self.user3.id), HTTP_Flag=hash_user(self.user3.id))
+
+        response_invitation = client2.post(
+            'http://' + self.server_host + '/friends/request/' + str(self.user3.id) + '/')
+        invitation_id = response_invitation.data['invitation_id']
+
+        client3.post('http://' + self.server_host + '/friends/request/manage/' + str(invitation_id) + '/')
+
+        response = client3.get(url, format='json')
+        self.assertEqual(len(response.data), 2)
+        self.assertIn(response.data[0]['post_id'], [self.post2.id, self.post3.id])
+        self.assertIn(response.data[1]['post_id'], [self.post2.id, self.post3.id])
+
+
+def create_image(storage, filename='test_image.png', size=(800, 600),
+                 image_mode='RGB', image_format='PNG'):
+    """
+    Generate a test image, returning the filename that it was saved as.
+    If ``storage`` is ``None``, the BytesIO containing the image data
+    will be passed instead.
+    """
+    data = BytesIO()
+    with Image.new(image_mode, size) as img:
+        img.save(data, image_format)
+    data.seek(0)
+    if not storage:
+        return data
+    image_file = ContentFile(data.read())
+    storage_file = storage.save(filename, image_file)
+    return storage_file

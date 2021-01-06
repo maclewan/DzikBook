@@ -23,7 +23,7 @@ class SigInUserPostsView(APIView):
     @authenticate
     def get(self, request, post_id):
         try:
-            post = Post.objects.get(pk=post_id)
+            post = Post.objects.get(id=post_id)
             context = PostSerializer(post).data
         except Exception as e:
             return Response("Post with given id doesn't exist!", status=status.HTTP_404_NOT_FOUND)
@@ -62,13 +62,12 @@ class SigInUserPostsView(APIView):
             post.save()
             return Response(PostSerializer(post).data)
         except Exception as e:
-            print(e)
             return Response("Error!", status=status.HTTP_404_NOT_FOUND)
 
     @authenticate
     def put(self, request, post_id):
         try:
-            post = Post.objects.get(pk=post_id, author=request.user)
+            post = Post.objects.get(id=post_id, author=request.user)
             data = {}
 
             description = request.POST.get('description', None)
@@ -105,7 +104,7 @@ class SigInUserPostsView(APIView):
     @authenticate
     def delete(self, request, post_id):
         try:
-            post = Post.objects.filter(pk=post_id, author=request.user)
+            post = Post.objects.filter(id=post_id, author=request.user)
             post.delete()
             return Response({"message": "Post deleted"})
         except models.ObjectDoesNotExist:
@@ -142,7 +141,7 @@ class PostsListView(APIView):
     @authenticate
     def get(self, request, user_id):
         try:
-            posts = Post.objects.filter(author=User(pk=user_id))
+            posts = Post.objects.filter(author=User(id=user_id))
             posts = posts.order_by('-timestamp')
             offset = int(request.GET.get('offset', 0))
             amount = int(request.GET.get('amount', 10))
