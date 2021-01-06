@@ -261,25 +261,38 @@ class PostViewTestCase(LiveServerTestCase):
         self.assertEqual(response.data['additional_data'], 'additional_data_updated')
         self.assertIsNotNone(response.data['photo'])
 
+    def test_sig_in_user_posts_delete(self):
+        url = reverse('sig_in_user_posts', args=[self.post1.id])
+        response = self.client.delete(url)
+        self.assertEqual(response.data, {'message': 'Post deleted'})
+
+    def test_sig_in_user_posts_delete_not_yours(self):
+        url = reverse('sig_in_user_posts', args=[self.post3.id])
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.data, "Post doesn't exist!")
+
     def test_sig_in_user_posts_list_get(self):
         url = reverse('sig_in_user_posts_list')
         response = self.client.get(url, format='json')
-
         self.assertEqual(len(response.data), 2)
         self.assertIn(response.data[0]['post_id'], [self.post1.id, self.post4.id])
         self.assertIn(response.data[1]['post_id'], [self.post1.id, self.post4.id])
 
+        url = reverse('sig_in_user_posts_list')
+        response = self.client.get(url, {'amount': 1, 'offset': 1}, format='json')
+        self.assertEqual(len(response.data), 1)
+
     def test_post_list_get(self):
         url = reverse('posts_list', args=[self.user3.id])
         response = self.client.get(url, format='json')
-
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['post_id'], self.post3.id)
 
     @mock.patch('wall.constants.SERVER_HOST', server_host)
     @mock.patch('friends.constants.SERVER_HOST', server_host)
     @mock.patch('authentication.constants.SERVER_HOST', server_host)
-    def test_main_wall_list_view_get(self):
+    def test_main_wall_list_get(self):
         url = reverse('main_wall')
         client2 = APIClient()
         client2.credentials(HTTP_Uid=str(self.user2.id), HTTP_Flag=hash_user(self.user2.id))
@@ -299,7 +312,7 @@ class PostViewTestCase(LiveServerTestCase):
         self.assertIn(response.data[1]['post_id'], [self.post2.id, self.post3.id])
 
 
-def create_image(storage, filename='test_image.png', size=(800, 600),
+def create_image(storage, filename='test_image.png', size=(100, 100),
                  image_mode='RGB', image_format='PNG'):
     """
     Generate a test image, returning the filename that it was saved as.

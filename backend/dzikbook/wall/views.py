@@ -104,7 +104,7 @@ class SigInUserPostsView(APIView):
     @authenticate
     def delete(self, request, post_id):
         try:
-            post = Post.objects.filter(id=post_id, author=request.user)
+            post = Post.objects.get(id=post_id, author=request.user)
             post.delete()
             return Response({"message": "Post deleted"})
         except models.ObjectDoesNotExist:
