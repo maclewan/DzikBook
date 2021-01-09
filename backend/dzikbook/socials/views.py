@@ -50,7 +50,7 @@ class ReactionsView(APIView):
     @authenticate
     def delete(self, request, post_id):
         try:
-            reaction = Reaction.objects.filter(post=post_id, giver=request.user)
+            reaction = Reaction.objects.get(post=post_id, giver=request.user)
             reaction.delete()
             return Response({"message": "Reaction deleted"})
         except models.ObjectDoesNotExist:

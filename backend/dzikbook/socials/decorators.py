@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.response import Response
 
-from .constants import SERVER_HOST
+import socials.constants as constants
 
 
 def authenticate(f):
@@ -27,7 +27,7 @@ def authenticate(f):
         else:
             # Is user will communicate with service
             auth = request.headers["Authorization"] if 'Authorization' in request.headers else ''
-            url = 'http://'+SERVER_HOST+'/auth/validate/'
+            url = 'http://'+constants.SERVER_HOST+'/auth/validate/'
             headers = {"Authorization": auth}
             r = requests.get(url, headers=headers)
 
