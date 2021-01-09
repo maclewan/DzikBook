@@ -321,6 +321,9 @@ class _AuthCardState extends State<AuthCard>
                                     _authData['first-name'] = value;
                                   },
                                 ),
+                                SizedBox(
+                                  height: deviceSize.height * 0.01,
+                                ),
                                 TextFormField(
                                   enabled: _authMode == AuthMode.SignUp,
                                   decoration: InputDecoration(
@@ -419,7 +422,10 @@ class _AuthCardState extends State<AuthCard>
                 ),
                 SizedBox(height: deviceSize.height * 0.002),
                 GestureDetector(
-                  onTap: _toggleAuthType,
+                  onTap: () {
+                    FocusScope.of(context).unfocus();
+                    _toggleAuthType();
+                  },
                   child: Text(
                     _changeAuthText,
                     style: TextStyle(

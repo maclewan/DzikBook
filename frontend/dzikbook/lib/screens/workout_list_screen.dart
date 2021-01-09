@@ -1,4 +1,5 @@
 import 'package:dzikbook/screens/add_workout_screen.dart';
+import 'package:dzikbook/widgets/drawer.dart';
 import 'package:dzikbook/widgets/navbar.dart';
 import 'package:flutter/material.dart';
 
@@ -12,6 +13,9 @@ class WorkoutListScreen extends StatelessWidget {
     final addToPlan = ModalRoute.of(context).settings.arguments as bool;
 
     return Scaffold(
+        drawer: Drawer(
+          child: DrawerBody(),
+        ),
         appBar: buildNavBar(
             context: context,
             routeName: WorkoutListScreen.routeName,

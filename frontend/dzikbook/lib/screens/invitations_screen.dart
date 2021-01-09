@@ -1,4 +1,5 @@
 import 'package:dzikbook/providers/friends.dart';
+import 'package:dzikbook/widgets/drawer.dart';
 import 'package:dzikbook/widgets/friend.dart';
 import 'package:dzikbook/widgets/invitation.dart';
 import 'package:dzikbook/widgets/navbar.dart';
@@ -30,6 +31,9 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
   Widget build(BuildContext context) {
     final friendsProvider = Provider.of<Friends>(context, listen: true);
     return Scaffold(
+      drawer: Drawer(
+        child: DrawerBody(),
+      ),
       appBar: buildNavBar(
           context: context,
           routeName: InvitationsScreen.routeName,
