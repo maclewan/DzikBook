@@ -22,7 +22,8 @@ class SocialIcon extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 12),
         padding: const EdgeInsets.only(top: 5),
-        width: deviceSize.width * 0.11,
+        width: deviceSize.width * 0.13,
+        height: deviceSize.width * 0.13,
         decoration: BoxDecoration(
           color: color,
           shape: BoxShape.rectangle,

@@ -1,4 +1,5 @@
 import 'package:dzikbook/providers/friends.dart';
+import 'package:dzikbook/widgets/drawer.dart';
 import 'package:dzikbook/widgets/friend.dart';
 import 'package:dzikbook/widgets/navbar.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +25,9 @@ class _FriendsListScreenState extends State<FriendsListScreen> {
   Widget build(BuildContext context) {
     final friendsProvider = Provider.of<Friends>(context, listen: true);
     return Scaffold(
+      drawer: Drawer(
+        child: DrawerBody(),
+      ),
       appBar: buildNavBar(
           context: context,
           routeName: FriendsListScreen.routeName,

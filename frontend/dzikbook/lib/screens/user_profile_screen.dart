@@ -1,6 +1,7 @@
 import 'package:dzikbook/models/PostFetcher.dart';
 import 'package:dzikbook/providers/posts.dart';
 import 'package:dzikbook/providers/user_data.dart';
+import 'package:dzikbook/widgets/drawer.dart';
 import 'package:dzikbook/widgets/navbar.dart';
 import 'package:dzikbook/widgets/user_profile_info.dart';
 import 'package:flutter/material.dart';
@@ -53,6 +54,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Widget build(BuildContext context) {
     var postsProvider = Provider.of<Posts>(context, listen: true);
     return Scaffold(
+        drawer: Drawer(
+          child: DrawerBody(),
+        ),
         appBar: buildNavBar(
             context: context,
             routeName: UserProfileScreen.routeName,

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:dzikbook/widgets/add_post.dart';
 import 'package:dzikbook/widgets/post.dart';
 import 'package:provider/provider.dart';
+import '../widgets/drawer.dart';
 
 class ProfileScreen extends StatefulWidget {
   static final routeName = '/profile';
@@ -35,6 +36,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Provider.of<DayPlans>(context, listen: false).fetchPlans();
 
     return Scaffold(
+        drawer: Drawer(
+          child: DrawerBody(),
+        ),
         appBar: buildNavBar(
             context: context,
             title: "Dzikbook",
