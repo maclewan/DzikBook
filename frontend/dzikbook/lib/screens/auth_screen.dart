@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dzikbook/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -27,7 +29,7 @@ class AuthScreen extends StatelessWidget {
               // height: deviceSize.height,
               width: deviceSize.width,
               padding: EdgeInsets.only(
-                  top: deviceSize.height * 0.15,
+                  top: deviceSize.height * 0.1,
                   bottom: deviceSize.height * 0.05),
               child: Column(
                 // mainAxisAlignment: MainAxisAlignment.start,
@@ -71,7 +73,8 @@ class AuthCard extends StatefulWidget {
   _AuthCardState createState() => _AuthCardState();
 }
 
-class _AuthCardState extends State<AuthCard> {
+class _AuthCardState extends State<AuthCard>
+    with SingleTickerProviderStateMixin {
   final GlobalKey<FormState> _formKey = GlobalKey();
   AuthMode _authMode = AuthMode.SignIn;
   bool _authModeBool = false;
@@ -81,6 +84,37 @@ class _AuthCardState extends State<AuthCard> {
   String _btnText = "Zaloguj";
   String _changeAuthText = "Zarejestruj się";
   bool _isLoading = false;
+
+  AnimationController _controller;
+  Animation<Offset> _slideAnimation;
+  Animation<double> _opacityAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(
+        milliseconds: 700,
+      ),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: Offset(0, -0.5),
+      end: Offset(0, 0),
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOutCubic,
+      ),
+    );
+    _opacityAnimation = Tween(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOutCubic,
+      ),
+    );
+  }
 
   void _togglePassword() {
     setState(() {
@@ -101,11 +135,13 @@ class _AuthCardState extends State<AuthCard> {
         _changeAuthDesc = "Należysz do stada?";
         _btnText = "Zarejestruj";
         _changeAuthText = "Zaloguj się";
+        _controller.forward();
       } else {
         _authMode = AuthMode.SignIn;
         _changeAuthDesc = "Nie należysz jeszcze do stada?";
         _btnText = "Zaloguj";
         _changeAuthText = "Zarejestruj się";
+        _controller.reverse();
       }
     });
   }
@@ -121,11 +157,11 @@ class _AuthCardState extends State<AuthCard> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('An Error Occurred!'),
+        title: Text('Wystąpił błąd'),
         content: Text(message),
         actions: <Widget>[
           FlatButton(
-            child: Text('Okay'),
+            child: Text('Okej'),
             onPressed: () {
               Navigator.of(ctx).pop();
             },
@@ -137,7 +173,6 @@ class _AuthCardState extends State<AuthCard> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState.validate()) {
-      // Invalid!
       return;
     }
     _formKey.currentState.save();
@@ -158,24 +193,13 @@ class _AuthCardState extends State<AuthCard> {
         await Provider.of<Auth>(context, listen: false).signup(
           _authData['email'],
           _authData['password'],
-          // _authData['name'],
-          // _authData['username],
+          _authData['first-name'],
+          _authData['last-name'],
         );
         _toggleAuthType();
       }
     } on HttpException catch (error) {
-      var errorMessage = 'Authentication failed';
-      if (error.toString().contains('EMAIL_EXISTS')) {
-        errorMessage = 'This email address is already in use.';
-      } else if (error.toString().contains('INVALID_EMAIL')) {
-        errorMessage = 'This is not a valid email address';
-      } else if (error.toString().contains('WEAK_PASSWORD')) {
-        errorMessage = 'This password is too weak.';
-      } else if (error.toString().contains('EMAIL_NOT_FOUND')) {
-        errorMessage = 'Could not find a user with that email.';
-      } else if (error.toString().contains('INVALID_PASSWORD')) {
-        errorMessage = 'Invalid password.';
-      }
+      var errorMessage = error.toString();
       _showErrorDialog(errorMessage);
     } catch (error) {
       const errorMessage =
@@ -198,143 +222,167 @@ class _AuthCardState extends State<AuthCard> {
           children: [
             Container(
               width: deviceSize.width * 0.6,
+              // height: deviceSize.height * 0.3,
               child: Form(
-                  key: _formKey,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        TextFormField(
-                          decoration: InputDecoration(
-                            labelText: 'E-mail',
-                            contentPadding:
-                                const EdgeInsets.only(bottom: -2, top: -5),
-                            icon: Icon(Icons.email),
+                key: _formKey,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        decoration: InputDecoration(
+                          labelText: 'E-mail',
+                          contentPadding:
+                              const EdgeInsets.only(bottom: -2, top: -5),
+                          icon: Icon(Icons.email),
+                        ),
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (value) {
+                          if (value.isEmpty || !value.contains('@')) {
+                            return 'Niepoprawny email!';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          _authData['email'] = value;
+                        },
+                      ),
+                      SizedBox(
+                        height: deviceSize.height * 0.01,
+                      ),
+                      TextFormField(
+                        decoration: InputDecoration(
+                          labelText: 'Hasło',
+                          contentPadding:
+                              const EdgeInsets.only(bottom: -2, top: -5),
+                          icon: Icon(Icons.lock),
+                          suffixIcon: IconButton(
+                            icon: _visibility,
+                            onPressed: _togglePassword,
                           ),
-                          keyboardType: TextInputType.emailAddress,
-                          validator: (value) {
-                            if (value.isEmpty || !value.contains('@')) {
-                              return 'Niepoprawny email!';
-                            }
-                            return null;
-                          },
-                          onSaved: (value) {
-                            _authData['email'] = value;
-                          },
                         ),
-                        SizedBox(
-                          height: deviceSize.height * 0.01,
-                        ),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            labelText: 'Hasło',
-                            contentPadding:
-                                const EdgeInsets.only(bottom: -2, top: -5),
-                            icon: Icon(Icons.lock),
-                            suffixIcon: IconButton(
-                              icon: _visibility,
-                              onPressed: _togglePassword,
-                            ),
-                          ),
-                          obscureText: _obscureTextPassword,
-                          validator: (value) {
-                            if (value.isEmpty || value.length < 5) {
-                              return 'Hasło jest zbyt krótkie!';
-                            }
-                            return null;
-                          },
-                          onSaved: (value) {
-                            _authData['password'] = value;
-                          },
-                        ),
-                        SizedBox(
-                          height: deviceSize.height * 0.01,
-                        ),
-                        if (_authMode == AuthMode.SignIn)
-                          Align(
-                            alignment: Alignment(1, 0),
-                            child: GestureDetector(
-                              onTap: () {},
-                              child: Text(
-                                "Zapomniałeś hasła?",
-                                style: TextStyle(
-                                  color: Color.fromRGBO(77, 105, 204, 1),
-                                ),
+                        obscureText: _obscureTextPassword,
+                        validator: (value) {
+                          if (value.isEmpty || value.length < 5) {
+                            return 'Hasło jest zbyt krótkie!';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          _authData['password'] = value;
+                        },
+                      ),
+                      SizedBox(
+                        height: deviceSize.height * 0.01,
+                      ),
+                      if (_authMode == AuthMode.SignIn)
+                        Align(
+                          alignment: Alignment(1, 0),
+                          child: GestureDetector(
+                            onTap: () {},
+                            child: Text(
+                              "Zapomniałeś hasła?",
+                              style: TextStyle(
+                                color: Color.fromRGBO(77, 105, 204, 1),
                               ),
                             ),
                           ),
-                        if (_authMode == AuthMode.SignUp)
-                          TextFormField(
-                            enabled: _authMode == AuthMode.SignUp,
-                            decoration: InputDecoration(
-                              labelText: 'Imię',
-                              contentPadding:
-                                  const EdgeInsets.only(bottom: -2, top: -5),
-                              icon: Icon(Icons.person),
-                            ),
-                            validator: (value) {
-                              if (value.isEmpty) {
-                                return 'Podaj imię!';
-                              }
-                              return null;
-                            },
-                            onSaved: (value) {
-                              _authData['first-name'] = value;
-                            },
-                          ),
-                        SizedBox(
-                          height: deviceSize.height * 0.01,
                         ),
-                        if (_authMode == AuthMode.SignUp)
-                          TextFormField(
-                            enabled: _authMode == AuthMode.SignUp,
-                            decoration: InputDecoration(
-                              labelText: 'Nazwisko',
-                              contentPadding:
-                                  const EdgeInsets.only(bottom: -2, top: -5),
-                              icon: Icon(Icons.person),
-                            ),
-                            validator: (value) {
-                              if (value.isEmpty || value.length < 5) {
-                                return 'Podaj nazwisko';
-                              }
-                              return null;
-                            },
-                            onSaved: (value) {
-                              _authData['second-name'] = value;
-                            },
-                          ),
-                        SizedBox(
-                          height: deviceSize.height * 0.02,
+                      AnimatedContainer(
+                        duration: Duration(milliseconds: 700),
+                        constraints: BoxConstraints(
+                          minHeight: _authMode == AuthMode.SignUp ? 60 : 0,
+                          maxHeight: _authMode == AuthMode.SignUp ? 120 : 0,
                         ),
-                        Material(
-                          clipBehavior: Clip.antiAlias,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: MaterialButton(
-                            // onPressed: _submit,
-                            onPressed: _submit,
-                            height: deviceSize.height * 0.07,
-                            minWidth: deviceSize.width * 0.45,
-                            textColor: Colors.white,
-                            color: Theme.of(context).primaryColor,
-                            child: _isLoading
-                                ? CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.white),
-                                  )
-                                : Text(
-                                    _btnText,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.w500),
+                        curve: Curves.easeInOutCubic,
+                        child: FadeTransition(
+                          opacity: _opacityAnimation,
+                          child: SlideTransition(
+                            position: _slideAnimation,
+                            child: ListView(
+                              padding: EdgeInsets.all(0),
+                              children: [
+                                TextFormField(
+                                  enabled: _authMode == AuthMode.SignUp,
+                                  decoration: InputDecoration(
+                                    labelText: 'Imię',
+                                    contentPadding: const EdgeInsets.only(
+                                        bottom: -2, top: -5),
+                                    icon: Icon(Icons.person),
                                   ),
+                                  validator: _authMode == AuthMode.SignUp
+                                      ? (value) {
+                                          if (value.isEmpty) {
+                                            return 'Podaj imię!';
+                                          }
+                                          return null;
+                                        }
+                                      : null,
+                                  onSaved: (value) {
+                                    _authData['first-name'] = value;
+                                  },
+                                ),
+                                SizedBox(
+                                  height: deviceSize.height * 0.01,
+                                ),
+                                TextFormField(
+                                  enabled: _authMode == AuthMode.SignUp,
+                                  decoration: InputDecoration(
+                                    labelText: 'Nazwisko',
+                                    contentPadding: const EdgeInsets.only(
+                                        bottom: -2, top: -5),
+                                    icon: Icon(Icons.person),
+                                  ),
+                                  validator: _authMode == AuthMode.SignUp
+                                      ? (value) {
+                                          if (value.isEmpty ||
+                                              value.length < 5) {
+                                            return 'Podaj nazwisko';
+                                          }
+                                          return null;
+                                        }
+                                      : null,
+                                  onSaved: (value) {
+                                    _authData['last-name'] = value;
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
-                        )
-                      ],
-                    ),
-                  )),
+                        ),
+                      ),
+                      SizedBox(
+                        height: deviceSize.height * 0.02,
+                      ),
+                      Material(
+                        clipBehavior: Clip.antiAlias,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: MaterialButton(
+                          // onPressed: _submit,
+                          onPressed: _submit,
+                          height: deviceSize.height * 0.07,
+                          minWidth: deviceSize.width * 0.45,
+                          textColor: Colors.white,
+                          color: Theme.of(context).primaryColor,
+                          child: _isLoading
+                              ? CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white),
+                                )
+                              : Text(
+                                  _btnText,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
             ),
             SizedBox(
               height: deviceSize.height * 0.05,
@@ -374,7 +422,10 @@ class _AuthCardState extends State<AuthCard> {
                 ),
                 SizedBox(height: deviceSize.height * 0.002),
                 GestureDetector(
-                  onTap: _toggleAuthType,
+                  onTap: () {
+                    FocusScope.of(context).unfocus();
+                    _toggleAuthType();
+                  },
                   child: Text(
                     _changeAuthText,
                     style: TextStyle(

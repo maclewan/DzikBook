@@ -4,9 +4,10 @@ import 'package:dzikbook/screens/user_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class Friend extends StatelessWidget {
-  final String userImg, userName, userId;
-  const Friend({this.userImg, this.userName, this.userId});
+class Invitation extends StatelessWidget {
+  final String userImg, userName, userId, invitationId;
+  const Invitation(
+      {this.userImg, this.userName, this.userId, this.invitationId});
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +57,7 @@ class Friend extends StatelessWidget {
                         context: context,
                         builder: (BuildContext context) {
                           return Container(
-                            height: 100,
+                            height: 150,
                             color: Colors.white,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -65,16 +66,29 @@ class Friend extends StatelessWidget {
                                   child: FlatButton(
                                       minWidth: double.infinity,
                                       onPressed: () {
-                                        final friendsProvider =
-                                            Provider.of<Friends>(context,
-                                                listen: false);
-                                        friendsProvider
-                                            .deleteUserFromFriends(this.userId)
+                                        Provider.of<Friends>(context,
+                                                listen: false)
+                                            .acceptFriendRequest(
+                                                this.invitationId)
                                             .then((response) {
                                           Navigator.of(context).pop();
                                         });
                                       },
-                                      child: Text("Usuń ze znajomych")),
+                                      child: Text("Akceptuj zaproszenie")),
+                                ),
+                                Expanded(
+                                  child: FlatButton(
+                                      minWidth: double.infinity,
+                                      onPressed: () {
+                                        Provider.of<Friends>(context,
+                                                listen: false)
+                                            .denyFriendRequest(
+                                                this.invitationId)
+                                            .then((response) {
+                                          Navigator.of(context).pop();
+                                        });
+                                      },
+                                      child: Text("Odrzuć zaproszenie")),
                                 ),
                                 Expanded(
                                   child: FlatButton(
@@ -86,6 +100,7 @@ class Friend extends StatelessWidget {
                                         userDataProvider
                                             .getAnotherUserData(this.userId)
                                             .then((data) {
+                                          print(data);
                                           Navigator.push(
                                               context,
                                               MaterialPageRoute(

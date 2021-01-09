@@ -1,4 +1,3 @@
-import 'package:dzikbook/screens/workout_list_screen.dart';
 import 'package:dzikbook/screens/workout_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';

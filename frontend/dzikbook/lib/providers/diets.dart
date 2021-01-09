@@ -21,11 +21,13 @@ class Food {
 }
 
 class Diet {
+  final String id;
   final String name;
   final int dietCalories;
   final List<Food> foodList;
 
   Diet({
+    @required this.id,
     @required this.name,
     @required this.dietCalories,
     @required this.foodList,
@@ -33,180 +35,8 @@ class Diet {
 }
 
 class Diets with ChangeNotifier {
-  List<Diet> _diets = [
-    Diet(name: "Dieta 1", dietCalories: 30, foodList: [
-      Food(
-          id: "1",
-          name: "ex1",
-          calories: 3,
-          weight: 4,
-          protein: 90,
-          carbs: 30,
-          fat: 20),
-      Food(
-          id: "2",
-          name: "ex2",
-          calories: 3,
-          weight: 4,
-          protein: 90,
-          carbs: 30,
-          fat: 20),
-      Food(
-          id: "3",
-          name: "ex3",
-          calories: 3,
-          weight: 4,
-          protein: 90,
-          carbs: 30,
-          fat: 20),
-      Food(
-          id: "4",
-          name: "ex4",
-          calories: 3,
-          weight: 4,
-          protein: 90,
-          carbs: 30,
-          fat: 20),
-      Food(
-          id: "5",
-          name: "ex5",
-          calories: 3,
-          weight: 4,
-          protein: 90,
-          carbs: 30,
-          fat: 20),
-    ]),
-    Diet(name: "Dieta 2", dietCalories: 30, foodList: [
-      Food(
-          id: "1",
-          name: "ex1",
-          calories: 3,
-          weight: 4,
-          protein: 90,
-          carbs: 30,
-          fat: 20),
-      Food(
-          id: "2",
-          name: "ex2",
-          calories: 3,
-          weight: 4,
-          protein: 90,
-          carbs: 30,
-          fat: 20),
-      Food(
-          id: "3",
-          name: "ex3",
-          calories: 3,
-          weight: 4,
-          protein: 90,
-          carbs: 30,
-          fat: 20),
-      Food(
-          id: "4",
-          name: "ex4",
-          calories: 3,
-          weight: 4,
-          protein: 90,
-          carbs: 30,
-          fat: 20),
-      Food(
-          id: "5",
-          name: "ex5",
-          calories: 3,
-          weight: 4,
-          protein: 90,
-          carbs: 30,
-          fat: 20),
-    ]),
-    Diet(name: "Dieta 2", dietCalories: 30, foodList: [
-      Food(
-          id: "1",
-          name: "ex1",
-          calories: 3,
-          weight: 4,
-          protein: 90,
-          carbs: 30,
-          fat: 20),
-      Food(
-          id: "2",
-          name: "ex2",
-          calories: 3,
-          weight: 4,
-          protein: 90,
-          carbs: 30,
-          fat: 20),
-      Food(
-          id: "3",
-          name: "ex3",
-          calories: 3,
-          weight: 4,
-          protein: 90,
-          carbs: 30,
-          fat: 20),
-      Food(
-          id: "4",
-          name: "ex4",
-          calories: 3,
-          weight: 4,
-          protein: 90,
-          carbs: 30,
-          fat: 20),
-      Food(
-          id: "5",
-          name: "ex5",
-          calories: 3,
-          weight: 4,
-          protein: 90,
-          carbs: 30,
-          fat: 20),
-    ]),
-    Diet(name: "Dieta 2", dietCalories: 30, foodList: [
-      Food(
-          id: "1",
-          name: "ex1",
-          calories: 3,
-          weight: 4,
-          protein: 90,
-          carbs: 30,
-          fat: 20),
-      Food(
-          id: "2",
-          name: "ex2",
-          calories: 3,
-          weight: 4,
-          protein: 90,
-          carbs: 30,
-          fat: 20),
-      Food(
-          id: "3",
-          name: "ex3",
-          calories: 3,
-          weight: 4,
-          protein: 90,
-          carbs: 30,
-          fat: 20),
-      Food(
-          id: "4",
-          name: "ex4",
-          calories: 3,
-          weight: 4,
-          protein: 90,
-          carbs: 30,
-          fat: 20),
-      Food(
-          id: "5",
-          name: "ex5",
-          calories: 3,
-          weight: 4,
-          protein: 90,
-          carbs: 30,
-          fat: 20),
-    ]),
-  ];
-
-  List<Diet> get diets {
-    return [..._diets];
-  }
+  List<Diet> diets;
+  Future<void> Function(List<Diet>) update;
 
   Future<double> sumCalories(List<Food> food) async {
     return food
@@ -214,8 +44,15 @@ class Diets with ChangeNotifier {
         .reduce((value, element) => value + element);
   }
 
-  Future<void> addDiet(Diet diet) {
-    _diets.add(diet);
-    notifyListeners();
+  Future<void> addDiet(Diet diet) async {
+    diets.add(diet);
+    update(diets)
+        .then(
+      (value) => notifyListeners(),
+    )
+        .catchError((error) {
+      diets.remove(diet);
+      return 42;
+    });
   }
 }

@@ -1,20 +1,18 @@
-//  Copyright (c) 2019 Aleksander Woźniak
-//  Licensed under Apache License v2.0
-
 import 'package:dzikbook/screens/diet_list_screen.dart';
 import 'package:dzikbook/screens/diet_screen.dart';
 import 'package:dzikbook/screens/workout_list_screen.dart';
 import 'package:dzikbook/screens/workout_screen.dart';
+import 'package:dzikbook/widgets/drawer.dart';
+import 'package:dzikbook/widgets/navbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/dayPlans.dart';
+import '../providers/day_plans.dart';
 import '../providers/workouts.dart';
 import '../providers/diets.dart';
 
-// Example holidays
 final Map<DateTime, List> _holidays = {
   DateTime(2020, 1, 1): ['New Year\'s Day'],
   DateTime(2020, 1, 6): ['Epiphany'],
@@ -44,6 +42,8 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
   bool _allButton = true;
   bool _dietButton = false;
   bool owner;
+  AnimationController _slideAnimController;
+  Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
@@ -62,6 +62,26 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
       duration: const Duration(milliseconds: 400),
     );
 
+    _slideAnimController = AnimationController(
+      vsync: this,
+      duration: Duration(
+        milliseconds: 700,
+      ),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: Offset(0, 2),
+      end: Offset(0, 0),
+    ).animate(
+      CurvedAnimation(
+        parent: _slideAnimController,
+        curve: Curves.easeInOutCubic,
+      ),
+    );
+
+    if (_selectedEvents.isNotEmpty) {
+      _slideAnimController.forward();
+    }
+
     _animationController.forward();
   }
 
@@ -72,7 +92,12 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
     super.dispose();
   }
 
-  void _onDaySelected(DateTime day, List events, List holidays) {
+  void _onDaySelected(DateTime day, List events, List holidays) async {
+    if (_slideAnimController.isCompleted && events.isEmpty) {
+      await _slideAnimController.reverse();
+    } else if (_slideAnimController.isDismissed && events.isNotEmpty) {
+      _slideAnimController.forward();
+    }
     setState(() {
       _selectedDay = day;
       _selectedEvents = events;
@@ -88,6 +113,13 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: Drawer(
+        child: DrawerBody(),
+      ),
+      appBar: buildNavBar(
+          context: context,
+          routeName: CalendarPlansScreen.routeName,
+          title: 'Kalendarz'),
       body: Column(
         mainAxisSize: MainAxisSize.max,
         children: <Widget>[
@@ -142,7 +174,7 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
             child: Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Theme.of(context).primaryColor,
+                border: Border.all(color: Colors.green[800], width: 2),
               ),
               margin: const EdgeInsets.all(4.0),
               width: 100,
@@ -151,9 +183,9 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
                 child: Text(
                   '${date.day}',
                   style: TextStyle().copyWith(
-                    fontSize: 16.0,
-                    color: Colors.white,
-                  ),
+                      fontSize: 16.0,
+                      color: Colors.green[800],
+                      fontWeight: FontWeight.w600),
                 ),
               ),
             ),
@@ -166,7 +198,7 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
             height: 100,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.orange,
+              color: Colors.green[800],
             ),
             child: Center(
               child: Text(
@@ -218,11 +250,7 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
       duration: const Duration(milliseconds: 300),
       decoration: BoxDecoration(
         shape: BoxShape.rectangle,
-        color: _calendarController.isSelected(date)
-            ? Colors.pink[500]
-            : _calendarController.isToday(date)
-                ? Colors.pink[300]
-                : Colors.blue[400],
+        color: Colors.pink[500],
       ),
       width: 16.0,
       height: 16.0,
@@ -285,7 +313,7 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
       if (workout == null) return;
       DateTime newDate =
           DateTime(_selectedDay.year, _selectedDay.month, _selectedDay.day);
-      plansData.addWorkoutPlan(workout, newDate);
+      await plansData.addWorkoutPlan(workout, newDate);
       _toActive("all");
       _setEvents(plansData.allPlans);
     }
@@ -296,7 +324,7 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
       if (diet == null) return;
       DateTime newDate =
           DateTime(_selectedDay.year, _selectedDay.month, _selectedDay.day);
-      plansData.addDietPlan(diet, newDate);
+      await plansData.addDietPlan(diet, newDate);
       _toActive("all");
       _setEvents(plansData.allPlans);
     }
@@ -312,9 +340,7 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
                 _setEvents(plansData.workoutPlans);
                 _toActive("workout");
               },
-              color: _workoutButton
-                  ? Colors.pink[500]
-                  : Theme.of(context).primaryColor,
+              color: _workoutButton ? Colors.green[800] : Colors.green[300],
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(18),
               ),
@@ -329,9 +355,7 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
                 _toActive("all");
                 _setEvents(plansData.allPlans);
               },
-              color: _allButton
-                  ? Colors.pink[500]
-                  : Theme.of(context).primaryColor,
+              color: _allButton ? Colors.green[800] : Colors.green[300],
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(18),
               ),
@@ -345,9 +369,7 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
                 _setEvents(plansData.dietPlans);
                 _toActive("diet");
               },
-              color: _dietButton
-                  ? Colors.pink[500]
-                  : Theme.of(context).primaryColor,
+              color: _dietButton ? Colors.green[800] : Colors.green[300],
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(18),
               ),
@@ -379,10 +401,10 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
   }
 
   Widget _buildEventList() {
-    return Visibility(
-      visible: _selectedEvents.isNotEmpty,
+    return SlideTransition(
+      position: _slideAnimation,
       child: Container(
-        padding: const EdgeInsets.only(top: 10),
+        padding: const EdgeInsets.only(top: 10, left: 8, right: 8),
         margin: const EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(
           color: Theme.of(context).primaryColor,
@@ -406,12 +428,15 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
               height: 10,
             ),
             Flexible(
-              child: ListView.builder(
+              child: ListView.separated(
+                separatorBuilder: (context, index) => SizedBox(
+                  height: 15,
+                ),
                 itemCount: _selectedEvents.length,
                 itemBuilder: (context, id) {
                   final event = _selectedEvents[id];
                   String picture = 'assets/images/diet.svg';
-                  String trailingData = 'xd';
+                  String trailingData = '';
                   var nav;
                   if (event is Workout) {
                     picture = 'assets/images/dumbbell.svg';
@@ -427,26 +452,33 @@ class _CalendarPlansScreenState extends State<CalendarPlansScreen>
                           .pushNamed(DietScreen.routeName, arguments: event);
                     };
                   }
-                  return ListTile(
-                    onTap: nav,
-                    leading: SvgPicture.asset(
-                      picture,
-                      color: Colors.black,
-                      height: 40,
+                  return Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(18),
+                      color: Colors.white,
                     ),
-                    title: Text(
-                      event.name,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
+                    child: ListTile(
+                      dense: true,
+                      onTap: nav,
+                      leading: SvgPicture.asset(
+                        picture,
+                        color: Colors.green[700],
+                        height: 30,
                       ),
-                    ),
-                    trailing: Text(
-                      trailingData,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 17,
+                      title: Text(
+                        event.name,
+                        style: TextStyle(
+                          color: Colors.grey[700],
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      trailing: Text(
+                        trailingData,
+                        style: TextStyle(
+                          color: Colors.grey[700],
+                          fontSize: 17,
+                        ),
                       ),
                     ),
                   );

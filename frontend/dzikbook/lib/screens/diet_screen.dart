@@ -11,27 +11,14 @@ class DietScreen extends StatelessWidget {
     final dietData = ModalRoute.of(context).settings.arguments as Diet;
     final deviceSize = MediaQuery.of(context).size;
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).primaryColor,
+        title: Text(dietData.name),
+      ),
       body: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 30),
         width: deviceSize.width,
         child: Column(
-          // crossAxisAlignment: CrossAxisAlignment.start,
-          // mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(
-              height: 80,
-            ),
-            Text(
-              dietData.name,
-              style: TextStyle(
-                fontSize: 36,
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(
-              height: 15,
-            ),
             Flexible(
               child: ListView.builder(
                 shrinkWrap: true,

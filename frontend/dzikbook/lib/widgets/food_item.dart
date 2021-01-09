@@ -14,6 +14,9 @@ class FoodItem extends StatelessWidget {
         root.name,
         style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
       ),
+      subtitle: Text(
+        '${root.weight.toString()} g',
+      ),
       children: [
         StaticDetailTile(
           categoryType: "Białko",

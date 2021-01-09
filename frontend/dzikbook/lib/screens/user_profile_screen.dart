@@ -1,27 +1,48 @@
-import 'package:dzikbook/providers/day_plans.dart';
+import 'package:dzikbook/models/PostFetcher.dart';
 import 'package:dzikbook/providers/posts.dart';
 import 'package:dzikbook/providers/user_data.dart';
+import 'package:dzikbook/widgets/drawer.dart';
 import 'package:dzikbook/widgets/navbar.dart';
+import 'package:dzikbook/widgets/user_profile_info.dart';
 import 'package:flutter/material.dart';
 
-import 'package:dzikbook/widgets/add_post.dart';
 import 'package:dzikbook/widgets/post.dart';
 import 'package:provider/provider.dart';
-import '../widgets/drawer.dart';
+import '../models/dummyData.dart';
 
-class ProfileScreen extends StatefulWidget {
-  static final routeName = '/profile';
-
+class UserProfileScreen extends StatefulWidget {
+  static const routeName = '/user-profile';
+  final String userName;
+  final String userImage;
+  final bool rootUser;
+  final bool friend;
+  final String id;
+  final int postsCount;
+  final int dietsCount;
+  final int trainingsCount;
+  const UserProfileScreen(
+      {this.userImage = mainUserImage,
+      this.userName = mainUserName,
+      this.rootUser = true,
+      this.friend = false,
+      @required this.postsCount,
+      @required this.dietsCount,
+      @required this.trainingsCount,
+      @required this.id});
   @override
-  _ProfileScreenState createState() => _ProfileScreenState();
+  _UserProfileScreenState createState() => _UserProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _UserProfileScreenState extends State<UserProfileScreen> {
   @override
   void initState() {
     super.initState();
     Provider.of<Posts>(context, listen: false).restart();
-    Provider.of<Posts>(context, listen: false).loadMore(type: 0);
+    if (this.widget.rootUser) {
+      Provider.of<Posts>(context, listen: false).loadMore(type: 1);
+    } else
+      Provider.of<Posts>(context, listen: false)
+          .loadMore(type: 2, userId: this.widget.id);
   }
 
   @override
@@ -32,26 +53,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     var postsProvider = Provider.of<Posts>(context, listen: true);
-    Provider.of<UserData>(context, listen: false).getUserData();
-    Provider.of<DayPlans>(context, listen: false).fetchPlans();
-
     return Scaffold(
         drawer: Drawer(
           child: DrawerBody(),
         ),
         appBar: buildNavBar(
             context: context,
-            title: "Dzikbook",
-            routeName: ProfileScreen.routeName),
+            routeName: UserProfileScreen.routeName,
+            title: 'Profil'),
         body: ListView.builder(
           itemCount: postsProvider.hasMore
               ? postsProvider.wallPostsCount + 2
               : postsProvider.wallPostsCount + 1,
           itemBuilder: (BuildContext context, int index) {
-            if (index == 0) return AddPost();
+            if (index == 0)
+              return UserProfileInfo(
+                userId: this.widget.id,
+                postsCount: this.widget.postsCount,
+                trainingsCount: this.widget.trainingsCount,
+                dietsCount: this.widget.dietsCount,
+                userImg: this.widget.userImage,
+                userName: this.widget.userName,
+                rootUser: this.widget.rootUser,
+                isFriend: this.widget.friend,
+              );
             if (index >= postsProvider.wallPostsCount + 1) {
               if (!postsProvider.isLoading) {
-                postsProvider.loadMore(type: 0);
+                postsProvider.loadMore(
+                    type: this.widget.rootUser ? 1 : 2, userId: this.widget.id);
               }
               return Center(
                 child: Padding(
@@ -66,7 +95,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             }
 
             return Post(
-              userId: postsProvider.wallPosts[index - 1].userId,
+              clickable: false,
               description: postsProvider.wallPosts[index - 1].description,
               id: postsProvider.wallPosts[index - 1].id,
               timeTaken: postsProvider.wallPosts[index - 1].timeTaken,
@@ -78,9 +107,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               loadedImg: postsProvider.wallPosts[index - 1].hasImage
                   ? postsProvider.wallPosts[index - 1].loadedImg
                   : null,
-              hasTraining: postsProvider.wallPosts[index - 1].hasTraining,
-              traning: postsProvider.wallPosts[index - 1].loadedTraining,
+              hasTraining: false,
               hasReacted: postsProvider.wallPosts[index - 1].hasReacted,
+              userId: this.widget.id,
             );
           },
         ));

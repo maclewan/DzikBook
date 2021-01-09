@@ -4,9 +4,6 @@ import 'package:dzikbook/providers/diets.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/static.dart';
-import '../providers/workouts.dart';
-
 import '../widgets/data_detail_tile.dart';
 
 class AddDietScreen extends StatefulWidget {
@@ -19,7 +16,6 @@ class _AddDietScreenState extends State<AddDietScreen> {
   TextEditingController _nameController;
   TextEditingController _foodController;
   TextEditingController _proteinController;
-  TextEditingController _kcalController;
   TextEditingController _carbsController;
   TextEditingController _fatController;
   TextEditingController _weightController;
@@ -27,13 +23,15 @@ class _AddDietScreenState extends State<AddDietScreen> {
   bool _cardVisible = false;
   final _foodForm = GlobalKey<FormState>();
   final _dietForm = GlobalKey<FormState>();
+  final _protein = 4;
+  final _fat = 9;
+  final _carbs = 4;
 
   @override
   void initState() {
     _nameController = TextEditingController();
     _foodController = TextEditingController();
     _proteinController = TextEditingController();
-    _kcalController = TextEditingController();
     _carbsController = TextEditingController();
     _fatController = TextEditingController();
     _weightController = TextEditingController();
@@ -45,11 +43,14 @@ class _AddDietScreenState extends State<AddDietScreen> {
     _nameController.dispose();
     _foodController.dispose();
     _proteinController.dispose();
-    _kcalController.dispose();
     _carbsController.dispose();
     _fatController.dispose();
     _weightController.dispose();
     super.dispose();
+  }
+
+  double countCalories(double carbs, double fat, double protein) {
+    return carbs * _carbs + fat * _fat + protein * _protein;
   }
 
   Future<void> _addFood() async {
@@ -58,14 +59,20 @@ class _AddDietScreenState extends State<AddDietScreen> {
       return;
     }
     _foodForm.currentState.save();
+
+    final _carbs = roundToFixed(_carbsController.text, 2);
+    final _proteins = roundToFixed(_proteinController.text, 2);
+    final _fat = roundToFixed(_fatController.text, 2);
+    final _weight = roundToFixed(_weightController.text, 2);
+    final _sum = _carbs + _proteins + _fat;
     Food newFood = Food(
       id: DateTime.now().toIso8601String(),
       name: _foodController.text,
-      weight: roundToFixed(_weightController.text, 2),
-      protein: roundToFixed(_proteinController.text, 2),
-      calories: roundToFixed(_kcalController.text, 2),
-      carbs: roundToFixed(_carbsController.text, 2),
-      fat: roundToFixed(_fatController.text, 2),
+      weight: _weight >= _sum ? _weight : _sum,
+      protein: _proteins,
+      calories: countCalories(_carbs, _fat, _proteins),
+      carbs: _carbs,
+      fat: _fat,
     );
     _food.add(newFood);
     _clearControllers();
@@ -77,7 +84,6 @@ class _AddDietScreenState extends State<AddDietScreen> {
   void _clearControllers() {
     _foodController.text = '';
     _proteinController.text = '';
-    _kcalController.text = '';
     _carbsController.text = '';
     _fatController.text = '';
     _weightController.text = '';
@@ -95,6 +101,7 @@ class _AddDietScreenState extends State<AddDietScreen> {
     final _dietProvider = Provider.of<Diets>(context, listen: false);
     final totalCalories = await _dietProvider.sumCalories(_food);
     Diet newDiet = Diet(
+      id: DateTime.now().toIso8601String(),
       name: _nameController.text,
       dietCalories: totalCalories.round(),
       foodList: _food,
@@ -107,6 +114,34 @@ class _AddDietScreenState extends State<AddDietScreen> {
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Tworzenie diety"),
+        backgroundColor: Theme.of(context).primaryColor,
+        actions: [
+          IconButton(
+              icon: Icon(Icons.done),
+              onPressed: () {
+                if (_food.isEmpty) {
+                  return showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                            title: Text("Błąd!"),
+                            content: Text(
+                                "Nie dodano żadnych posiłków do tej diety!"),
+                            actions: [
+                              FlatButton(
+                                  onPressed: () {
+                                    Navigator.of(ctx).pop();
+                                  },
+                                  child: Text("Okej"))
+                            ],
+                          ));
+                } else {
+                  _addDiet();
+                }
+              })
+        ],
+      ),
       body: Stack(
         children: [
           Padding(
@@ -116,7 +151,7 @@ class _AddDietScreenState extends State<AddDietScreen> {
               child: Column(
                 children: [
                   const SizedBox(
-                    height: 80,
+                    height: 30,
                   ),
                   Container(
                     width: deviceSize.width * 0.6,
@@ -128,7 +163,7 @@ class _AddDietScreenState extends State<AddDietScreen> {
                       textAlign: TextAlign.center,
                       cursorColor: Theme.of(context).primaryColor,
                       style: TextStyle(
-                        fontSize: 25,
+                        fontSize: 24,
                         color: Color.fromRGBO(0, 0, 0, 1),
                       ),
                       validator: (value) {
@@ -144,16 +179,16 @@ class _AddDietScreenState extends State<AddDietScreen> {
                   ),
                   ListTile(
                     title: Text(
-                      "Jedzenie",
+                      "Posiłki",
                       style: TextStyle(fontSize: 22),
                     ),
-                    trailing: GestureDetector(
-                      onTap: () {
+                    trailing: IconButton(
+                      onPressed: () {
                         setState(() {
                           _cardVisible = true;
                         });
                       },
-                      child: Icon(
+                      icon: Icon(
                         Icons.add,
                         color: Theme.of(context).primaryColor,
                       ),
@@ -168,7 +203,7 @@ class _AddDietScreenState extends State<AddDietScreen> {
                           trailing: IconButton(
                             icon: Icon(
                               Icons.delete,
-                              color: Colors.redAccent,
+                              color: Colors.grey[700],
                             ),
                             onPressed: () {
                               _food.removeAt(id);
@@ -184,72 +219,14 @@ class _AddDietScreenState extends State<AddDietScreen> {
             ),
           ),
           Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            // left: deviceSize.width * 0.5,
-            child: ButtonBar(
-              buttonHeight: 40,
-              buttonMinWidth: 100,
-              alignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                RaisedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text(
-                    "Anuluj",
-                    style: TextStyle(
-                      fontSize: 20,
-                    ),
-                  ),
-                  color: Colors.redAccent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                RaisedButton(
-                  onPressed: () {
-                    if (_food.isEmpty) {
-                      return showDialog(
-                          context: context,
-                          builder: (ctx) => AlertDialog(
-                                title: Text("Błąd!"),
-                                content: Text(
-                                    "Nie dodano żadnych posiłków do tej diety!"),
-                                actions: [
-                                  FlatButton(
-                                      onPressed: () {
-                                        Navigator.of(ctx).pop();
-                                      },
-                                      child: Text("Okej"))
-                                ],
-                              ));
-                    } else {
-                      _addDiet();
-                    }
-                  },
-                  child: Text(
-                    "Dodaj",
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  color: Theme.of(context).primaryColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Positioned(
-            top: deviceSize.height * 0.23,
+            top: deviceSize.height * 0.25,
             left: deviceSize.width * 0.1,
             child: Visibility(
               visible: _cardVisible,
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
                 child: Container(
-                  height: deviceSize.height * 0.64,
+                  height: deviceSize.height * 0.5,
                   width: deviceSize.width * 0.8,
                   child: Card(
                     elevation: 4,
@@ -291,11 +268,6 @@ class _AddDietScreenState extends State<AddDietScreen> {
                             ),
                             DataDetailTile(
                               deviceSize: deviceSize,
-                              textController: _kcalController,
-                              title: "Kalorie",
-                            ),
-                            DataDetailTile(
-                              deviceSize: deviceSize,
                               textController: _carbsController,
                               title: "Węgle (g)",
                             ),
@@ -305,7 +277,7 @@ class _AddDietScreenState extends State<AddDietScreen> {
                               title: "Tłuszcz (g)",
                             ),
                             SizedBox(
-                              height: deviceSize.height * 0.01,
+                              height: deviceSize.height * 0.02,
                             ),
                             ButtonBar(
                               alignment: MainAxisAlignment.spaceEvenly,

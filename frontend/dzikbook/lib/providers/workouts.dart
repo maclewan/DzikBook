@@ -17,11 +17,13 @@ class Exercise {
 }
 
 class Workout {
+  final String id;
   final String name;
   final int workoutLength;
   final List<Exercise> exercises;
 
   Workout({
+    @required this.id,
     @required this.name,
     @required this.workoutLength,
     @required this.exercises,
@@ -29,40 +31,8 @@ class Workout {
 }
 
 class Workouts with ChangeNotifier {
-  List<Workout> _workouts = [
-    Workout(name: "Trening 1", workoutLength: 30, exercises: [
-      Exercise(id: "1", name: "ex1", series: 3, reps: 4, breakTime: 90),
-      Exercise(id: "2", name: "ex2", series: 3, reps: 4, breakTime: 90),
-      Exercise(id: "3", name: "ex3", series: 3, reps: 4, breakTime: 90),
-      Exercise(id: "4", name: "ex4", series: 3, reps: 4, breakTime: 90),
-      Exercise(id: "5", name: "ex5", series: 3, reps: 4, breakTime: 90),
-    ]),
-    Workout(name: "Trening 2", workoutLength: 30, exercises: [
-      Exercise(id: "1", name: "ex1", series: 3, reps: 4, breakTime: 90),
-      Exercise(id: "2", name: "ex2", series: 3, reps: 4, breakTime: 90),
-      Exercise(id: "3", name: "ex3", series: 3, reps: 4, breakTime: 90),
-      Exercise(id: "4", name: "ex4", series: 3, reps: 4, breakTime: 90),
-      Exercise(id: "5", name: "ex5", series: 3, reps: 4, breakTime: 90),
-    ]),
-    Workout(name: "Trening 2", workoutLength: 30, exercises: [
-      Exercise(id: "1", name: "ex1", series: 3, reps: 4, breakTime: 90),
-      Exercise(id: "2", name: "ex2", series: 3, reps: 4, breakTime: 90),
-      Exercise(id: "3", name: "ex3", series: 3, reps: 4, breakTime: 90),
-      Exercise(id: "4", name: "ex4", series: 3, reps: 4, breakTime: 90),
-      Exercise(id: "5", name: "ex5", series: 3, reps: 4, breakTime: 90),
-    ]),
-    Workout(name: "Trening 2", workoutLength: 30, exercises: [
-      Exercise(id: "1", name: "ex1", series: 3, reps: 4, breakTime: 90),
-      Exercise(id: "2", name: "ex2", series: 3, reps: 4, breakTime: 90),
-      Exercise(id: "3", name: "ex3", series: 3, reps: 4, breakTime: 90),
-      Exercise(id: "4", name: "ex4", series: 3, reps: 4, breakTime: 90),
-      Exercise(id: "5", name: "ex5", series: 3, reps: 4, breakTime: 90),
-    ]),
-  ];
-
-  List<Workout> get workouts {
-    return [..._workouts];
-  }
+  Future<void> Function(List<Workout>) update;
+  List<dynamic> workouts;
 
   Future<int> countWorkoutLength(List<Exercise> exercises) async {
     return exercises
@@ -70,8 +40,15 @@ class Workouts with ChangeNotifier {
         .reduce((value, element) => value + element);
   }
 
-  void addWorkout(Workout newWorkout) {
-    _workouts.add(newWorkout);
-    notifyListeners();
+  Future<void> addWorkout(Workout newWorkout) async {
+    workouts.add(newWorkout);
+    update(workouts)
+        .then(
+      (value) => notifyListeners(),
+    )
+        .catchError((error) {
+      workouts.remove(newWorkout);
+      return 42;
+    });
   }
 }
