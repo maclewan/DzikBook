@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
-from .constants import SERVER_HOST
+import notifications.constants as constants
 
 
 from rest_framework.views import APIView
@@ -44,6 +44,7 @@ class SigInUserNotificationsView(APIView):
             return Response(context)
         except models.ObjectDoesNotExist:
             return Response("Notification doesn't exist!", status=status.HTTP_404_NOT_FOUND)
+    
     # TODO: jak z postami?
     @authenticate
     def post(self, request, user_id, not_type):
@@ -66,7 +67,7 @@ class SigInUserNotificationsView(APIView):
             return Response("Could not create Response", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 def check_if_user_exist(user_id):
-    url = 'http://'+SERVER_HOST+'/auth/user/' + str(user_id) + '/'
+    url = 'http://'+constants.SERVER_HOST+'/auth/user/' + str(user_id) + '/'
     if requests.get(url).text == 'true':
         return True
     else:
