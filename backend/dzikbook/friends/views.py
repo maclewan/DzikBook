@@ -1,5 +1,5 @@
 import json
-import authentication.constants as constants
+import friends.constants as constants
 
 import requests
 from django.shortcuts import render
@@ -11,7 +11,6 @@ from .decorators import authenticate, hash_user, internal
 # create your views here
 from .models import Invitation, Relation
 from .serializers import InvitationSerializer, RelationSerializer
-
 
 class SigInUserFriendsInvitationsView(APIView):
     authentication_classes = []
