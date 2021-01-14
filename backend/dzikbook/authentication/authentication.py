@@ -9,7 +9,7 @@ from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.state import User
 
 
-class MyJWTAuthentication(JWTAuthentication):
+class MyJWTAuthentication(JWTAuthentication):  #pragma: no cover
     def get_user(self, validated_token):
         """
         Attempts to find and return a user using the given validated token.

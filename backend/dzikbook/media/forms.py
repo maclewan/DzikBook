@@ -12,6 +12,3 @@ class ProfilePhotoForm(forms.ModelForm):
     class Meta:
         model = ProfilePhoto
         fields = ['photo', 'downsized_photo']
-
-    def validate(self, value):
-        pass

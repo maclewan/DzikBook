@@ -57,7 +57,7 @@ class SigInUserProfilePhotoView(APIView):
         request.FILES['photo'] = in_memory_file
         response_downsized = save_inmemory_image(request)
 
-        if 'photo' not in response_downsized.data:  # if error occured
+        if 'photo' not in response_downsized.data:  # pragma: no cover
             return response_downsized
 
         downsized_photo_id = response_downsized.data['photo']['id']
@@ -65,11 +65,11 @@ class SigInUserProfilePhotoView(APIView):
         profile_photo = ProfilePhoto(photo=original_photo_id,
                                      downsized_photo=downsized_photo_id,
                                      user=request.user.pk)
-        try:
-            old_profile_photo = ProfilePhoto.objects.filter(user=request.user.pk)
+
+        old_profile_photo = ProfilePhoto.objects.filter(user=request.user.pk)
+
+        if old_profile_photo.exists():
             old_profile_photo.delete()
-        except ProfilePhoto.DoesNotExist:
-            pass
 
         profile_photo.save()
 
@@ -79,25 +79,19 @@ class SigInUserProfilePhotoView(APIView):
 
     @authenticate
     def get(self, request):
-        try:
-            current_user = request.user
-
-            profile_photo = ProfilePhoto.objects.filter(user=current_user.pk).first()  # None if not found
-            if profile_photo is None:
-                photo = Photo()
-                downsized_photo = Photo()
-                photo.photo = "photos/default_profile.png"
-                downsized_photo.photo = "photos/default_profile_downscaled.png"
-                context = {'id': None,
-                           'photo': PhotoSerializer(photo).data,
-                           'downsized_photo': PhotoSerializer(downsized_photo).data,
-                           'user': current_user.id}
-            else:
-                context = ProfilePhotoSerializer(profile_photo).data
-
-        except Exception as e:
-            return Response("Error, could not retrive logged in user profile photos!",
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        current_user = request.user
+        profile_photo = ProfilePhoto.objects.filter(user=current_user.pk).first()  # None if not found
+        if profile_photo is None:
+            photo = Photo()
+            downsized_photo = Photo()
+            photo.photo = "photos/default_profile.png"
+            downsized_photo.photo = "photos/default_profile_downscaled.png"
+            context = {'id': None,
+                       'photo': PhotoSerializer(photo).data,
+                       'downsized_photo': PhotoSerializer(downsized_photo).data,
+                       'user': current_user.id}
+        else:
+            context = ProfilePhotoSerializer(profile_photo).data
         return Response(context)
 
     @authenticate
@@ -116,22 +110,18 @@ class ProfilePhotoView(APIView):
 
     @authenticate
     def get(self, request, user_id):
-        try:
-            profile_photo = ProfilePhoto.objects.filter(user=user_id).first()  # None if not found
-            if profile_photo is None:
-                photo = Photo()
-                downsized_photo = Photo()
-                photo.photo = "photos/default_profile.png"
-                downsized_photo.photo = "photos/default_profile_downscaled.png"
-                context = {'id': None,
-                           'photo': PhotoSerializer(photo).data,
-                           'downsized_photo': PhotoSerializer(downsized_photo).data,
-                           'user': user_id}
-            else:
-                context = ProfilePhotoSerializer(profile_photo).data
-        except:
-            return Response("Error, could not retrive profile photo with id " + str(user_id) + "!",
-                            status=status.HTTP_404_NOT_FOUND)
+        profile_photo = ProfilePhoto.objects.filter(user=user_id).first()  # None if not found
+        if profile_photo is None:
+            photo = Photo()
+            downsized_photo = Photo()
+            photo.photo = "photos/default_profile.png"
+            downsized_photo.photo = "photos/default_profile_downscaled.png"
+            context = {'id': None,
+                       'photo': PhotoSerializer(photo).data,
+                       'downsized_photo': PhotoSerializer(downsized_photo).data,
+                       'user': user_id}
+        else:
+            context = ProfilePhotoSerializer(profile_photo).data
         return Response(context)
 
 

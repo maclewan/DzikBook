@@ -3,7 +3,8 @@ import tempfile
 from PIL import Image
 from django.core.files.base import ContentFile
 from django.test import TestCase, LiveServerTestCase, override_settings
-
+from rest_framework.response import Response
+from rest_framework import status
 from .decorators import hash_user
 from .models import Photo, ProfilePhoto
 from django.contrib.auth.models import User
@@ -20,7 +21,6 @@ from django.utils.six import BytesIO
 ## models tests ##
 ##################
 from django.conf import settings
-
 
 class PhotoTestCase(TestCase):
     def setUp(self):
@@ -200,6 +200,19 @@ class PhotoManagementViewTestCase(LiveServerTestCase):
                                  'message': 'Photo uploaded successfully.'
                              })
 
+    def test_photo_management_post_wrong_type(self):
+        url = reverse('upload_photo')
+
+        file = BytesIO()
+        file.seek(0)
+        photo_file = SimpleUploadedFile('wrong_type.png', file.getvalue())
+        data = {
+            "photo": photo_file,
+        }
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 415)
+        self.assertEqual(response.data, 'Invalid form, please provide an image!')
+
     def test_photo_management_delete(self):
         url = reverse('photo_management', args=[self.photo.id])
         response = self.client.delete(url)
@@ -272,7 +285,14 @@ class ProfilePhotoViewTestCase(LiveServerTestCase):
         downsized_photo = Image.open(path)
         self.assertEqual(downsized_photo.size, (100, 100))
 
-    def test_sig_in_user_profile_photo_get_notexisting(self):
+    @mock.patch("media.views.save_inmemory_image", lambda x: Response("Couldn't upload image!", status=status.HTTP_503_SERVICE_UNAVAILABLE))
+    def test_sig_in_user_profile_photo_post_no_image(self):
+        url = reverse('sig_in_user_profile_photo')
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 503)
+        self.assertEqual(response.data, "Couldn't upload image!")
+
+    def test_sig_in_user_profile_photo_get_noexisting(self):
         client = APIClient()
         client.credentials(HTTP_Uid=str(self.user3.id), HTTP_Flag=hash_user(self.user3.id))
         url = reverse('sig_in_user_profile_photo')
@@ -286,6 +306,7 @@ class ProfilePhotoViewTestCase(LiveServerTestCase):
         response = self.client.get(url, format='json')
         serializer = ProfilePhotoSerializer(self.profile_photo)
         self.assertEqual(response.data, serializer.data)
+
 
     def test_sig_in_user_profile_photo_delete(self):
         url = reverse('sig_in_user_profile_id', args=[self.profile_photo.id])
@@ -303,6 +324,14 @@ class ProfilePhotoViewTestCase(LiveServerTestCase):
         response = self.client.get(url, format='json')
         serializer = ProfilePhotoSerializer(self.profile_photo2)
         self.assertEqual(response.data, serializer.data)
+
+    def test_sig_in_user_profile_photo_get_not_yours_noexisting(self):
+        url = reverse('profile_photo', args=[self.user3.id])
+        response = self.client.get(url, format='json')
+        serializer = ProfilePhotoSerializer(self.profile_photo2)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['photo']['photo'], '/storage/photos/default_profile.png')
+        self.assertEqual(response.data['downsized_photo']['photo'], '/storage/photos/default_profile_downscaled.png')
 
 
 def create_image(storage, filename='test_image.png', size=(200, 200),
