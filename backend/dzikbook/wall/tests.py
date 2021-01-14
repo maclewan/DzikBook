@@ -16,7 +16,6 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils.six import BytesIO
 
 
-
 # Create your tests here.
 
 ##################
@@ -24,13 +23,26 @@ from django.utils.six import BytesIO
 ##################
 
 
+def raise_exception(*args, **kwargs):
+    raise Exception('error')
+
+def make_mocked_request(**kwargs):
+    def mocked_request(*args2, **kwargs2):
+        return mock.Mock(**kwargs)
+    return mocked_request
+
+
+
 class PostTestCase(TestCase):
 
     def setUp(self):
         self.author = User.objects.create(username="test_user", password="test_password")
         data = {
-            "author": author,
-            "description": "description"
+            "author": self.author,
+            "description": "description",
+            "type": "media",
+            "photo": "photo_url",
+            "additional_data": "additional_data",
         }
         self.post = Post.objects.create(**data)
 
@@ -146,9 +158,9 @@ class PostSerializerTestCase(TestCase):
         self.assertEqual(self.post.timestamp, starting_timestamp)  # timestamp shouldnt update
 
 
-#################
-## views tests ##
-#################
+# #################
+# ## views tests ##
+# #################
 
 
 class PostViewTestCase(LiveServerTestCase):
@@ -167,12 +179,18 @@ class PostViewTestCase(LiveServerTestCase):
         data = {
             "author": self.user1,
             "description": "description",
-            "type": "text",
         }
+        data['type'] = "text"
         self.post1 = Post.objects.create(**data)
+
+        data['type'] = "media"
         self.post4 = Post.objects.create(**data)
+
+        data['type'] = "media"
         data["author"] = self.user2
         self.post2 = Post.objects.create(**data)
+
+        data['type'] = "text"
         data["author"] = self.user3
         self.post3 = Post.objects.create(**data)
 
@@ -213,6 +231,46 @@ class PostViewTestCase(LiveServerTestCase):
         self.assertEqual(response.data['additional_data'], 'additional_data')
         self.assertIsNotNone(response.data['photo'])
 
+    @mock.patch('wall.constants.SERVER_HOST', server_host)
+    @mock.patch('requests.post', raise_exception)
+    def test_sig_in_user_posts_post_image_internal_error(self):
+        url = reverse('sig_in_user_add_post')
+
+        photo = create_image(None)
+        photo_file = SimpleUploadedFile('photo.png', photo.getvalue())
+        data = {
+            "description": "description",
+            "additional_data": "additional_data",
+            "type": "media",
+            "photo": photo_file,
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.data, "Internal server error!")
+
+    @mock.patch('wall.constants.SERVER_HOST', server_host)
+    @mock.patch('requests.post', make_mocked_request(
+        **{
+            'json.return_value': [],
+            'content': "Couldn't upload your photo!",
+            'status_code': 500,
+        }
+    ))
+    def test_sig_in_user_posts_post_image_upload_photo_error(self):
+        url = reverse('sig_in_user_add_post')
+
+        photo = create_image(None)
+        photo_file = SimpleUploadedFile('photo.png', photo.getvalue())
+        data = {
+            "description": "description",
+            "additional_data": "additional_data",
+            "type": "media",
+            "photo": photo_file,
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.data, "Couldn't upload your photo!")
+
     def test_sig_in_user_posts_post_nonimage(self):
         url = reverse('sig_in_user_add_post')
 
@@ -232,25 +290,177 @@ class PostViewTestCase(LiveServerTestCase):
     def test_sig_in_user_posts_put_not_yours(self):
         url = reverse('sig_in_user_posts', args=[self.post3.id])
         data = {
-            "author": author,
-            "description": "description"
+            "description": "description_updated",
+            "additional_data": "additional_data_updated",
+            "type": "text",
         }
-        Post.objects.create(**data)
+        response = self.client.put(url, data)
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.data, "Post doesn't exist!")
 
-    def test_translation(self):
-        post = Post.objects.get(pk=1)
-        serializer = PostSerializer
-        self.assertEqual(serializer(post).data,
-                         {'post_id': 1, 'author': 1, 'description': "description", 'visibility': True, 'image': None})
+    @mock.patch('wall.constants.SERVER_HOST', server_host)
+    def test_sig_in_user_posts_put(self):
+        url = reverse('sig_in_user_posts', args=[self.post1.id])
 
-    def test_update(self):
-        serializer = PostSerializer()
-        post = Post.objects.get(pk=1)
+        photo = create_image(None)
+        photo_file = SimpleUploadedFile('photo.png', photo.getvalue())
         data = {
-            "description": "test_description",
-            "image": "new_image",
-            "visibility": False,
+            "description": "description_updated",
+            "additional_data": "additional_data_updated",
+            "type": "media",
+            "photo": photo_file,
         }
-        post = serializer.update(post, validated_data=data)
-        self.assertTrue(isinstance(post.author,
-                                   User) and post.description == "test_description" and post.visibility and post.image == "new_image")
+        response = self.client.put(url, data)
+        self.assertEqual(int(response.data['author']), self.user1.id)
+        self.assertEqual(response.data['description'], 'description_updated')
+        self.assertEqual(response.data['type'], 'text')  # type cannot be modified
+        self.assertEqual(response.data['additional_data'], 'additional_data_updated')
+        self.assertIsNotNone(response.data['photo'])
+
+    @mock.patch('wall.constants.SERVER_HOST', server_host)
+    @mock.patch('requests.post', raise_exception)
+    def test_sig_in_user_posts_put_internal_error(self):
+        url = reverse('sig_in_user_posts', args=[self.post1.id])
+
+        photo = create_image(None)
+        photo_file = SimpleUploadedFile('photo.png', photo.getvalue())
+        data = {
+            "description": "description_updated",
+            "additional_data": "additional_data_updated",
+            "type": "media",
+            "photo": photo_file,
+        }
+        response = self.client.put(url, data)
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.data, "Internal server error!")
+
+    @mock.patch('wall.constants.SERVER_HOST', server_host)
+    @mock.patch('requests.post', make_mocked_request(
+        **{
+            'json.return_value': [],
+            'content': "Couldn't upload your photo!",
+            'status_code': 500,
+        }
+    ))
+    def test_sig_in_user_posts_post_put_upload_photo_error(self):
+        url = reverse('sig_in_user_posts', args=[self.post1.id])
+
+        photo = create_image(None)
+        photo_file = SimpleUploadedFile('photo.png', photo.getvalue())
+        data = {
+            "description": "description_updated",
+            "additional_data": "additional_data_updated",
+            "type": "media",
+            "photo": photo_file,
+        }
+        response = self.client.put(url, data)
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.data, "Couldn't upload your photo!")
+
+    def test_sig_in_user_posts_delete(self):
+        url = reverse('sig_in_user_posts', args=[self.post1.id])
+        response = self.client.delete(url)
+        self.assertEqual(response.data, {'message': 'Post deleted'})
+
+    def test_sig_in_user_posts_delete_not_yours(self):
+        url = reverse('sig_in_user_posts', args=[self.post3.id])
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.data, "Post doesn't exist!")
+
+    def test_sig_in_user_posts_list_get(self):
+        url = reverse('sig_in_user_posts_list')
+        response = self.client.get(url, format='json')
+        self.assertEqual(len(response.data), 2)
+        self.assertIn(response.data[0]['post_id'], [self.post1.id, self.post4.id])
+        self.assertIn(response.data[1]['post_id'], [self.post1.id, self.post4.id])
+
+        response = self.client.get(url, {'amount': 1, 'offset': 1}, format='json')
+        self.assertEqual(len(response.data), 1)
+
+        response = self.client.get(url, {'type': 'media'}, format='json')
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['post_id'], self.post4.id)
+
+
+    def test_sig_in_user_posts_list_get_empty(self):
+        url = reverse('sig_in_user_posts_list')
+        user_id = 999
+        client = APIClient()
+        client.credentials(HTTP_Uid=str(user_id), HTTP_Flag=hash_user(user_id))
+        response = client.get(url, format='json')
+        self.assertEqual(len(response.data), 0)
+
+    def test_post_list_get(self):
+        url = reverse('posts_list', args=[self.user3.id])
+        response = self.client.get(url, format='json')
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['post_id'], self.post3.id)
+
+        response = self.client.get(url, {"type": "media"}, format='json')
+        self.assertEqual(len(response.data), 0)
+
+    @mock.patch('wall.constants.SERVER_HOST', server_host)
+    @mock.patch('friends.constants.SERVER_HOST', server_host)
+    @mock.patch('authentication.constants.SERVER_HOST', server_host)
+    def test_main_wall_list_get(self):
+        url = reverse('main_wall')
+        client2 = APIClient()
+        client2.credentials(HTTP_Uid=str(self.user2.id), HTTP_Flag=hash_user(self.user2.id))
+
+        client3 = APIClient()
+        client3.credentials(HTTP_Uid=str(self.user3.id), HTTP_Flag=hash_user(self.user3.id))
+
+        response_invitation = client2.post(
+            'http://' + self.server_host + '/friends/request/' + str(self.user3.id) + '/')
+        invitation_id = response_invitation.data['invitation_id']
+
+        client3.post('http://' + self.server_host + '/friends/request/manage/' + str(invitation_id) + '/')
+
+        response = client3.get(url, format='json')
+        self.assertEqual(len(response.data), 2)
+        self.assertIn(response.data[0]['post_id'], [self.post2.id, self.post3.id])
+        self.assertIn(response.data[1]['post_id'], [self.post2.id, self.post3.id])
+
+        response = client3.get(url, {'type': 'media'}, format='json')
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['post_id'], self.post2.id)
+
+    @mock.patch('requests.get', raise_exception)
+    def test_main_wall_list_get_internal_error(self):
+        url = reverse('main_wall')
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.data, "Internal server error!")
+
+    @mock.patch('wall.constants.SERVER_HOST', server_host)
+    @mock.patch('requests.get', make_mocked_request(
+        **{
+            'json.return_value': [],
+            'content': "Couldn't get friends data!",
+            'status_code': 500,
+        }
+    ))
+    def test_main_wall_list_get_friends_error(self):
+        url = reverse('main_wall')
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.data, "Couldn't get friends data!")
+
+
+def create_image(storage, filename='test_image.png', size=(100, 100),
+                 image_mode='RGB', image_format='PNG'):
+    """
+    Generate a test image, returning the filename that it was saved as.
+    If ``storage`` is ``None``, the BytesIO containing the image data
+    will be passed instead.
+    """
+    data = BytesIO()
+    with Image.new(image_mode, size) as img:
+        img.save(data, image_format)
+    data.seek(0)
+    if not storage:
+        return data
+    image_file = ContentFile(data.read())
+    storage_file = storage.save(filename, image_file)
+    return storage_file
