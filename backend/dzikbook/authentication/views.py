@@ -1,7 +1,8 @@
 import json
 import time
 
-import authentication.constants as constants
+from .constants import SERVER_HOST
+
 
 
 import requests
@@ -85,10 +86,9 @@ class ExistsUserView(APIView):
 
 
 def createUserData(user: User):
-    print(constants.SERVER_HOST)
     id = user.pk
     # Send request to users service
-    url = 'http://'+constants.SERVER_HOST+'/users/data/new/'
+    url = 'http://'+SERVER_HOST+'/users/data/new/'
     headers = {
         "Uid": str(id),
         "Flag": hash_user(id),

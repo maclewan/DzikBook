@@ -10,6 +10,7 @@ class UserDataSerializer(serializers.Serializer):
     birth_date = serializers.DateField(required=True, format="%d/%m/%Y", allow_null=True)
     sex = serializers.CharField(required=True, allow_blank=True)
     job = serializers.CharField(required=True, allow_blank=True)
+    # TODO?: ewentualnie zmieniamy na konkretne
     additional_data = serializers.CharField(required=True, allow_blank=True)
 
     class Meta:

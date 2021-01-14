@@ -1,6 +1,6 @@
 import json
 
-import friends.constants as constants
+from .constants import SERVER_HOST
 
 import requests
 from django.db import models
@@ -188,7 +188,7 @@ class UserDataView(APIView):
 
     @authenticate
     def get(self, request, id):
-        url = 'http://' + constants.SERVER_HOST + '/friends/' + str(id) + '/'
+        url = 'http://' + SERVER_HOST + '/friends/' + str(id) + '/'
         headers = {"Uid": str(request.user.id), "Flag": hash_user(request.user.id)}
         r = requests.get(url, headers=headers)
         r = r.json()
@@ -325,6 +325,7 @@ class MultipleUsersDataView(APIView):
 
         data_list = [UserData.objects.get(user=u) for u in user_id_list if UserData.objects.filter(user=u).exists()]
         return_list = [{
+            # TODO: add another info if required
             'user_id': a.user,
             'first_name': a.first_name,
             'last_name': a.last_name

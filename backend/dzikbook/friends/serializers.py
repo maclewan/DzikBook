@@ -19,6 +19,8 @@ class InvitationSerializer(serializers.Serializer):
         """
         return Invitation.objects.create(**validated_data)
 
+    def update(self, instance, validated_data):
+        pass
 
 
 class RelationSerializer(serializers.Serializer):
