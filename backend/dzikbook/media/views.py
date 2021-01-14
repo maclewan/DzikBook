@@ -1,19 +1,14 @@
 from django.contrib.auth.models import User
 from .constants import SERVER_HOST
 
-
 from django.core.files.base import ContentFile
-from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Photo, ProfilePhoto
 from .serializers import PhotoSerializer, ProfilePhotoSerializer
-from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from django.db import models
-from .forms import PhotoForm, ProfilePhotoForm
-from django.shortcuts import render
-import requests
+from .forms import PhotoForm
 from PIL import Image
 import uuid
 import os
@@ -67,12 +62,9 @@ class SigInUserProfilePhotoView(APIView):
 
         downsized_photo_id = response_downsized.data['photo']['id']
 
-        original_photo = Photo.objects.get(pk=original_photo_id)
-        downsized_photo = Photo.objects.get(pk=downsized_photo_id)
-
-        profile_photo = ProfilePhoto.objects.create(photo=original_photo,
-                                                    downsized_photo=downsized_photo,
-                                                    user=request.user.pk)
+        profile_photo = ProfilePhoto(photo=original_photo_id,
+                                     downsized_photo=downsized_photo_id,
+                                     user=request.user.pk)
         try:
             old_profile_photo = ProfilePhoto.objects.filter(user=request.user.pk)
             old_profile_photo.delete()
@@ -96,9 +88,12 @@ class SigInUserProfilePhotoView(APIView):
                 downsized_photo = Photo()
                 photo.photo = "photos/default_profile.png"
                 downsized_photo.photo = "photos/default_profile_downscaled.png"
-                profile_photo = ProfilePhoto(photo=photo, downsized_photo=downsized_photo, user=current_user.pk)
-
-            context = ProfilePhotoSerializer(profile_photo).data
+                context = {'id': None,
+                           'photo': PhotoSerializer(photo).data,
+                           'downsized_photo': PhotoSerializer(downsized_photo).data,
+                           'user': current_user.id}
+            else:
+                context = ProfilePhotoSerializer(profile_photo).data
 
         except Exception as e:
             return Response("Error, could not retrive logged in user profile photos!",
@@ -128,9 +123,12 @@ class ProfilePhotoView(APIView):
                 downsized_photo = Photo()
                 photo.photo = "photos/default_profile.png"
                 downsized_photo.photo = "photos/default_profile_downscaled.png"
-                profile_photo = ProfilePhoto(photo=photo, downsized_photo=downsized_photo, user=user_id)
-
-            context = ProfilePhotoSerializer(profile_photo).data
+                context = {'id': None,
+                           'photo': PhotoSerializer(photo).data,
+                           'downsized_photo': PhotoSerializer(downsized_photo).data,
+                           'user': user_id}
+            else:
+                context = ProfilePhotoSerializer(profile_photo).data
         except:
             return Response("Error, could not retrive profile photo with id " + str(user_id) + "!",
                             status=status.HTTP_404_NOT_FOUND)
@@ -152,8 +150,7 @@ def save_inmemory_image(request):
 
 
 def image_to_inmemory(photo):
-    path = os.path.join(os.path.abspath(""), 'storage', 'thumbnails')
-
+    path = os.path.join(os.path.abspath(""), 'storage', 'photos')
     while True:
         filename = uuid.uuid4().hex + '.png'
         full_path = os.path.join(path, filename)
