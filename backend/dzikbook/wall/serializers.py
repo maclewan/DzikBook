@@ -8,9 +8,9 @@ class PostSerializer(serializers.Serializer):
     description = serializers.CharField(required=True, allow_blank=True)
     additional_data = serializers.CharField(allow_blank=True, allow_null=True)
     visibility = serializers.BooleanField()
-    photo = serializers.CharField()
-    type = serializers.ChoiceField(choices=[(tag, tag.value) for tag in PostTypes])
-    timestamp = serializers.DateTimeField()
+    photo = serializers.CharField(allow_blank=True)
+    type = serializers.ChoiceField(choices=[(tag.name.lower(), tag.value) for tag in PostTypes])
+    timestamp = serializers.DateTimeField(required=False)
 
     def get_post_id(self, obj):
         return obj.pk
@@ -21,13 +21,13 @@ class PostSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         """
-        Create and return a new `Comment` instance, given the validated data.
+        Create and return a new `Post` instance, given the validated data.
         """
         return Post.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
         """
-        Update and return an existing `Comment` instance, given the validated data.
+        Update and return an existing `Post` instance, given the validated data.
         """
         instance.description = validated_data.get('description', instance.description)
         instance.additional_data = validated_data.get('additional_data', instance.additional_data)
