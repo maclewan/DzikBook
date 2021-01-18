@@ -1,7 +1,9 @@
 import 'package:dzikbook/providers/day_plans.dart';
 import 'package:dzikbook/providers/posts.dart';
 import 'package:dzikbook/providers/user_data.dart';
+import 'package:dzikbook/services/push_notification_service.dart';
 import 'package:dzikbook/widgets/navbar.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 import 'package:dzikbook/widgets/add_post.dart';
@@ -22,6 +24,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     Provider.of<Posts>(context, listen: false).restart();
     Provider.of<Posts>(context, listen: false).loadMore(type: 0);
+    final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+    final pushNotificationService = PushNotificationService(_firebaseMessaging);
+    pushNotificationService.initialise();
   }
 
   @override

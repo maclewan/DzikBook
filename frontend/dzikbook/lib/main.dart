@@ -37,12 +37,12 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  static final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  // static final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    final pushNotificationService = PushNotificationService(_firebaseMessaging);
-    pushNotificationService.initialise();
+    // final pushNotificationService = PushNotificationService(_firebaseMessaging);
+    // pushNotificationService.initialise();
     return MultiProvider(
         providers: [
           ChangeNotifierProvider(
