@@ -24,9 +24,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     Provider.of<Posts>(context, listen: false).restart();
     Provider.of<Posts>(context, listen: false).loadMore(type: 0);
-    final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
-    final pushNotificationService = PushNotificationService(_firebaseMessaging);
-    pushNotificationService.initialise();
   }
 
   @override

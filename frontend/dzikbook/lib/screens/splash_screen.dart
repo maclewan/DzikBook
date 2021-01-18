@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:dzikbook/services/push_notification_service.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -22,6 +24,7 @@ class _SplashScreenState extends State<SplashScreen> {
     final auth = Provider.of<Auth>(context, listen: false);
     Timer(Duration(seconds: 3), () async {
       if (auth.isAuth) {
+        _initFcm();
         Navigator.of(context).pushReplacementNamed(ProfileScreen.routeName);
       } else {
         final autoLogin = await auth.tryAutoLogin().catchError((error) {
@@ -29,12 +32,19 @@ class _SplashScreenState extends State<SplashScreen> {
           return false;
         });
         if (autoLogin) {
+          _initFcm();
           Navigator.of(context).pushReplacementNamed(ProfileScreen.routeName);
         } else {
           Navigator.of(context).pushReplacementNamed(AuthScreen.routeName);
         }
       }
     });
+  }
+
+  void _initFcm() {
+    final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+    final pushNotificationService = PushNotificationService(_firebaseMessaging);
+    pushNotificationService.initialise(context);
   }
 
   @override

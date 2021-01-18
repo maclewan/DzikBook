@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:dzikbook/screens/profile_screen.dart';
+import 'package:dzikbook/services/push_notification_service.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -171,6 +173,12 @@ class _AuthCardState extends State<AuthCard>
     );
   }
 
+  void _initFcm() {
+    final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+    final pushNotificationService = PushNotificationService(_firebaseMessaging);
+    pushNotificationService.initialise(context);
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState.validate()) {
       return;
@@ -186,7 +194,7 @@ class _AuthCardState extends State<AuthCard>
           _authData['email'],
           _authData['password'],
         );
-
+        _initFcm();
         Navigator.of(context).pushReplacementNamed(ProfileScreen.routeName);
       } else {
         // Sign user up

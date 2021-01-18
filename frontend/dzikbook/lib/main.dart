@@ -1,3 +1,4 @@
+import 'package:dzikbook/providers/notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:dzikbook/screens/user_profile_screen.dart';
 import 'package:flutter/material.dart';
@@ -89,6 +90,10 @@ class MyApp extends StatelessWidget {
               ..update = userData.updateDiets
               ..diets = userData.additionalData['diets'],
           ),
+          ChangeNotifierProxyProvider<Auth, Notifications>(
+              create: (_) => Notifications(),
+              update: (_, authData, notifications) =>
+                  notifications..token = authData.token)
         ],
         child: Consumer<Auth>(
           builder: (ctx, auth, _) => MaterialApp(
