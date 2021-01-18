@@ -1,4 +1,5 @@
 import 'package:dzikbook/providers/notifications.dart';
+import 'package:dzikbook/screens/notifications_screen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:dzikbook/screens/user_profile_screen.dart';
 import 'package:flutter/material.dart';
@@ -119,6 +120,7 @@ class MyApp extends StatelessWidget {
               UserSettingsScreeen.routeName: (ctx) => UserSettingsScreeen(),
               FriendsListScreen.routeName: (ctx) => FriendsListScreen(),
               InvitationsScreen.routeName: (ctx) => InvitationsScreen(),
+              NotificationsScreen.routeName: (ctx) => NotificationsScreen(),
             },
           ),
         ));

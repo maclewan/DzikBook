@@ -1,10 +1,12 @@
 import 'package:dzikbook/providers/search_people.dart';
 import 'package:dzikbook/providers/user_data.dart';
 import 'package:dzikbook/screens/user_profile_screen.dart';
+import 'package:dzikbook/widgets/drawer.dart';
 import 'package:dzikbook/widgets/navbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+import '../widgets/drawer.dart';
 
 class PersonsListScreen extends StatefulWidget {
   static final routeName = '/persons-list';
@@ -20,6 +22,9 @@ class _PersonsListScreenState extends State<PersonsListScreen> {
   Widget build(BuildContext context) {
     final searchPeopleProvider = Provider.of<SearchPeople>(context);
     return Scaffold(
+      drawer: Drawer(
+        child: DrawerBody(),
+      ),
       appBar: buildNavBar(
           context: context,
           routeName: PersonsListScreen.routeName,
