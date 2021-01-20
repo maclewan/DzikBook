@@ -255,17 +255,17 @@ def create_relation(invitation):
     return Response({"message": "Relation created", "relation": serializer.data})
 
 
-def notify(not_type, user, this_user):
+def notify(not_type, user, this_user, post=None):
     payload = {
         'notification_type': not_type,
         'user': user,
         'sender': this_user,
-        'post': None
+        'post': post
     }
 
     # Send request to users service
     url = 'http://' + constants.SERVER_HOST + '/notifications/'
 
     headers = {"Uid": str(this_user), "Flag": hash_user(this_user)}
-    r = requests.post(url, data=(payload), headers=headers)
+    r = requests.post(url, data=payload, headers=headers)
     return r.json()
