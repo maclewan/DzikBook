@@ -1,7 +1,6 @@
+from cassandra.cqlengine.query import DoesNotExist
 from django.shortcuts import render
 from .constants import SERVER_HOST
-
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth.decorators import login_required
@@ -33,10 +32,10 @@ class ReactionsView(APIView):
     @authenticate
     def post(self, request, post_id):
         try:
-            if Reaction.objects.filter(post=post_id, giver=request.user).exists():
+            if Reaction.objects.filter(post=post_id, giver=request.user.id).exists():
                 return Response("Reaction already exists!", status=status.HTTP_404_NOT_FOUND)
             data = {
-                "giver": request.user,
+                "giver": request.user.id,
                 "post": post_id,
             }
             reaction_serializer = ReactionSerializer()
@@ -50,10 +49,10 @@ class ReactionsView(APIView):
     @authenticate
     def delete(self, request, post_id):
         try:
-            reaction = Reaction.objects.get(post=post_id, giver=request.user)
+            reaction = Reaction.objects.get(post=post_id, giver=request.user.id)
             reaction.delete()
             return Response({"message": "Reaction deleted"})
-        except models.ObjectDoesNotExist:
+        except DoesNotExist:
             return Response("Reaction doesn't exist!", status=status.HTTP_404_NOT_FOUND)
 
 
@@ -74,7 +73,7 @@ class CommentsView(APIView):
         try:
             data = {
                 "post": post_id,
-                "author": request.user,
+                "author": request.user.id,
                 "content": request.POST.get('content', ''),
             }
             comment_serializer = CommentSerializer()
@@ -87,16 +86,16 @@ class CommentsView(APIView):
     @authenticate
     def delete(self, request, comment_id):
         try:
-            comment = Comment.objects.get(pk=comment_id, author=request.user)
+            comment = Comment.objects.get(id=comment_id, author=request.user.id)
             comment.delete()
             return Response({"message": "Comment deleted"})
-        except models.ObjectDoesNotExist:
+        except DoesNotExist:
             return Response("Comment doesn't exist!", status=status.HTTP_404_NOT_FOUND)
 
     @authenticate
     def put(self, request, comment_id):
         try:
-            comment = Comment.objects.get(pk=comment_id, author=request.user)
+            comment = Comment.objects.get(id=comment_id, author=request.user.id)
             data = {
                 "content": request.POST.get('content', ''),
             }

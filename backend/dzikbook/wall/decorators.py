@@ -6,7 +6,6 @@ from rest_framework.response import Response
 
 import wall.constants as constants
 
-
 def authenticate(f):
     def validate(*args, **kwargs):
         request = args[1]

@@ -6,11 +6,11 @@ from .models import Comment, Reaction
 class CommentSerializer(serializers.Serializer):
     comment_id = serializers.SerializerMethodField('get_comment_id')
     author = serializers.PrimaryKeyRelatedField(read_only=True)
-    post = serializers.PrimaryKeyRelatedField(read_only=True)
+    post = serializers.UUIDField(read_only=True)
     content = serializers.CharField(required=True, allow_blank=True)
 
     def get_comment_id(self, obj):
-        return obj.id
+        return str(obj.id)
 
     class Meta:
         model = Comment
@@ -39,7 +39,7 @@ class ReactionSerializer(serializers.Serializer):
     user_id = serializers.SerializerMethodField('get_user_id')
 
     def get_user_id(self, obj):
-        return obj.giver.pk
+        return obj.giver
 
     def create(self, validated_data):
         """

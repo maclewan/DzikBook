@@ -1,16 +1,20 @@
-from django.db import models
-from wall.models import Post
+from datetime import datetime
 from django.contrib.auth.models import User
+# from time_uuid import time_uuid
+import uuid
+from cassandra.cqlengine import columns
+from django_cassandra_engine.models import DjangoCassandraModel
 
 
-class Comment(models.Model):
-    #post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    post = models.IntegerField()
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
-    content = models.TextField()
+class Comment(DjangoCassandraModel):
+    id = columns.UUID(primary_key=True, partition_key=True, default=uuid.uuid4)
+    post = columns.UUID()
+    author = columns.Integer()
+    content = columns.Text()
+    time = columns.DateTime(primary_key=True, clustering_order="ASC", default=datetime.now)
 
 
-class Reaction(models.Model):
-    # post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    post = models.IntegerField()
-    giver = models.ForeignKey(User, on_delete=models.CASCADE)
+class Reaction(DjangoCassandraModel):
+    id = columns.UUID(primary_key=True, partition_key=True, default=uuid.uuid4)
+    post = columns.UUID()
+    giver = columns.Integer()

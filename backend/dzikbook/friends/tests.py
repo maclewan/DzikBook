@@ -6,8 +6,7 @@ from unittest import mock
 import requests
 from django.contrib.auth.models import User
 from django.test import TestCase, LiveServerTestCase
-from rest_framework.test import RequestsClient, APITestCase
-
+from rest_framework.test import RequestsClient, APITestCase, APIClient
 
 from .decorators import hash_user
 from .models import Invitation, Relation
@@ -68,6 +67,7 @@ class RelationTestCase(TestCase):
 @mock.patch('friends.constants.SERVER_HOST', "localhost:8081")
 @mock.patch('users.constants.SERVER_HOST', "localhost:8081")
 @mock.patch('authentication.constants.SERVER_HOST', "localhost:8081")
+@mock.patch('notifications.constants.SERVER_HOST', "localhost:8081")
 class ViewsTestCase(LiveServerTestCase):
     port = 8081
 
@@ -81,11 +81,11 @@ class ViewsTestCase(LiveServerTestCase):
             'receiver': 1
         }
 
-        self.client = RequestsClient()
-        self.client.headers = {"Uid": str(1), "Flag": hash_user(1)}
+        self.client = APIClient()
+        self.client.credentials(HTTP_Uid=str(1), HTTP_Flag=hash_user(1))
 
-        self.client2 = RequestsClient()
-        self.client2.headers = {"Uid": str(2), "Flag": hash_user(2)}
+        self.client2 = APIClient()
+        self.client2.credentials(HTTP_Uid=str(2), HTTP_Flag=hash_user(2))
 
         Invitation.objects.create(**self.invitation1)
         Invitation.objects.create(**self.invitation2)
@@ -94,12 +94,11 @@ class ViewsTestCase(LiveServerTestCase):
         # user_data
         Relation.objects.create(**{'user1': 2, 'user2': 38})
         Relation.objects.create(**{'user1': 2, 'user2': 39})
+        client38 = APIClient()
+        client38.credentials(HTTP_Uid=str(38), HTTP_Flag=hash_user(38))
 
-        client38 = RequestsClient()
-        client38.headers = {"Uid": str(38), "Flag": hash_user(38)}
-
-        client39 = RequestsClient()
-        client39.headers = {"Uid": str(39), "Flag": hash_user(39)}
+        client39 = APIClient()
+        client39.credentials(HTTP_Uid=str(39), HTTP_Flag=hash_user(39))
 
         data38 = {
             'gym': "Gym for 38",
@@ -187,56 +186,59 @@ class ViewsTestCase(LiveServerTestCase):
 
 
         # Accepting
-        respond = self.client.get('http://testserver/friends/2/')
-        self.assertEqual(respond.json(), {'relation': 'Request received', 'request_id': 14})
+        respond = self.client.get('http://testserver:8081/friends/2/')
+        request_id1 = 18
+        self.assertEqual(respond.json(), {'relation': 'Request received', 'request_id': request_id1})
 
-        respond = self.client.post('http://testserver/friends/request/manage/99/')
+        respond = self.client.post('http://testserver:8081/friends/request/manage/99/')
         self.assertEqual(respond.json(), 'No such invitation')
 
-        respond = self.client.post('http://testserver/friends/request/manage/14/')
+        respond = self.client.post(f'http://testserver:8081/friends/request/manage/{request_id1}/')
         self.assertEqual(respond.json(), {'message': 'Relation created', 'relation': {'user1': 1, 'user2': 2}})
 
-        respond = self.client.get('http://testserver/friends/2/')
+        respond = self.client.get('http://testserver:8081/friends/2/')
         self.assertEqual(respond.json(), {'relation': 'Friends', 'request_id': None})
 
         # Rejecting
-        respond = self.client.get('http://testserver/friends/21/')
-        self.assertEqual(respond.json(), {'relation': 'Request received', 'request_id': 13})
+        respond = self.client.get('http://testserver:8081/friends/21/')
+        request_id2 = 17
+        self.assertEqual(respond.json(), {'relation': 'Request received', 'request_id': request_id2})
 
-        respond = self.client.delete('http://testserver/friends/request/manage/13/')
+        respond = self.client.delete(f'http://testserver:8081/friends/request/manage/{request_id2}/')
         self.assertEqual(respond.json(), {'message': 'Invitation successfully rejected.'})
 
-        respond = self.client.get('http://testserver/friends/21/')
+        respond = self.client.get('http://testserver:8081/friends/21/')
         self.assertEqual(respond.json(), {'relation': 'Not Friends', 'request_id': None})
 
-        respond = self.client.get('http://testserver/friends/33/')
-        self.assertEqual(respond.json(), {'relation': 'Request sent', 'request_id': 15})
+        respond = self.client.get('http://testserver:8081/friends/33/')
+        self.assertEqual(respond.json(), {'relation': 'Request sent', 'request_id': 19})
 
         # Deleting from friends
-        respond = self.client.delete('http://testserver/friends/2/')
+        respond = self.client.delete('http://testserver:8081/friends/2/')
         self.assertEqual(respond.json(), {'message': 'Successfully removed user with id: 2 from friends.'})
 
-        respond = self.client.get('http://testserver/friends/2/')
+        respond = self.client.get('http://testserver:8081/friends/2/')
         self.assertEqual(respond.json(), {'relation': 'Not Friends', 'request_id': None})
 
     def test_friends_list(self):
-        respond = self.client2.get('http://testserver/friends/list/')
+        respond = self.client2.get('http://testserver:8081/friends/list/')
         self.assertEqual(respond.json(), {'user_data_list': [{'user_id': 38, 'first_name': 'user 38', 'last_name': 'lanem 38'}, {'user_id': 39, 'first_name': 'user 39', 'last_name': 'lanem 39'}]})
 
     def test_someones_friends_list(self):
-        respond = self.client.get('http://testserver/friends/list/2/')
+        respond = self.client.get('http://testserver:8081/friends/list/2/')
         self.assertEqual(respond.json(), {'user_data_list': [{'user_id': 38, 'first_name': 'user 38', 'last_name': 'lanem 38'}, {'user_id': 39, 'first_name': 'user 39', 'last_name': 'lanem 39'}]})
 
     def test_friends_id_list(self):
-        respond = self.client.get('http://testserver/friends/id_list/')
+        respond = self.client.get('http://testserver:8081/friends/id_list/')
         self.assertEqual(respond.json(), {'friends_list': [4]})
 
 
-"""@mock.patch('friends.constants.SERVER_HOST', "localhost:8081")
+@mock.patch('friends.constants.SERVER_HOST', "localhost:8081")
 @mock.patch('users.constants.SERVER_HOST', "localhost:8081")
-@mock.patch('authentication.constants.SERVER_HOST', "localhost:8081")"""
-class TestUtils(TestCase):
-    """port = 8081"""
+@mock.patch('authentication.constants.SERVER_HOST', "localhost:8081")
+@mock.patch('notifications.constants.SERVER_HOST', "localhost:8081")
+class TestUtils(LiveServerTestCase):
+    port = 8081
 
     def setUp(self):
         pass
@@ -267,10 +269,10 @@ class TestUtils(TestCase):
         self.assertTrue(res)
 
     def test_get_invitation_id(self):
-        Invitation.objects.create(**{'sender': 1, 'receiver': 2})
+        invitation = Invitation.objects.create(**{'sender': 1, 'receiver': 2})
         res1 = get_invitation_id(1, 2)
         res2 = get_invitation_id(2, 1)
-        self.assertEqual(res1, 1)
+        self.assertEqual(res1, invitation.id)
         self.assertEqual(res1, res2)
 
     def test_check_friendship(self):

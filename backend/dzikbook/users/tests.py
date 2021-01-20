@@ -3,7 +3,7 @@ import json
 from copy import copy
 
 from django.test import TestCase
-from rest_framework.test import  RequestsClient, APITestCase
+from rest_framework.test import RequestsClient, APITestCase, APIClient
 
 from .decorators import hash_user
 from .models import UserData, DetailsData
@@ -195,8 +195,8 @@ class ViewsTestCase(APITestCase):
             'diet_plans': "test_diet_plans",
         }
 
-        self.client = RequestsClient()
-        self.client.headers = {"Uid": str(1), "Flag": hash_user(1)}
+        self.client = APIClient()
+        self.client.credentials(HTTP_Uid=str(1), HTTP_Flag=hash_user(1))
 
         self.data2 = {
             'user': 2,
@@ -215,8 +215,8 @@ class ViewsTestCase(APITestCase):
             'diet_plans': "test_diet_plans",
         }
 
-        self.client2 = RequestsClient()
-        self.client2.headers = {"Uid": str(2), "Flag": hash_user(2)}
+        self.client2 = APIClient()
+        self.client2.credentials(HTTP_Uid=str(2), HTTP_Flag=hash_user(2))
 
     def test_signed_in_user_data(self):
         response = self.client.post('http://testserver/users/data/', self.data)
@@ -292,8 +292,8 @@ class ViewsTestCase(APITestCase):
                          })
 
     def test_create_empty_user_data(self):
-        self.client.post('http://testserver/users/data/new/', )
-        response = self.client.get('http://testserver/users/data/')
+        self.client.post('http://testserver/users/data/new/', format='json')
+        response = self.client.get('http://testserver/users/data/', format='json')
         self.assertEqual(response.json(), {
             'gym': "",
             'additional_data': "",
@@ -310,9 +310,9 @@ class ViewsTestCase(APITestCase):
         data2['first_name'] = 'john'
         data2['last_name'] = 'doe'
 
-        self.client.post('http://testserver/users/data/', self.data)
-        self.client2.post('http://testserver/users/data/', data2)
-        response = self.client.get('http://testserver/users/search?key=gym&value=test&amount=10&offset=0')
+        self.client.post('http://testserver/users/data/', self.data, format='json')
+        self.client2.post('http://testserver/users/data/', data2, format='json')
+        response = self.client.get('http://testserver/users/search?key=gym&value=test&amount=10&offset=0', format='json')
 
         self.assertEqual(response.json(), {'users_list': [
             {'user_id': 1, 'first_name': 'test_name', 'last_name': 'test_last_name', 'gym': 'test_gym',
@@ -320,7 +320,7 @@ class ViewsTestCase(APITestCase):
             {'user_id': 2, 'first_name': 'john', 'last_name': 'doe', 'gym': 'test_gym', 'birth_date': '1900-01-01',
              'sex': 'test_sex', 'job': 'test_job'}]})
 
-        response = self.client.get('http://testserver/users/search?key=name&value=test&amount=10&offset=0')
+        response = self.client.get('http://testserver/users/search?key=name&value=test&amount=10&offset=0', format='json')
         self.assertEqual(response.json(), {'users_list': [
             {'user_id': 1, 'first_name': 'test_name', 'last_name': 'test_last_name', 'gym': 'test_gym',
              'birth_date': '1900-01-01', 'sex': 'test_sex', 'job': 'test_job'}]})

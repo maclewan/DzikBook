@@ -9,12 +9,14 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-import datetime
-from pathlib import Path
-import os
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+import os
+from pathlib import Path
+from cassandra import ConsistencyLevel
+import datetime
+
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -25,13 +27,15 @@ SECRET_KEY = 'r5u_-bh##l@qgnyrd^_00!h=5-vct@&9c+yyvrv+%_jz3hplny'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '10.0.2.2', '127.0.0.1', '192.168.1.17']
+ALLOWED_HOSTS = ['localhost', '10.0.2.2', '127.0.0.1', '0.0.0.0', '192.168.1.17']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'django_cassandra_engine',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -46,7 +50,6 @@ INSTALLED_APPS = [
     'socials',
     'users',
     'wall',
-
 ]
 
 REST_FRAMEWORK = {
@@ -55,15 +58,13 @@ REST_FRAMEWORK = {
     )
 }
 
-# JWT lib
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': datetime.timedelta(hours=1),
     'JWT_ALLOW_REFRESH': True,
     'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': True,
 }
-
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -102,13 +103,9 @@ WSGI_APPLICATION = 'dzikbook.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': str(BASE_DIR / 'db.sqlite3'),
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
-
-
-
 
 
 # Password validation
@@ -139,12 +136,17 @@ TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
-USE_L10N = False
+USE_L10N = True
 
 USE_TZ = True
 
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
+
+STATIC_URL = '/static/'
+SESSION_ENGINE = 'django_cassandra_engine.sessions.backends.db'
+CASSANDRA_FALLBACK_ORDER_BY_PYTHON = True
 
 STATIC_URL = '/static/'
 
@@ -153,4 +155,14 @@ MEDIA_URL = '/storage/'
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 1025
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {'console': {'class': 'logging.StreamHandler',},},
+    'loggers': {
+        'django': {'handlers': ['console'], 'level': 'INFO',},
+        'cassandra': {'handlers': ['console'], 'level': 'ERROR',},
+    },
+}
 
+CASSANDRA_HOST = os.getenv('CASS_HOST')
