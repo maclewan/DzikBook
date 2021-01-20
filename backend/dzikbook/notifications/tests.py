@@ -24,9 +24,9 @@ class NotificationTestCase(TestCase):
 
     def setUp(self):
         data = {
-            "post":5,
-            "user":2,
-            "notification_type":"test_type"
+            "post": 5,
+            "user": 2,
+            "notification_type": "test_type"
         }
         self.notification = Notification.objects.create(**data)
 

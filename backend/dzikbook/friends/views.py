@@ -2,15 +2,14 @@ import json
 import friends.constants as constants
 
 import requests
-from django.shortcuts import render
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .decorators import authenticate, hash_user, internal
 
-# create your views here
 from .models import Invitation, Relation
 from .serializers import InvitationSerializer, RelationSerializer
+
 
 class SigInUserFriendsInvitationsView(APIView):
     authentication_classes = []
@@ -35,7 +34,7 @@ class SigInUserFriendsInvitationsView(APIView):
             return Response("Already friends!", status=status.HTTP_208_ALREADY_REPORTED)
 
         if check_invitations(id, user_id):
-            return Response("There is already one invitation!", status=status.HTTP_208_ALREADY_REPORTED)
+           return Response("There is already one invitation!", status=status.HTTP_208_ALREADY_REPORTED)
 
         if not check_if_user_exist(user_id):
             return Response("No such user in db!", status=status.HTTP_422_UNPROCESSABLE_ENTITY)
@@ -57,6 +56,9 @@ class SigInUserFriendsInvitationsView(APIView):
             'message': 'Invitation successfully send.',
             'invitation_id': invit.id
         }
+
+        notify('invitation_send', user_id, id)
+
         return Response(context)
 
     @authenticate
@@ -125,7 +127,7 @@ class SigInUserFriendInfo(APIView):
         id = request.user.id
 
         (request_id, relation) = \
-                (None, 'Just you') if str(id) == str(user_id) \
+            (None, 'Just you') if str(id) == str(user_id) \
                 else (None, 'Friends') if check_friendship(id, user_id) \
                 else (get_invitation_id(id, user_id), 'Request sent') if check_if_sent(id, user_id) \
                 else (get_invitation_id(id, user_id), 'Request received') if check_if_sent(user_id, id) \
@@ -141,7 +143,7 @@ class SigInUserFriendInfo(APIView):
     def delete(self, request, user_id):
         id = request.user.id
         if not check_friendship(user_id, id):
-            Response("You are not friends!",status=status.HTTP_403_FORBIDDEN)
+            Response("You are not friends!", status=status.HTTP_403_FORBIDDEN)
 
         relation = Relation.objects.filter(user1=id, user2=user_id) \
             if Relation.objects.filter(user1=id, user2=user_id).exists() \
@@ -183,7 +185,7 @@ class FriendsListView(APIView):
     def get(self, request):
         user_id = request.user.id
         friends_list = get_friends_id(user_id)
-        return Response({'friends_list' : friends_list})
+        return Response({'friends_list': friends_list})
 
 
 def check_friendship(user1, user2):
@@ -210,7 +212,7 @@ def get_user_list(friends_list, id):
     payload = {'id_list': friends_list}
 
     # Send request to users service
-    url = 'http://'+constants.SERVER_HOST+'/users/multi/'
+    url = 'http://' + constants.SERVER_HOST + '/users/multi/'
     headers = {"Uid": str(id), "Flag": hash_user(id)}
     r = requests.post(url, data=json.dumps(payload), headers=headers)
 
@@ -226,7 +228,7 @@ def get_friends_id(user_id):
 
 
 def check_if_user_exist(user_id):
-    url = 'http://'+constants.SERVER_HOST+'/auth/user/' + str(user_id) + '/'
+    url = 'http://' + constants.SERVER_HOST + '/auth/user/' + str(user_id) + '/'
     if requests.get(url).text == 'true':
         return True
     else:
@@ -249,4 +251,21 @@ def create_relation(invitation):
     invitation.delete()
 
     # TODO: Notify notification service
+    notify('invitation_accepted', invitation.sender, invitation.receiver)
     return Response({"message": "Relation created", "relation": serializer.data})
+
+
+def notify(not_type, user, this_user):
+    payload = {
+        'notification_type': not_type,
+        'user': user,
+        'sender': this_user,
+        'post': None
+    }
+
+    # Send request to users service
+    url = 'http://' + constants.SERVER_HOST + '/notifications/'
+
+    headers = {"Uid": str(this_user), "Flag": hash_user(this_user)}
+    r = requests.post(url, data=(payload), headers=headers)
+    return r.json()

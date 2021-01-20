@@ -1,1 +1,3 @@
-SERVER_HOST = "127.0.0.1:8000"
+import sys
+
+SERVER_HOST = sys.argv[-1]

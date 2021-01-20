@@ -19,4 +19,6 @@ def main():
 
 
 if __name__ == '__main__':
+    if sys.argv[1] == 'runserver' and len(sys.argv) !=3:
+        sys.argv.append('127.0.0.1:8000')
     main()
