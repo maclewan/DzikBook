@@ -1,6 +1,4 @@
 from django.db import models
-from django.contrib.auth.models import User
-from wall.models import Post
 
 
 # TODO: ustawić żywotność
@@ -8,4 +6,10 @@ from wall.models import Post
 class Notification(models.Model):
     notification_type = models.TextField()
     user = models.IntegerField(null=False, blank=False)
+    sender = models.IntegerField(null=False, blank=False, default="1")
     post = models.IntegerField(null=True, blank=False)
+
+
+class Device(models.Model):
+    user = models.IntegerField(null=False, blank=False)
+    token = models.TextField(null=True, blank=False)

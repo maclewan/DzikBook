@@ -26,7 +26,7 @@ SECRET_KEY = 'r5u_-bh##l@qgnyrd^_00!h=5-vct@&9c+yyvrv+%_jz3hplny'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '10.0.2.2', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '10.0.2.2', '127.0.0.1', '192.168.1.17']
 
 
 # Application definition
@@ -108,6 +108,9 @@ DATABASES = {
 
 
 
+
+
+
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 
@@ -149,3 +152,5 @@ MEDIA_ROOT =  os.path.join(BASE_DIR, 'storage')
 MEDIA_URL = '/storage/'
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 1025
+
+
