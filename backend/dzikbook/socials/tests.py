@@ -233,57 +233,68 @@ class CommentsViewTestCase(LiveServerTestCase):
         url = reverse('post_comments', args=[self.comment1.post])
         response = self.client.get(url, format='json')
         # Convert ordered dict to dict
-        self.maxDiff = None
         self.assertListEqual(response.json(),
                              [
                                  {'comment_id': str(self.comment1.id), 'author': self.comment1.author,
-                                  'post': self.comment1.post, 'content': self.comment1.content},
+                                  'post': str(self.comment1.post), 'content': self.comment1.content},
                                  {'comment_id': str(self.comment2.id), 'author': self.comment2.author,
-                                  'post': self.comment2.post, 'content': self.comment2.content}
+                                  'post': str(self.comment2.post), 'content': self.comment2.content}
                              ]
                              )
-#
+
+
     def test_post_comments_post(self):
-        url = reverse('post_comments', args=[self.comment1.post])
+        post_id = uuid.uuid4()
+        url = reverse('post_comments', args=[post_id])
         test_context = 'test post'
         # Ony context should matter
         data = {
             'content': test_context,
-            'post': uuid.uuid4(),
+            'post': post_id,
             'author': self.user1.id
-            }
+        }
         response = self.client.post(url, data)
-        self.assertEqual(response.data, {'comment_id': mock.ANY, 'author': str(self.user1.id), 'post': dat['post'], 'content': test_context})
-#
-#     def test_comments_management_put(self):
-#         # Positive case
-#         url = reverse('comments_management', args=[self.comment2.id])
-#         test_context = "test put"
-#         # Ony context should matter
-#         data = {
-#             'content': test_context,
-#             'post': self.comment2.post + 1,
-#             'author': self.user1.id - 1
-#             }
-#         response = self.client.put(url, data)
-#         self.assertEqual(response.data, {'comment_id': self.comment2.id, 'author': self.user1.id, 'post': self.comment2.post, 'content': test_context})
-#         # Negative case, sign in user not an author
-#         url = reverse('comments_management', args=[self.comment1.id])
-#         response = self.client.put(url, data)
-#         self.assertEqual(response.data, "Comment doesn't exist!")
-#
-#     def test_comments_management_delete(self):
-#         # Negative case one, comment doesn't exists
-#         url = reverse('comments_management', args=[0])
-#         response = self.client.delete(url)
-#         self.assertEqual(response.data, "Comment doesn't exist!")
-#         self.assertEqual(response.status_code, 404)
-#         # Negative case two, sign in user not an author
-#         url = reverse('comments_management', args=[self.comment1.id])
-#         response = self.client.delete(url)
-#         self.assertEqual(response.data, "Comment doesn't exist!")
-#         self.assertEqual(response.status_code, 404)
-#         # Positive case
-#         url = reverse('comments_management', args=[self.comment2.id])
-#         response = self.client.delete(url)
-#         self.assertEqual(response.data, {'message': 'Comment deleted'})
+        self.assertDictEqual(response.data, {'comment_id': mock.ANY,
+                                             'author': self.user1.id,
+                                             'post': str(data['post']),
+                                             'content': test_context})
+
+
+    def test_comments_management_put(self):
+        # Positive case
+        comment_id = self.comment2.id
+        old_post_id = self.comment2.post
+        new_post_id = uuid.uuid4()
+        url = reverse('comments_management', args=[comment_id])
+        test_context = "test put"
+        # Ony context should matter
+        data = {
+            'content': test_context,
+            'post': new_post_id,
+            'author': self.user1.id
+        }
+        response = self.client.put(url, data)
+        self.assertEqual(response.data, {'comment_id': str(comment_id),
+                                         'author': self.user1.id,
+                                         'post': str(old_post_id),
+                                         'content': test_context})
+        # Negative case, sign in user not an author
+        url = reverse('comments_management', args=[self.comment1.id])
+        response = self.client.put(url, data)
+        self.assertEqual(response.data, "Comment doesn't exist!")
+
+    def test_comments_management_delete(self):
+        # Negative case one, comment doesn't exists
+        url = reverse('comments_management', args=[uuid.uuid4()])
+        response = self.client.delete(url)
+        self.assertEqual(response.data, "Comment doesn't exist!")
+        self.assertEqual(response.status_code, 404)
+        # Negative case two, sign in user not an author
+        url = reverse('comments_management', args=[self.comment1.id])
+        response = self.client.delete(url)
+        self.assertEqual(response.data, "Comment doesn't exist!")
+        self.assertEqual(response.status_code, 404)
+        # Positive case
+        url = reverse('comments_management', args=[self.comment2.id])
+        response = self.client.delete(url)
+        self.assertEqual(response.data, {'message': 'Comment deleted'})

@@ -7,11 +7,13 @@ from django_cassandra_engine.models import DjangoCassandraModel
 
 
 class Comment(DjangoCassandraModel):
-    id = columns.UUID(primary_key=True, partition_key=True, default=uuid.uuid4)
-    post = columns.UUID()
+    class Meta:
+        get_pk_field = 'id'
+    post = columns.UUID(primary_key=True, partition_key=True)
+    time = columns.DateTime(primary_key=True, clustering_order="ASC", default=datetime.now)
+    id = columns.UUID(primary_key=True, default=uuid.uuid4)
     author = columns.Integer()
     content = columns.Text()
-    time = columns.DateTime(primary_key=True, clustering_order="ASC", default=datetime.now)
 
 
 class Reaction(DjangoCassandraModel):

@@ -43,7 +43,6 @@ class ReactionsView(APIView):
             reaction.save()
             return Response(ReactionSerializer(reaction).data)
         except Exception as e:
-            print(e)
             return Response("Error!", status=status.HTTP_404_NOT_FOUND)
 
     @authenticate
@@ -95,7 +94,9 @@ class CommentsView(APIView):
     @authenticate
     def put(self, request, comment_id):
         try:
-            comment = Comment.objects.get(id=comment_id, author=request.user.id)
+            comment = Comment.objects.filter(author=request.user.id, id=comment_id).first()
+            if comment is None:
+                raise models.ObjectDoesNotExist
             data = {
                 "content": request.POST.get('content', ''),
             }
