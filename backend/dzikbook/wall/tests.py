@@ -402,7 +402,7 @@ class PostViewTestCase(LiveServerTestCase):
 
     @mock.patch('wall.constants.SERVER_HOST', server_host)
     @mock.patch('friends.constants.SERVER_HOST', server_host)
-    @mock.patch('authentication.constants.SERVER_HOST', server_host)
+    @mock.patch('friends.views.notify', mock.Mock())
     def test_main_wall_list_get(self):
         url = reverse('main_wall')
         client2 = APIClient()
