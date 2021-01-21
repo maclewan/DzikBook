@@ -1,5 +1,4 @@
 from datetime import datetime
-from django.contrib.auth.models import User
 # from time_uuid import time_uuid
 import uuid
 from cassandra.cqlengine import columns
@@ -17,6 +16,8 @@ class Comment(DjangoCassandraModel):
 
 
 class Reaction(DjangoCassandraModel):
-    id = columns.UUID(primary_key=True, partition_key=True, default=uuid.uuid4)
-    post = columns.UUID()
+    class Meta:
+        get_pk_field = 'id'
+    post = columns.UUID(primary_key=True, partition_key=True)
+    id = columns.UUID(primary_key=True, default=uuid.uuid4)
     giver = columns.Integer()

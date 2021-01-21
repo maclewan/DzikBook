@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from time import sleep
 
 from PIL import Image
 from django.core.files.base import ContentFile
@@ -38,7 +39,7 @@ class PostTestCase(TestCase):
     def setUp(self):
         self.author = User.objects.create(username="test_user", password="test_password")
         data = {
-            "author": self.author,
+            "author": self.author.id,
             "description": "description",
             "type": "media",
             "photo": "photo_url",
@@ -47,11 +48,12 @@ class PostTestCase(TestCase):
         self.post = Post.objects.create(**data)
 
     def tearDown(self):
-        Post.objects.all().delete()
+        for post in Post.objects.all():
+            post.delete()
 
     def test_post_create(self):
         self.assertTrue(isinstance(self.post, Post))
-        self.assertEqual(self.post.author, self.author)
+        self.assertEqual(self.post.author, self.author.id)
         self.assertEqual(self.post.description, "description")
         self.assertEqual(self.post.type, "media")
         self.assertEqual(self.post.photo, "photo_url")
@@ -63,7 +65,7 @@ class PostTestCase(TestCase):
         self.post.type = "text"
         self.post.photo = "photo_url_updated"
         self.post.additional_data = "additional_data_updated"
-        starting_timestamp = self.post.timestamp
+        starting_timestamp = self.post.time
 
         self.assertNotEqual(self.post.description, "description")
         self.assertNotEqual(self.post.type, "media")
@@ -75,7 +77,7 @@ class PostTestCase(TestCase):
         self.assertEqual(self.post.photo, "photo_url_updated")
         self.assertEqual(self.post.additional_data, "additional_data_updated")
 
-        self.assertEqual(self.post.timestamp, starting_timestamp)  # timestamp shouldnt update
+        self.assertEqual(self.post.time, starting_timestamp)  # timestamp shouldnt update
 
     def test_post_delete(self):
         id = self.post.id
@@ -91,7 +93,7 @@ class PostSerializerTestCase(TestCase):
     def setUp(self):
         self.author = User.objects.create(username="test_user", password="test_password")
         data = {
-            "author": self.author,
+            "author": self.author.id,
             "description": "description",
             "type": "media",
             "photo": "photo_url",
@@ -100,7 +102,8 @@ class PostSerializerTestCase(TestCase):
         self.post = Post.objects.create(**data)
 
     def tearDown(self):
-        Post.objects.all().delete()
+        for post in Post.objects.all():
+            post.delete()
 
     def test_post_serializer_parse(self):
         serializer = PostSerializer(self.post)
@@ -116,14 +119,14 @@ class PostSerializerTestCase(TestCase):
 
     def test_post_serializer_update(self):
         new_data = {
-            "author": self.author,
+            "author": self.author.id,
             "description": "description_updated",
             "visibility": True,
             "type": "text",
             "photo": "photo_url_updated",
             "additional_data": "additional_data_updated",
         }
-        starting_timestamp = self.post.timestamp
+        starting_timestamp = self.post.time
 
         serializer = PostSerializer(data=new_data)
         self.assertTrue(serializer.is_valid(raise_exception=True))
@@ -155,7 +158,7 @@ class PostSerializerTestCase(TestCase):
                              'timestamp': mock.ANY,
                          })
 
-        self.assertEqual(self.post.timestamp, starting_timestamp)  # timestamp shouldnt update
+        self.assertEqual(self.post.time, starting_timestamp)  # timestamp shouldnt update
 
 
 # #################
@@ -177,7 +180,7 @@ class PostViewTestCase(LiveServerTestCase):
         self.client.credentials(HTTP_Uid=str(logged_user_id), HTTP_Flag=hash_user(logged_user_id))
 
         data = {
-            "author": self.user1,
+            "author": self.user1.id,
             "description": "description",
         }
         data['type'] = "text"
@@ -187,26 +190,30 @@ class PostViewTestCase(LiveServerTestCase):
         self.post4 = Post.objects.create(**data)
 
         data['type'] = "media"
-        data["author"] = self.user2
+        data["author"] = self.user2.id
         self.post2 = Post.objects.create(**data)
 
         data['type'] = "text"
-        data["author"] = self.user3
+        data["author"] = self.user3.id
         self.post3 = Post.objects.create(**data)
 
     def tearDown(self):
-        Post.objects.all().delete()
-        User.objects.all().delete()
+        for post in Post.objects.all():
+            post.delete()
+            User.objects.all().delete()
 
     def test_sig_in_user_posts_get_existing(self):
         tested_post = self.post3
         url = reverse('sig_in_user_posts', args=[tested_post.id])
         response = self.client.get(url, format='json')
         serializer = PostSerializer(tested_post)
-        self.assertEqual(response.data, serializer.data)
-
+        correct_output = serializer.data
+        self.assertEquals(response.data['timestamp'].split('.')[0], correct_output['timestamp'].split('.')[0])
+        correct_output['timestamp'] = mock.ANY
+        self.assertEqual(response.data, correct_output)
+#
     def test_sig_in_user_posts_get_nonexisting(self):
-        url = reverse('sig_in_user_posts', args=[999])
+        url = reverse('sig_in_user_posts', args=['907e7ecd-7b9d-4109-afd0-93d052042cae'])
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.data, "Post with given id doesn't exist!")
@@ -404,6 +411,12 @@ class PostViewTestCase(LiveServerTestCase):
     @mock.patch('friends.constants.SERVER_HOST', server_host)
     @mock.patch('friends.views.notify', mock.Mock())
     def test_main_wall_list_get(self):
+        data = {
+            "author": self.user3.id,
+            "description": "description",
+            'type': 'text'
+        }
+
         url = reverse('main_wall')
         client2 = APIClient()
         client2.credentials(HTTP_Uid=str(self.user2.id), HTTP_Flag=hash_user(self.user2.id))
@@ -419,8 +432,9 @@ class PostViewTestCase(LiveServerTestCase):
 
         response = client3.get(url, format='json')
         self.assertEqual(len(response.data), 2)
-        self.assertIn(response.data[0]['post_id'], [self.post2.id, self.post3.id])
-        self.assertIn(response.data[1]['post_id'], [self.post2.id, self.post3.id])
+
+        self.assertEqual(response.data[0]['post_id'], self.post3.id)
+        self.assertEqual(response.data[1]['post_id'], self.post2.id)
 
         response = client3.get(url, {'type': 'media'}, format='json')
         self.assertEqual(len(response.data), 1)

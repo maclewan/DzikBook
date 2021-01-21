@@ -48,7 +48,9 @@ class ReactionsView(APIView):
     @authenticate
     def delete(self, request, post_id):
         try:
-            reaction = Reaction.objects.get(post=post_id, giver=request.user.id)
+            reaction = Reaction.objects.filter(post=post_id, giver=request.user.id).first()
+            if reaction is None:
+                raise DoesNotExist
             reaction.delete()
             return Response({"message": "Reaction deleted"})
         except DoesNotExist:
@@ -85,7 +87,9 @@ class CommentsView(APIView):
     @authenticate
     def delete(self, request, comment_id):
         try:
-            comment = Comment.objects.get(id=comment_id, author=request.user.id)
+            comment = Comment.objects.filter(id=comment_id, author=request.user.id).first()
+            if comment is None:
+                raise DoesNotExist
             comment.delete()
             return Response({"message": "Comment deleted"})
         except DoesNotExist:

@@ -23,7 +23,9 @@ class SigInUserPostsView(APIView):
     @authenticate
     def get(self, request, post_id):
         try:
-            post = Post.objects.get(id=post_id)
+            post = Post.objects.filter(id=post_id).first()
+            if post is None:
+                raise Exception()
             context = PostSerializer(post).data
         except Exception as e:
             return Response("Post with given id doesn't exist!", status=status.HTTP_404_NOT_FOUND)
@@ -32,7 +34,7 @@ class SigInUserPostsView(APIView):
     @authenticate
     def post(self, request):
         data = {
-            "author": request.user,
+            "author": request.user.id,
             "description": request.POST.get('description', ''),
             "additional_data": request.POST.get('additional_data', ''),
             "visibility": request.POST.get('visibility', 1),
@@ -64,7 +66,9 @@ class SigInUserPostsView(APIView):
     @authenticate
     def put(self, request, post_id):
         try:
-            post = Post.objects.get(id=post_id, author=request.user)
+            post = Post.objects.filter(id=post_id, author=request.user.id).first()
+            if post is None:
+                raise models.ObjectDoesNotExist
             data = {}
 
             description = request.POST.get('description', None)
@@ -101,7 +105,9 @@ class SigInUserPostsView(APIView):
     @authenticate
     def delete(self, request, post_id):
         try:
-            post = Post.objects.get(id=post_id, author=request.user)
+            post = Post.objects.filter(id=post_id, author=request.user.id).first()
+            if post is None:
+                raise models.ObjectDoesNotExist
             post.delete()
             return Response({"message": "Post deleted"})
         except models.ObjectDoesNotExist:
@@ -114,8 +120,8 @@ class SigInUserPostsListView(APIView):
 
     @authenticate
     def get(self, request):
-        posts = Post.objects.filter(author=request.user)
-        posts = posts.order_by('-timestamp')
+        posts = Post.objects.filter(author=request.user.id)
+        # posts = posts.order_by('-time')
         type = request.GET.get('type', None)
         offset = int(request.GET.get('offset', 0))
         amount = int(request.GET.get('amount', 10))
@@ -123,6 +129,7 @@ class SigInUserPostsListView(APIView):
         if type is not None:
             posts = posts.filter(type=type)
 
+        posts = sorted(posts, key=lambda p: p.time, reverse=True)
         posts = posts[offset:offset + amount]
 
         context = PostSerializer(posts, many=True).data
@@ -134,14 +141,15 @@ class PostsListView(APIView):
 
     @authenticate
     def get(self, request, user_id):
-        posts = Post.objects.filter(author=User(id=user_id))
-        posts = posts.order_by('-timestamp')
+        posts = Post.objects.filter(author=user_id)
+        # posts = posts.order_by('-time')
         offset = int(request.GET.get('offset', 0))
         amount = int(request.GET.get('amount', 10))
         type = request.GET.get('type', None)
         if type is not None:
             posts = posts.filter(type=type)
 
+        posts = sorted(posts, key=lambda p: p.time, reverse=True)
         posts = posts[offset:offset + amount]
         context = PostSerializer(posts, many=True).data
         return Response(context)
@@ -169,8 +177,8 @@ class MainWallListView(APIView):
         friends_id_list = list(response_json['friends_list'])
 
         friends_id_list.append(user_id)
-        users_list = [User(int(id)) for id in friends_id_list]
-        all_posts = Post.objects.filter(author__in=users_list).order_by('-timestamp')
+        users_list = [int(id) for id in friends_id_list]
+        all_posts = Post.objects.filter(author__in=users_list)  # .order_by('-time')
 
         type = request.GET.get('type', None)
         offset = int(request.GET.get('offset', 0))
@@ -179,6 +187,7 @@ class MainWallListView(APIView):
         if type is not None:
             all_posts = all_posts.filter(type=type)
 
+        all_posts = sorted(all_posts, key=lambda p: p.time, reverse=True)
         all_posts = all_posts[offset:offset + amount]
         context = PostSerializer(all_posts, many=True).data
         return Response(context)

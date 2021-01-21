@@ -4,16 +4,19 @@ from .models import PostTypes, Post
 
 class PostSerializer(serializers.Serializer):
     post_id = serializers.SerializerMethodField('get_post_id')
-    author = serializers.PrimaryKeyRelatedField(read_only=True)
+    author = serializers.IntegerField(read_only=True)
     description = serializers.CharField(required=True, allow_blank=True)
     additional_data = serializers.CharField(allow_blank=True, allow_null=True)
     visibility = serializers.BooleanField()
     photo = serializers.CharField(allow_blank=True)
     type = serializers.ChoiceField(choices=[(tag.name.lower(), tag.value) for tag in PostTypes])
-    timestamp = serializers.DateTimeField(required=False)
+    timestamp = serializers.SerializerMethodField('get_timestamp')
 
     def get_post_id(self, obj):
-        return obj.pk
+        return obj.id
+
+    def get_timestamp(self, obj):
+        return str(obj.time)
 
     class Meta:
         model = Post
