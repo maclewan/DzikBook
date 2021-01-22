@@ -1,6 +1,7 @@
 import 'package:dzikbook/providers/workouts.dart';
 import 'package:dzikbook/screens/workout_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class WorkoutPost extends StatelessWidget {
   final Workout workout;
@@ -52,7 +53,10 @@ class WorkoutPost extends StatelessWidget {
               children: [
                 Expanded(
                   child: OutlineButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Provider.of<Workouts>(context, listen: false)
+                          .addWorkout(workout);
+                    },
                     child: FittedBox(
                       fit: BoxFit.contain,
                       child: Padding(

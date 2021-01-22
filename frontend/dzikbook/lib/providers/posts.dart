@@ -4,6 +4,7 @@ import 'package:dzikbook/models/CommentModel.dart';
 import 'package:dzikbook/models/HttpException.dart';
 import 'dart:async';
 import 'package:dzikbook/models/config.dart';
+import 'package:dzikbook/providers/workouts.dart';
 import 'package:flutter/widgets.dart';
 import 'package:dzikbook/models/PostFetcher.dart';
 import 'package:flutter/cupertino.dart';
@@ -31,12 +32,15 @@ class Posts with ChangeNotifier {
     final List<String> tokens = [];
     if (days != 0) {
       tokens.add('${days}d');
+      return tokens.join(':');
     }
     if (tokens.isNotEmpty || hours != 0) {
       tokens.add('${hours}h');
+      return tokens.join(':');
     }
     if (tokens.isNotEmpty || minutes != 0) {
       tokens.add('${minutes}m');
+      return tokens.join(':');
     }
     tokens.add('${seconds}s');
 
@@ -244,8 +248,12 @@ class Posts with ChangeNotifier {
             timeDuration -= Duration(hours: 6);
 
             String time = formatDuration(timeDuration);
-
             int secondsTaken = timeDuration.inSeconds;
+            var workouts;
+            if (json.decode(r["additional_data"]) != null) {
+              workouts = json.decode(r["additional_data"]);
+            }
+
             PostModel post = new PostModel(
                 userId: r["author"].toString(),
                 hasReacted: reactions.contains(int.parse(this.userId)),
@@ -256,9 +264,30 @@ class Posts with ChangeNotifier {
                 userName: "${creds.userName} ${creds.lastName}",
                 timeTaken: time,
                 hasImage: r["photo"] != null ? true : false,
-                hasTraining: false,
+                hasTraining: json.decode(r["additional_data"]) != null,
                 comments: comments,
-                loadedTraining: null,
+                loadedTraining: json.decode(r["additional_data"]) != null
+                    ? Workout(
+                        id: workouts['id'],
+                        name: workouts['name'],
+                        workoutLength: workouts['length'],
+                        exercises: workouts['exercises']
+                            .map<Exercise>(
+                              (e) => Exercise(
+                                id: e['id'],
+                                name: e['name'],
+                                series: int.parse(e['series']),
+                                reps: int.parse(
+                                  e['reps'],
+                                ),
+                                breakTime: int.parse(
+                                  e['breakTime'],
+                                ),
+                              ),
+                            )
+                            .toList(),
+                      )
+                    : null,
                 loadedImg: r["photo"] != null
                     ? Image.network('$apiUrl${r["photo"]}')
                     : null,
@@ -314,10 +343,24 @@ class Posts with ChangeNotifier {
 
   Future<void> addPost(postDescription, file, hasImg, hasTraining, training,
       username, userPhoto) async {
+    final workout = {
+      'id': training.id,
+      'name': training.name,
+      'length': training.workoutLength,
+      'exercises': training.exercises
+          .map((Exercise e) => {
+                'id': e.id,
+                'name': e.name,
+                'series': e.series.toString(),
+                'reps': e.reps.toString(),
+                'breakTime': e.breakTime.toString(),
+              })
+          .toList(),
+    };
     final url = "$apiUrl/wall/post/";
     Map<String, dynamic> body = {
       'description': postDescription,
-      'additional_data': json.encode(training),
+      'additional_data': hasTraining ? json.encode(workout) : null,
       'type': hasImg
           ? 'media'
           : hasTraining
@@ -346,6 +389,7 @@ class Posts with ChangeNotifier {
         throw HttpException("Operacja nie powiodła się!");
       }
       final Map parsed = response.data;
+      print(parsed);
       PostModel post = PostModel(
           hasReacted: false,
           secondsTaken: 0,
@@ -357,7 +401,7 @@ class Posts with ChangeNotifier {
           userName: username,
           timeTaken: "0s",
           hasImage: parsed["photo"] == null ? false : true,
-          hasTraining: false,
+          hasTraining: parsed["additional_data"] == null ? false : false,
           loadedImg: parsed["photo"] == null
               ? null
               : Image.network('$apiUrl${parsed["photo"]}'),

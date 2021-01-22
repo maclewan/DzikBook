@@ -107,7 +107,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               loadedImg: postsProvider.wallPosts[index - 1].hasImage
                   ? postsProvider.wallPosts[index - 1].loadedImg
                   : null,
-              hasTraining: false,
+              hasTraining: postsProvider.wallPosts[index - 1].hasTraining,
+              traning: postsProvider.wallPosts[index - 1].hasTraining
+                  ? postsProvider.wallPosts[index - 1].loadedTraining
+                  : null,
               hasReacted: postsProvider.wallPosts[index - 1].hasReacted,
               userId: this.widget.id,
             );

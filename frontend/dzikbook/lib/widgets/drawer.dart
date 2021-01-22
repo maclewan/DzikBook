@@ -1,6 +1,8 @@
+import 'package:dzikbook/providers/auth.dart';
 import 'package:dzikbook/widgets/drawer_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 
 class DrawerBody extends StatelessWidget {
   @override
@@ -62,6 +64,22 @@ class DrawerBody extends StatelessWidget {
             routeName: '/invitations-list',
             icon: Icons.group_add,
             title: 'Zaproszenia',
+          ),
+          ListTile(
+            onTap: () {
+              Provider.of<Auth>(context).logout();
+              Navigator.of(context).pushReplacementNamed('/auth');
+            },
+            leading: Icon(
+              Icons.logout,
+              size: 30,
+            ),
+            title: Text(
+              "Wyloguj",
+              style: TextStyle(
+                fontSize: 20,
+              ),
+            ),
           ),
         ],
       ),
