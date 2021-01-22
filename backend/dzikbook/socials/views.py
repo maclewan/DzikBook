@@ -10,11 +10,12 @@ from .models import Comment, Reaction
 from django.db import models
 from rest_framework.permissions import IsAuthenticated
 from .serializers import CommentSerializer, ReactionSerializer
-
+import requests
+import constants
+from .decorators import authenticate, hash_user
 
 
 # create your views here
-from .decorators import authenticate
 
 
 class ReactionsView(APIView):
@@ -41,6 +42,14 @@ class ReactionsView(APIView):
             reaction_serializer = ReactionSerializer()
             reaction = reaction_serializer.create(validated_data=data)
             reaction.save()
+            try:
+                print("XDDD")
+                author_id = get_author_id(request.user.id, post_id)
+                # Avoid notifying yourself
+                if author_id != request.user.id:
+                    notify("like", author_id, request.user.id, post=post_id)
+            except:
+                pass
             return Response(ReactionSerializer(reaction).data)
         except Exception as e:
             return Response("Error!", status=status.HTTP_404_NOT_FOUND)
@@ -80,6 +89,13 @@ class CommentsView(APIView):
             comment_serializer = CommentSerializer()
             comment = comment_serializer.create(validated_data=data)
             comment.save()
+            try:
+                author_id = get_author_id(request.user.id, post_id)
+                # Avoid notifying yourself
+                if author_id != request.user.id:
+                    notify("comment", author_id, request.user.id, post=post_id)
+            except:
+                pass
             return Response(CommentSerializer(comment).data)
         except:
             return Response("Error during posting a comment!", status=status.HTTP_404_NOT_FOUND)
@@ -109,3 +125,28 @@ class CommentsView(APIView):
             return Response(CommentSerializer(comment).data)
         except models.ObjectDoesNotExist:
             return Response("Comment doesn't exist!", status=status.HTTP_404_NOT_FOUND)
+
+
+def notify(not_type, user, this_user, post=None):
+    payload = {
+        'notification_type': not_type,
+        'user': user,
+        'sender': this_user,
+        'post': post
+    }
+
+    # Send request to users service
+    url = 'http://' + constants.SERVER_HOST + '/notifications/'
+
+    headers = {"Uid": str(this_user), "Flag": hash_user(this_user)}
+    r = requests.post(url, data=payload, headers=headers)
+    return r.json()
+
+
+def get_author_id(this_user, post_id):
+    # Send request to users service
+    url = 'http://' + constants.SERVER_HOST + '/wall/post/' + str(post_id) + '/'
+
+    headers = {"Uid": str(this_user), "Flag": hash_user(this_user)}
+    response = requests.get(url, headers=headers)
+    return response.json()["author"]
