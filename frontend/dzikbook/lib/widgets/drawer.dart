@@ -67,7 +67,7 @@ class DrawerBody extends StatelessWidget {
           ),
           ListTile(
             onTap: () {
-              Provider.of<Auth>(context).logout();
+              Provider.of<Auth>(context, listen: false).logout();
               Navigator.of(context).pushReplacementNamed('/auth');
             },
             leading: Icon(

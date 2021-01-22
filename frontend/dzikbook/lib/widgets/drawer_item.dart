@@ -11,7 +11,8 @@ class DrawerItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: () {
-        Navigator.of(context).pushReplacementNamed(this.routeName);
+        Navigator.of(context)
+            .pushReplacementNamed(this.routeName, arguments: false);
       },
       leading: Icon(
         this.icon,

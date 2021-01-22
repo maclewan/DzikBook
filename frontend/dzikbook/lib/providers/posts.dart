@@ -227,9 +227,6 @@ class Posts with ChangeNotifier {
         throw HttpException("Operacja nie powiodła się!");
       }
       final List parsedList = response.data;
-      for (final r in parsedList) {
-        print(r);
-      }
       Stopwatch stopwatch = new Stopwatch()..start();
       await Future.wait([
         for (final r in parsedList)
@@ -389,7 +386,10 @@ class Posts with ChangeNotifier {
         throw HttpException("Operacja nie powiodła się!");
       }
       final Map parsed = response.data;
-      print(parsed);
+      var workouts;
+      if (json.decode(parsed["additional_data"]) != null) {
+        workouts = json.decode(parsed["additional_data"]);
+      }
       PostModel post = PostModel(
           hasReacted: false,
           secondsTaken: 0,
@@ -401,7 +401,29 @@ class Posts with ChangeNotifier {
           userName: username,
           timeTaken: "0s",
           hasImage: parsed["photo"] == null ? false : true,
-          hasTraining: parsed["additional_data"] == null ? false : false,
+          hasTraining: json.decode(parsed["additional_data"]) != null,
+          loadedTraining: json.decode(parsed["additional_data"]) != null
+              ? Workout(
+                  id: workouts['id'],
+                  name: workouts['name'],
+                  workoutLength: workouts['length'],
+                  exercises: workouts['exercises']
+                      .map<Exercise>(
+                        (e) => Exercise(
+                          id: e['id'],
+                          name: e['name'],
+                          series: int.parse(e['series']),
+                          reps: int.parse(
+                            e['reps'],
+                          ),
+                          breakTime: int.parse(
+                            e['breakTime'],
+                          ),
+                        ),
+                      )
+                      .toList(),
+                )
+              : null,
           loadedImg: parsed["photo"] == null
               ? null
               : Image.network('$apiUrl${parsed["photo"]}'),
