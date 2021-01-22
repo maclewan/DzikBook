@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "76386375587",
+    "firebase_url": "https://dzikbook.firebaseio.com",
+    "project_id": "dzikbook",
+    "storage_bucket": "dzikbook.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:76386375587:android:87a5df229f65f5e32bac16",
+        "android_client_info": {
+          "package_name": "com.example.dzikbook"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "76386375587-u9g6cikcbh6t7u0d027uundag11g4mut.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCmCGSbo53sgrcGDNOxtO20JA7evTudlzc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "76386375587-u9g6cikcbh6t7u0d027uundag11g4mut.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

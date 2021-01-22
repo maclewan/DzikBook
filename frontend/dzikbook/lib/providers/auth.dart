@@ -143,7 +143,6 @@ class Auth with ChangeNotifier {
       _autoTokenRefresh();
       notifyListeners();
     } catch (error) {
-      print(error);
       throw HttpException('Twoja sesja wygasła. Zaloguj się ponownie');
     }
     final prefs = await SharedPreferences.getInstance();

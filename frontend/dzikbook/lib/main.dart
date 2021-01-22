@@ -1,3 +1,6 @@
+import 'package:dzikbook/providers/notifications.dart';
+import 'package:dzikbook/screens/notifications_screen.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:dzikbook/screens/user_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -28,15 +31,20 @@ import './screens/friends_list_screen.dart';
 import './screens/invitations_screen.dart';
 import './screens/user_settings_screen.dart';
 
+import './services/push_notification_service.dart';
+
 void main() {
   initializeDateFormatting().then((_) => runApp(MyApp()));
   // runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  // static final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    // final pushNotificationService = PushNotificationService(_firebaseMessaging);
+    // pushNotificationService.initialise();
     return MultiProvider(
         providers: [
           ChangeNotifierProvider(
@@ -83,6 +91,10 @@ class MyApp extends StatelessWidget {
               ..update = userData.updateDiets
               ..diets = userData.additionalData['diets'],
           ),
+          ChangeNotifierProxyProvider<Auth, Notifications>(
+              create: (_) => Notifications(),
+              update: (_, authData, notifications) =>
+                  notifications..token = authData.token)
         ],
         child: Consumer<Auth>(
           builder: (ctx, auth, _) => MaterialApp(
@@ -108,7 +120,7 @@ class MyApp extends StatelessWidget {
               UserSettingsScreeen.routeName: (ctx) => UserSettingsScreeen(),
               FriendsListScreen.routeName: (ctx) => FriendsListScreen(),
               InvitationsScreen.routeName: (ctx) => InvitationsScreen(),
-              UserProfileScreen.routeName: (ctx) => UserProfileScreen()
+              NotificationsScreen.routeName: (ctx) => NotificationsScreen(),
             },
           ),
         ));
