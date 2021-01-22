@@ -43,7 +43,6 @@ class ReactionsView(APIView):
             reaction = reaction_serializer.create(validated_data=data)
             reaction.save()
             try:
-                print("XDDD")
                 author_id = get_author_id(request.user.id, post_id)
                 # Avoid notifying yourself
                 if author_id != request.user.id:
