@@ -7,7 +7,7 @@ class Notification(models.Model):
     notification_type = models.TextField()
     user = models.IntegerField(null=False, blank=False)
     sender = models.IntegerField(null=False, blank=False, default="1")
-    post = models.IntegerField(null=True, blank=False)
+    post = models.UUIDField(null=True, blank=False)
 
 
 class Device(models.Model):
