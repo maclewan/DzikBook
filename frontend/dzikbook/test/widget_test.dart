@@ -460,4 +460,63 @@ void main() {
     expect(find.byType(SvgPicture), findsOneWidget);
     expect(find.byType(Container), findsOneWidget);
   });
+  testWidgets("Checking SocialIcon", (WidgetTester tester) async {
+    await tester.pumpWidget(MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (context) => Auth(),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => Static(),
+          ),
+          ChangeNotifierProxyProvider<Auth, UserData>(
+            create: (_) => UserData(),
+            update: (_, auth, userData) => userData..update(auth),
+          ),
+          ChangeNotifierProxyProvider<UserData, DayPlans>(
+            create: (context) => DayPlans(),
+            update: (_, userData, dayPlans) => dayPlans
+              ..token = userData.token
+              ..userId = userData.id
+              ..workouts = userData.additionalData['workouts']
+              ..diets = userData.additionalData['diets'],
+          ),
+          ChangeNotifierProxyProvider<UserData, Posts>(
+              create: (_) => Posts(),
+              update: (_, userData, posts) => posts
+                ..token = userData.token
+                ..refreshToken = userData.refreshToken
+                ..userId = userData.id),
+          ChangeNotifierProxyProvider<Auth, Friends>(
+            create: (_) => Friends(),
+            update: (_, auth, friends) => friends..token = auth.token,
+          ),
+          ChangeNotifierProxyProvider<Auth, Notifications>(
+              create: (_) => Notifications(),
+              update: (_, authData, notifications) =>
+                  notifications..token = authData.token)
+        ],
+        child: Consumer<Auth>(
+          builder: (ctx, auth, _) => MaterialApp(
+            title: 'Flutter Demo',
+            theme: ThemeData(
+              primarySwatch: Colors.green,
+              accentColor: Colors.green,
+              fontFamily: 'Montserrat',
+              visualDensity: VisualDensity.adaptivePlatformDensity,
+            ),
+            home: SocialIcon(
+              color: Colors.amber,
+              deviceSize: Size(100, 100),
+              icon: "assets/images/dzik.svg",
+              press: null,
+            ),
+            routes: {
+              WorkoutListScreen.routeName: (ctx) => WorkoutListScreen(),
+            },
+          ),
+        )));
+    expect(find.byType(SvgPicture), findsOneWidget);
+    expect(find.byType(Container), findsOneWidget);
+  });
 }
