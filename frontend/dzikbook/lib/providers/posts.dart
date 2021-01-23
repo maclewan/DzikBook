@@ -82,7 +82,7 @@ class Posts with ChangeNotifier {
     this.postsCount = 0;
   }
 
-  Future<List> getPostReactions(int postId) async {
+  Future<List> getPostReactions(String postId) async {
     final url = "$apiUrl/socials/reactions/$postId";
     try {
       final response = await dio.get(url,
@@ -98,7 +98,7 @@ class Posts with ChangeNotifier {
     }
   }
 
-  Future<List<CommentModel>> fetchPostComments(int postId) async {
+  Future<List<CommentModel>> fetchPostComments(String postId) async {
     final url = "$apiUrl/socials/comments/post/$postId/";
     List<CommentModel> comments = [];
     try {
@@ -231,10 +231,11 @@ class Posts with ChangeNotifier {
       await Future.wait([
         for (final r in parsedList)
           Future.wait([
-            fetchPostComments(r["post_id"]),
-            getPostReactions(r["post_id"]),
+            fetchPostComments(r["post_id"].toString()),
+            getPostReactions(r["post_id"].toString()),
             getCredentials(r["author"])
           ]).then((res) {
+            print(r);
             List<CommentModel> comments = res[0];
             List<dynamic> reactions = res[1];
             Credentials creds = res[2];
