@@ -5,7 +5,8 @@ from .models import Comment, Reaction
 
 class CommentSerializer(serializers.Serializer):
     comment_id = serializers.SerializerMethodField('get_comment_id')
-    author = serializers.PrimaryKeyRelatedField(read_only=True)
+    timestamp = serializers.DateTimeField(source='time')
+    author = serializers.IntegerField(read_only=True)
     post = serializers.UUIDField(read_only=True)
     content = serializers.CharField(required=True, allow_blank=True)
 
@@ -14,7 +15,7 @@ class CommentSerializer(serializers.Serializer):
 
     class Meta:
         model = Comment
-        fields = ('comment_id', 'author', 'content', 'post')
+        fields = ('comment_id', 'author', 'content', 'post', 'timestamp')
 
     def create(self, validated_data):
         """
