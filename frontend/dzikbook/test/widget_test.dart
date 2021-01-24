@@ -8,6 +8,7 @@ import 'package:dzikbook/screens/add_diet_screen.dart';
 import 'package:dzikbook/screens/add_workout_screen.dart';
 import 'package:dzikbook/screens/calendar_plans_screen.dart';
 import 'package:dzikbook/screens/invitations_screen.dart';
+import 'package:dzikbook/widgets/invitation.dart';
 import 'package:dzikbook/widgets/social_icon.dart';
 import 'package:dzikbook/widgets/user_profile_info.dart';
 import 'package:flutter_svg/svg.dart';
@@ -34,6 +35,7 @@ import 'package:dzikbook/widgets/post.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
+import 'package:universal_html/prefer_universal/js.dart';
 
 void main() {
   testWidgets("Checking Auth Screen", (WidgetTester tester) async {
@@ -184,85 +186,6 @@ void main() {
       expect(find.text('Posty'), findsOneWidget);
       expect(find.text('15'), findsOneWidget);
       expect(find.text('10'), findsNWidgets(2));
-    });
-  });
-
-  testWidgets("Checking AddDiet", (WidgetTester tester) async {
-    provideMockedNetworkImages(() async {
-      await tester.pumpWidget(MultiProvider(
-          providers: [
-            ChangeNotifierProvider(
-              create: (context) => Auth(),
-            ),
-            ChangeNotifierProvider(
-              create: (context) => Static(),
-            ),
-            ChangeNotifierProxyProvider<Auth, UserData>(
-              create: (_) => UserData(),
-              update: (_, auth, userData) => userData..update(auth),
-            ),
-            ChangeNotifierProxyProvider<UserData, DayPlans>(
-              create: (context) => DayPlans(),
-              update: (_, userData, dayPlans) => dayPlans
-                ..token = userData.token
-                ..userId = userData.id
-                ..workouts = userData.additionalData['workouts']
-                ..diets = userData.additionalData['diets'],
-            ),
-            ChangeNotifierProxyProvider<UserData, Posts>(
-                create: (_) => Posts(),
-                update: (_, userData, posts) => posts
-                  ..token = userData.token
-                  ..refreshToken = userData.refreshToken
-                  ..userId = userData.id),
-            ChangeNotifierProxyProvider<Auth, Friends>(
-              create: (_) => Friends(),
-              update: (_, auth, friends) => friends..token = auth.token,
-            ),
-            ChangeNotifierProxyProvider<Auth, SearchPeople>(
-              create: (_) => SearchPeople(),
-              update: (_, auth, people) => people..token = auth.token,
-            ),
-            ChangeNotifierProxyProvider<UserData, Workouts>(
-              create: (_) => Workouts(),
-              update: (_, userData, workouts) => workouts
-                ..update = userData.updateWorkouts
-                ..workouts = userData.additionalData['workouts'],
-            ),
-            ChangeNotifierProxyProvider<UserData, Diets>(
-              create: (_) => Diets(),
-              update: (_, userData, workouts) => workouts
-                ..update = userData.updateDiets
-                ..diets = userData.additionalData['diets'],
-            ),
-            ChangeNotifierProxyProvider<Auth, Notifications>(
-                create: (_) => Notifications(),
-                update: (_, authData, notifications) =>
-                    notifications..token = authData.token)
-          ],
-          child: Consumer<Auth>(
-            builder: (ctx, auth, _) => MaterialApp(
-              title: 'Flutter Demo',
-              theme: ThemeData(
-                primarySwatch: Colors.green,
-                accentColor: Colors.green,
-                fontFamily: 'Montserrat',
-                visualDensity: VisualDensity.adaptivePlatformDensity,
-              ),
-              home: AddDietScreen(),
-              routes: {
-                WorkoutListScreen.routeName: (ctx) => WorkoutListScreen(),
-              },
-            ),
-          )));
-      await tester.tap(find.byIcon(Icons.done));
-      await tester.pump();
-      expect(find.text('Błąd!'), findsOneWidget);
-      expect(find.byType(FlatButton), findsNWidgets(1));
-      await tester.tap(find.byType(FlatButton));
-      await tester.pump();
-      expect(find.text('Błąd!'), findsNothing);
-      expect(find.byType(FlatButton), findsNothing);
     });
   });
 
@@ -518,5 +441,86 @@ void main() {
         )));
     expect(find.byType(SvgPicture), findsOneWidget);
     expect(find.byType(Container), findsOneWidget);
+  });
+  testWidgets("Test WorkoutListScreen", (WidgetTester tester) async {
+    await tester.pumpWidget(MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (context) => Auth(),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => Static(),
+          ),
+          ChangeNotifierProxyProvider<Auth, UserData>(
+            create: (_) => UserData(),
+            update: (_, auth, userData) => userData..update(auth),
+          ),
+          ChangeNotifierProxyProvider<UserData, DayPlans>(
+            create: (context) => DayPlans(),
+            update: (_, userData, dayPlans) => dayPlans
+              ..token = userData.token
+              ..userId = userData.id
+              ..workouts = userData.additionalData['workouts']
+              ..diets = userData.additionalData['diets'],
+          ),
+          ChangeNotifierProxyProvider<UserData, Posts>(
+              create: (_) => Posts(),
+              update: (_, userData, posts) => posts
+                ..token = userData.token
+                ..refreshToken = userData.refreshToken
+                ..userId = userData.id),
+          ChangeNotifierProxyProvider<Auth, Friends>(
+            create: (_) => Friends(),
+            update: (_, auth, friends) => friends..token = auth.token,
+          ),
+          ChangeNotifierProxyProvider<Auth, SearchPeople>(
+            create: (_) => SearchPeople(),
+            update: (_, auth, people) => people..token = auth.token,
+          ),
+          ChangeNotifierProxyProvider<UserData, Workouts>(
+            create: (_) => Workouts(),
+            update: (_, userData, workouts) => workouts
+              ..update = userData.updateWorkouts
+              ..workouts = userData.additionalData['workouts'],
+          ),
+          ChangeNotifierProxyProvider<UserData, Diets>(
+            create: (_) => Diets(),
+            update: (_, userData, workouts) => workouts
+              ..update = userData.updateDiets
+              ..diets = userData.additionalData['diets'],
+          ),
+          ChangeNotifierProxyProvider<Auth, Notifications>(
+              create: (_) => Notifications(),
+              update: (_, authData, notifications) =>
+                  notifications..token = authData.token)
+        ],
+        child: Consumer<Auth>(
+          builder: (ctx, auth, _) => MaterialApp(
+            title: 'Flutter Demo',
+            theme: ThemeData(
+              primarySwatch: Colors.green,
+              accentColor: Colors.green,
+              fontFamily: 'Montserrat',
+              visualDensity: VisualDensity.adaptivePlatformDensity,
+            ),
+            home: Navigator(
+              onGenerateRoute: (_) {
+                final bool arg = true;
+                return MaterialPageRoute<Widget>(
+                  builder: (_) => WorkoutListScreen(),
+                  settings: RouteSettings(arguments: arg),
+                );
+              },
+            ),
+            routes: {
+              WorkoutListScreen.routeName: (ctx) => WorkoutListScreen(),
+            },
+          ),
+        )));
+    expect(find.text('Treningi'), findsWidgets);
+    expect(find.byType(Container), findsWidgets);
+
+    await tester.tap(find.widgetWithIcon(IconButton, Icons.add));
+    await tester.pump();
   });
 }

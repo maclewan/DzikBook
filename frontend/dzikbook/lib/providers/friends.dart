@@ -27,6 +27,7 @@ class Friends with ChangeNotifier {
   List<_Invitation> _invitations = [];
   List<_Friend> get friends => _friends;
   List<_Invitation> get invitations => _invitations;
+  set invitations(List<_Invitation> newList) => _invitations = newList;
   bool _hasFetched = false;
   bool _hasFetchedInvitations = false;
   bool get hasFetched => _hasFetched;
