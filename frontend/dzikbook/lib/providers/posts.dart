@@ -116,14 +116,15 @@ class Posts with ChangeNotifier {
             CommentModel comment = new CommentModel(
                 description: c["content"],
                 imgSource: userPhoto,
-                commentId: c["comment_id"]);
+                commentId: c["timestamp"]);
             comments.add(comment);
           })
       ]);
 
       comments.sort((a, b) {
-        int aId = a.commentId;
-        int bId = b.commentId;
+        DateTime aId = (DateTime.parse(a.commentId));
+        DateTime bId = (DateTime.parse(b.commentId));
+
         return aId.compareTo(bId);
       });
       return comments;
@@ -149,7 +150,7 @@ class Posts with ChangeNotifier {
     }
   }
 
-  Future<int> addComment(String postId, String comment) async {
+  Future<String> addComment(String postId, String comment) async {
     final url = "$apiUrl/socials/comments/post/$postId/";
     Map<String, dynamic> body = {
       'content': comment,
@@ -171,7 +172,8 @@ class Posts with ChangeNotifier {
         return null;
       }
       print("comment added for post $postId");
-      return response.data["comment_id"];
+      print(response.data);
+      return response.data["timestamp"];
     } catch (error) {
       return null;
     }
@@ -341,24 +343,26 @@ class Posts with ChangeNotifier {
 
   Future<void> addPost(postDescription, file, hasImg, hasTraining, training,
       username, userPhoto) async {
-    final workout = {
-      'id': training.id,
-      'name': training.name,
-      'length': training.workoutLength,
-      'exercises': training.exercises
-          .map((Exercise e) => {
-                'id': e.id,
-                'name': e.name,
-                'series': e.series.toString(),
-                'reps': e.reps.toString(),
-                'breakTime': e.breakTime.toString(),
-              })
-          .toList(),
-    };
+    final workout = hasTraining
+        ? {
+            'id': training.id,
+            'name': training.name,
+            'length': training.workoutLength,
+            'exercises': training.exercises
+                .map((Exercise e) => {
+                      'id': e.id,
+                      'name': e.name,
+                      'series': e.series.toString(),
+                      'reps': e.reps.toString(),
+                      'breakTime': e.breakTime.toString(),
+                    })
+                .toList(),
+          }
+        : null;
     final url = "$apiUrl/wall/post/";
     Map<String, dynamic> body = {
       'description': postDescription,
-      'additional_data': hasTraining ? json.encode(workout) : null,
+      'additional_data': hasTraining ? json.encode(workout) : 'null',
       'type': hasImg
           ? 'media'
           : hasTraining

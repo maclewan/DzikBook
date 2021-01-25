@@ -155,6 +155,32 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.containsKey('deviceTok')) {
+      final deviceToken = prefs.getString('deviceTok');
+      final url = '$apiUrl/notifications/register_device/';
+      Map<String, dynamic> body = {
+        'deviceToken': deviceToken,
+      };
+
+      FormData formData = new FormData.fromMap(body);
+      try {
+        await dio.delete(
+          url,
+          options: Options(
+            headers: {
+              "Authorization": "Bearer " + _token,
+              "Accept": "application/json",
+            },
+          ),
+          data: formData,
+        );
+      } catch (error) {
+        print(error);
+        throw HttpException('Wystąpił błąd!');
+      }
+    }
+
     _token = null;
     _refreshToken = null;
     _expiryDate = null;
@@ -162,10 +188,12 @@ class Auth with ChangeNotifier {
       _authTimer.cancel();
       _authTimer = null;
     }
-    notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
+
     prefs.remove('userData');
+    prefs.remove('deviceTok');
     prefs.clear();
+
+    notifyListeners();
   }
 
   void _autoTokenRefresh() {

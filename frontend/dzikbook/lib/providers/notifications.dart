@@ -5,6 +5,7 @@ import 'package:dzikbook/models/HttpException.dart';
 import 'package:dzikbook/models/config.dart';
 
 import 'package:flutter/widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationClass {
   final String title;
@@ -22,27 +23,10 @@ class Notifications with ChangeNotifier {
   Dio dio = new Dio();
   String token;
   int _unreadNotifications = 0;
-  List<NotificationClass> _notifications = [
-    NotificationClass(
-        type: 'invitation_send',
-        title: 'Zaproszenie',
-        body: 'Nowe zaproszenie do znajomych od Maciej Lewandowicz.'),
-    NotificationClass(
-        type: 'invitation_accepted',
-        title: 'Zaproszenie zaakceptowane',
-        body: 'Zaproszenie zaakceptowane przez Maciej Lewandowicz.'),
-    NotificationClass(
-        type: 'like',
-        title: 'Zadzikowano Twój post',
-        body: 'Maciej Lewandowicz zadzikował Twój post'),
-    NotificationClass(
-        type: 'comment',
-        title: 'Skomentowano Twój post',
-        body: 'Maciej Lewandowicz skomentował Twój post.'),
-  ];
+  List<NotificationClass> _notifications = [];
 
   List<NotificationClass> get notifications {
-    return _notifications;
+    return _notifications.reversed.toList();
   }
 
   int get unreadNotifications {
