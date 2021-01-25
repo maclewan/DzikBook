@@ -73,6 +73,8 @@ class CommentsView(APIView):
         try:
             comments_list = Comment.objects.filter(post=post_id)
             context = CommentSerializer(comments_list, many=True).data
+            # for i, comment in enumerate(context):
+            #     comment['id'] = i
         except:
             return Response("Error during loading a comment!", status=status.HTTP_404_NOT_FOUND)
         return Response(context)

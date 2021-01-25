@@ -33,9 +33,23 @@ class RegisterDeviceView(APIView):
             return Response("Invalid data provided!", status=status.HTTP_400_BAD_REQUEST)
 
         device = serializer.create(validated_data=data)
+        device_token = device.token
+        if Device.objects.filter(token=device_token).exists():
+            return Response("Invalid data provided!", status=status.HTTP_400_BAD_REQUEST)
+        
         device.save()
-
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+    @authenticate
+    def delete(self, request):
+        device_token = request.POST.get('deviceToken', None)
+        if device_token is None:
+            return Response("Device token not provided!", status=status.HTTP_400_BAD_REQUEST)
+        
+        devices = Device.objects.filter(token=device_token, user=request.user.id)
+        devices.delete()
+        return Response("Device uninstalled successfully", status=status.HTTP_202_ACCEPTED)
+      
 
 
 class SigInUserNotificationsView(APIView):
@@ -168,6 +182,8 @@ def push_notification(user: int, sender: int, not_type: str):
 
     codes = []
     for device_token in devices_tokens:
+        if device_token is None:
+            continue
         print('Pushing not fot device: '+device_token)
         request_body = {
             'to': device_token,

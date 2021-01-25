@@ -12,7 +12,7 @@ class NotificationSerializer(serializers.ModelSerializer):
         """
         Create and return a new `Notification` instance, given the validated data.
         """
-        return Notification.objects.create(**validated_data)
+        return Notification(**validated_data)
 
     # TODO: zamienić na aktualizację żywotności
     def update(self, instance, validated_data):
