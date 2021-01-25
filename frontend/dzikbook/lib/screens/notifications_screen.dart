@@ -1,7 +1,9 @@
 import 'package:dzikbook/providers/notifications.dart';
+import 'package:dzikbook/providers/posts.dart';
 import 'package:dzikbook/widgets/drawer.dart';
 import 'package:dzikbook/widgets/navbar.dart';
 import 'package:dzikbook/widgets/notification_item.dart';
+import 'package:dzikbook/widgets/post.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

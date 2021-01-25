@@ -243,7 +243,6 @@ class Posts with ChangeNotifier {
             Credentials creds = res[2];
             DateTime now = (DateTime.now().add(Duration(hours: 6)));
             DateTime old = (DateTime.parse(r["timestamp"]));
-            // print(r["timestamp"]);
             Duration timeDuration = now.difference(old);
             timeDuration -= Duration(hours: 6);
 
@@ -438,6 +437,92 @@ class Posts with ChangeNotifier {
       notifyListeners();
     } catch (error) {
       throw HttpException("Operacja nie powiodła się!");
+    }
+  }
+
+  Future<PostModel> fetchSinglePost({String postId}) async {
+    var url;
+    url = "$apiUrl/wall/post/$postId";
+    PostModel post;
+    try {
+      final response = await dio.get(url,
+          options: Options(headers: {
+            "Authorization": "Bearer " + token,
+          }));
+      if (response.statusCode >= 400) {
+        throw HttpException("Operacja nie powiodła się!");
+      }
+      final parsedList = response.data;
+      print(parsedList);
+      await Future.wait([
+        for (final r in [parsedList])
+          Future.wait([
+            fetchPostComments(r["post_id"].toString()),
+            getPostReactions(r["post_id"].toString()),
+            getCredentials(r["author"])
+          ]).then((res) {
+            print("XDDDDDDDDDDDDDDDDDDD");
+            print(r);
+            print("XDDDDDDDDDDDDDDDDDDD");
+            List<CommentModel> comments = res[0];
+            List<dynamic> reactions = res[1];
+            Credentials creds = res[2];
+            DateTime now = (DateTime.now().add(Duration(hours: 6)));
+            DateTime old = (DateTime.parse(r["timestamp"]));
+            // print(r["timestamp"]);
+            Duration timeDuration = now.difference(old);
+            timeDuration -= Duration(hours: 6);
+
+            String time = formatDuration(timeDuration);
+            int secondsTaken = timeDuration.inSeconds;
+            var workouts;
+            if (json.decode(r["additional_data"]) != null) {
+              workouts = json.decode(r["additional_data"]);
+            }
+            post = new PostModel(
+                userId: r["author"].toString(),
+                hasReacted: reactions.contains(int.parse(this.userId)),
+                secondsTaken: secondsTaken,
+                description: r["description"],
+                id: r["post_id"].toString(),
+                userImg: creds.userImg,
+                userName: "${creds.userName} ${creds.lastName}",
+                timeTaken: time,
+                hasImage: r["photo"] != null ? true : false,
+                hasTraining: json.decode(r["additional_data"]) != null,
+                comments: comments,
+                loadedTraining: json.decode(r["additional_data"]) != null
+                    ? Workout(
+                        id: workouts['id'],
+                        name: workouts['name'],
+                        workoutLength: workouts['length'],
+                        exercises: workouts['exercises']
+                            .map<Exercise>(
+                              (e) => Exercise(
+                                id: e['id'],
+                                name: e['name'],
+                                series: int.parse(e['series']),
+                                reps: int.parse(
+                                  e['reps'],
+                                ),
+                                breakTime: int.parse(
+                                  e['breakTime'],
+                                ),
+                              ),
+                            )
+                            .toList(),
+                      )
+                    : null,
+                loadedImg: r["photo"] != null
+                    ? Image.network('$apiUrl${r["photo"]}')
+                    : null,
+                likes: reactions.length);
+          })
+      ]);
+      return post;
+    } catch (error) {
+      print(error);
+      return null;
     }
   }
 }

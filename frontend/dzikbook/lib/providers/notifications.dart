@@ -11,11 +11,13 @@ class NotificationClass {
   final String title;
   final String body;
   final String type;
+  final String postId;
 
   NotificationClass({
     @required this.title,
     @required this.body,
     @required this.type,
+    @required this.postId,
   });
 }
 
@@ -59,15 +61,16 @@ class Notifications with ChangeNotifier {
       final List result = response.data;
       List<NotificationClass> _fetchedNotifications = [];
       for (var r in result) {
+        print(r);
         _fetchedNotifications.add(
           NotificationClass(
             type: r['notification_type'],
             title: r['title'],
             body: r['body'],
+            postId: r['post'],
           ),
         );
       }
-      print(_fetchedNotifications);
       _notifications = _fetchedNotifications;
       notifyListeners();
     } catch (error) {
