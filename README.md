@@ -4,6 +4,9 @@
 * [Głowne informacje](#głowne-informacje)
 * [Opis Aplikacji](#opis-aplikacji)
 
+## Errata
+*Poniższy kod napisany został w czasie studiów i z perspektywy licznych doświadczeń, szczególnie komercyjnych, zostawia on bardzo dużo do życzenia, co należy mieć na uwadze, szczególnie 
+nieudolne posługiwanie się, a właściwie nieposługiwanie się generycznymi rozwiązaniami oferowanymi przez django, viewsetami, serializerami itd itd itd*
 	
 
 ## Technologie
